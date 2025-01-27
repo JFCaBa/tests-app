@@ -4,8 +4,7 @@ import crypto from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { config } from "../backend/src/config/config.js";
-import { User } from "../backend/src/models/index.js";
+import dotenv from "dotenv";
 
 // Get the directory name in ES module
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,10 +28,12 @@ const setupEnvironmentFile = async () => {
     // Check if .env exists
     try {
       await fs.access(envPath);
-      console.log(".env file exists, skipping creation");
+      console.log(".env file exists, loading existing configuration");
+      dotenv.config({ path: envPath });
       return;
     } catch {
       // File doesn't exist, continue with creation
+      console.log(".env file not found, creating new one");
     }
 
     const jwtSecret = generateJwtSecret();
@@ -46,6 +47,7 @@ MAX_FILE_SIZE=10mb`;
 
     await fs.writeFile(envPath, envContent);
     console.log(".env file created successfully with new JWT secret");
+    dotenv.config({ path: envPath });
   } catch (error) {
     console.error("Error setting up .env file:", error);
     throw error;
@@ -57,8 +59,12 @@ const setupDatabase = async () => {
     // Setup environment file first
     await setupEnvironmentFile();
 
+    if (!process.env.MONGODB_URI) {
+      throw new Error("MONGODB_URI is not defined in environment variables");
+    }
+
     // Connect to MongoDB
-    await mongoose.connect(config.mongoURI);
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log("Connected to MongoDB successfully");
 
     // Create indexes
@@ -82,6 +88,18 @@ const setupDatabase = async () => {
     ]);
 
     console.log("Database indexes created successfully");
+
+    // Define User Schema for admin creation
+    const userSchema = new mongoose.Schema({
+      username: String,
+      email: String,
+      password: String,
+      role: String,
+      isActive: Boolean,
+    });
+
+    // Create User model
+    const User = mongoose.model("User", userSchema);
 
     // Check if admin user exists
     const adminExists = await User.findOne({ role: "admin" });
