@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { LogOut, User, Settings, BarChart, Menu } from "lucide-react";
+import { LogOut, User, Settings, BarChart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,12 +59,9 @@ export const MainLayout = () => {
             <div className="flex items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="relative h-8 w-8 rounded-full border-gray-200 hover:bg-gray-100"
-                  >
-                    <Menu className="h-5 w-5 text-gray-700" />
-                  </Button>
+                  <button className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-700" />
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
