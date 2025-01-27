@@ -1,0 +1,30 @@
+{
+  "name": "test-app",
+  "version": "1.0.0",
+  "description": "Educational Testing Application",
+  "main": "index.js",
+  "scripts": {
+    "setup": "node scripts/setup-db.js && npm run install-all",
+    "install-all": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm run dev",
+    "build": "concurrently \"cd backend && npm run build\" \"cd frontend && npm run build\"",
+    "test": "concurrently \"cd backend && npm test\" \"cd frontend && npm test\"",
+    "lint": "concurrently \"cd backend && npm run lint\" \"cd frontend && npm run lint\"",
+    "clean": "rimraf node_modules backend/node_modules frontend/node_modules"
+  },
+  "keywords": [
+    "education",
+    "testing",
+    "learning"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  }
+}

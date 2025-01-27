@@ -1,0 +1,159 @@
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+
+const TestResultSchema = new mongoose.Schema({
+  questionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Question",
+    required: true,
+  },
+  userAnswer: mongoose.Schema.Types.Mixed,
+  correct: Boolean,
+  timeSpent: Number, // Time spent on this question in seconds
+});
+
+const TestHistorySchema = new mongoose.Schema({
+  testDate: {
+    type: Date,
+    default: Date.now,
+  },
+  subject: {
+    type: String,
+    required: true,
+    enum: [
+      "listening",
+      "grammar",
+      "history",
+      "laws",
+      "reading",
+      "writing",
+      "all",
+    ],
+  },
+  score: {
+    type: Number,
+    required: true,
+  },
+  totalQuestions: {
+    type: Number,
+    required: true,
+  },
+  correctAnswers: {
+    type: Number,
+    required: true,
+  },
+  timeSpent: {
+    type: Number,
+    required: true, // Total time spent on test in seconds
+  },
+  questions: [TestResultSchema],
+});
+
+const UserSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      unique: true,
+      trim: true,
+      minlength: [3, "Username must be at least 3 characters long"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email",
+      ],
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters long"],
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    lastLogin: {
+      type: Date,
+    },
+    testHistory: [TestHistorySchema],
+    preferences: {
+      preferredSubjects: [
+        {
+          type: String,
+          enum: [
+            "listening",
+            "grammar",
+            "history",
+            "laws",
+            "reading",
+            "writing",
+          ],
+        },
+      ],
+      notificationEnabled: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Pre-save middleware to hash password
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare password
+UserSchema.methods.comparePassword = async function (candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Method to get user's average score by subject
+UserSchema.methods.getAverageScoreBySubject = function (subject) {
+  const subjectTests = this.testHistory.filter(
+    (test) => test.subject === subject
+  );
+  if (subjectTests.length === 0) return 0;
+
+  const totalScore = subjectTests.reduce((sum, test) => sum + test.score, 0);
+  return totalScore / subjectTests.length;
+};
+
+// Virtual for total tests taken
+UserSchema.virtual("totalTests").get(function () {
+  return this.testHistory.length;
+});
+
+const User = mongoose.model("User", UserSchema);
+
+export default User;
