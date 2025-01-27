@@ -38,10 +38,10 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
+          <CardTitle className="text-2xl font-bold">Login</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -63,6 +63,7 @@ export const LoginForm = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
+                className="w-full"
               />
             </div>
 
@@ -75,6 +76,7 @@ export const LoginForm = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                className="w-full"
               />
             </div>
 

@@ -92,7 +92,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
-    // Clear any cached data or state here
   };
 
   const updateProfile = async (data) => {
