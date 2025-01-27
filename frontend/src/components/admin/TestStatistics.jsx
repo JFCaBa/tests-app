@@ -25,7 +25,7 @@ const TestStatistics = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get("/api/admin/stats");
+        const response = await axios.get("/admin/stats");
         setStats(response.data.tests);
         setLoading(false);
       } catch (error) {

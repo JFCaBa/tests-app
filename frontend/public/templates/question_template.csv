@@ -1,0 +1,4 @@
+subject,type,difficulty,question,options,correctAnswer,active,createdBy
+"grammar","multiple-choice","medium","Select the correct form of the verb:","[{\"text\": \"is\", \"isCorrect\": true}, {\"text\": \"are\", \"isCorrect\": false}, {\"text\": \"be\", \"isCorrect\": false}]",0,true,"admin_id"
+"listening","audio","easy","Listen to the audio and select the correct answer:","[{\"text\": \"Option 1\", \"isCorrect\": false}, {\"text\": \"Option 2\", \"isCorrect\": true}, {\"text\": \"Option 3\", \"isCorrect\": false}]",1,true,"admin_id"
+"writing","writing","hard","Write a paragraph about your favorite book:","[]",null,true,"admin_id"

@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Search, Edit2, Trash2, FileAudio, Image } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  FileAudio,
+  Image,
+  Upload,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import QuestionForm from "./QuestionForm";
+import { BulkQuestionUpload } from "./BulkQuestionUpload";
 
 const subjects = [
   "listening",
@@ -34,19 +43,21 @@ const questionTypes = ["multiple-choice", "writing", "audio"];
 const difficultyLevels = ["easy", "medium", "hard"];
 
 const QuestionManager = () => {
+  console.log("QuestionManager rendering");
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({
-    subject: "",
-    type: "",
-    difficulty: "",
+    subject: "all",
+    type: "all",
+    difficulty: "all",
     search: "",
   });
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [formData, setFormData] = useState({
     subject: "",
     type: "",
@@ -60,7 +71,42 @@ const QuestionManager = () => {
     imageFile: null,
   });
 
-  // ... [Previous fetchQuestions and useEffect remain the same]
+  const resetForm = () => {
+    setFormData({
+      subject: "",
+      type: "",
+      question: "",
+      options: ["", "", "", ""],
+      correctAnswer: 0,
+      difficulty: "medium",
+      explanation: "",
+      sampleResponse: "",
+      audioFile: null,
+      imageFile: null,
+    });
+  };
+
+  const fetchQuestions = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/questions", {
+        params: {
+          ...filters,
+          page,
+        },
+      });
+      setQuestions(response.data.questions);
+      setTotalPages(response.data.pagination.pages);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch questions");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [filters, page]);
 
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
@@ -79,11 +125,11 @@ const QuestionManager = () => {
       });
 
       if (editingQuestion) {
-        await axios.put(`/api/questions/${editingQuestion._id}`, formDataObj, {
+        await axios.put(`/questions/${editingQuestion._id}`, formDataObj, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await axios.post("/api/questions", formDataObj, {
+        await axios.post("/questions", formDataObj, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -97,20 +143,61 @@ const QuestionManager = () => {
     }
   };
 
-  const resetForm = () => {
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this question?")) {
+      try {
+        await axios.delete(`/questions/${id}`);
+        fetchQuestions();
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to delete question");
+      }
+    }
+  };
+
+  const handleEdit = (question) => {
+    setEditingQuestion(question);
     setFormData({
-      subject: "",
-      type: "",
-      question: "",
-      options: ["", "", "", ""],
-      correctAnswer: 0,
-      difficulty: "medium",
-      explanation: "",
-      sampleResponse: "",
+      subject: question.subject,
+      type: question.type,
+      question: question.question,
+      options: question.options,
+      correctAnswer: question.correctAnswer,
+      difficulty: question.difficulty,
+      explanation: question.explanation,
+      sampleResponse: question.sampleResponse,
       audioFile: null,
       imageFile: null,
     });
+    setShowForm(true);
   };
+
+  const handleBulkUploadComplete = () => {
+    setShowBulkUpload(false);
+    fetchQuestions();
+  };
+
+  if (showBulkUpload) {
+    return (
+      <div className="p-6">
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Bulk Upload Questions</CardTitle>
+              <Button
+                variant="outline"
+                onClick={() => setShowBulkUpload(false)}
+              >
+                Back to Questions
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <BulkQuestionUpload onUploadComplete={handleBulkUploadComplete} />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -118,14 +205,199 @@ const QuestionManager = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Question Management</CardTitle>
-            <Button onClick={() => setShowForm(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Question
-            </Button>
+            <div className="flex gap-4">
+              <Button onClick={() => setShowBulkUpload(true)} variant="outline">
+                <Upload className="mr-2 h-4 w-4" />
+                Bulk Upload
+              </Button>
+              <Button onClick={() => setShowForm(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Question
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          {/* ... [Previous filters and table remain the same] */}
+          <div className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex flex-wrap gap-4">
+              <div className="w-full md:w-auto">
+                <Select
+                  value={filters.subject}
+                  onValueChange={(value) =>
+                    setFilters({
+                      ...filters,
+                      subject: value === "all" ? "" : value,
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select Subject" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Subjects</SelectItem>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject.charAt(0).toUpperCase() + subject.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="w-full md:w-auto">
+                <Select
+                  value={filters.type}
+                  onValueChange={(value) =>
+                    setFilters({
+                      ...filters,
+                      type: value === "all" ? "" : value,
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Question Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    {questionTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="w-full md:w-auto">
+                <Select
+                  value={filters.difficulty}
+                  onValueChange={(value) =>
+                    setFilters({
+                      ...filters,
+                      difficulty: value === "all" ? "" : value,
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Difficulty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Difficulties</SelectItem>
+                    {difficultyLevels.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="w-full md:w-auto flex-1">
+                <Input
+                  placeholder="Search questions..."
+                  value={filters.search}
+                  onChange={(e) =>
+                    setFilters({ ...filters, search: e.target.value })
+                  }
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Question</TableHead>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Difficulty</TableHead>
+                    <TableHead>Media</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-4">
+                        Loading...
+                      </TableCell>
+                    </TableRow>
+                  ) : questions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-4">
+                        No questions found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    questions.map((question) => (
+                      <TableRow key={question._id}>
+                        <TableCell className="max-w-md truncate">
+                          {question.question}
+                        </TableCell>
+                        <TableCell>{question.subject}</TableCell>
+                        <TableCell>{question.type}</TableCell>
+                        <TableCell>{question.difficulty}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            {question.audioUrl && (
+                              <FileAudio className="h-4 w-4 text-blue-500" />
+                            )}
+                            {question.imageUrl && (
+                              <Image className="h-4 w-4 text-green-500" />
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(question)}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(question._id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 

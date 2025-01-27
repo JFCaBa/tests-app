@@ -190,7 +190,7 @@ export const TestContainer = () => {
               <SelectContent>
                 <SelectItem value="all">All Subjects</SelectItem>
                 <SelectItem value="listening">Listening</SelectItem>
-                <SelectItem value="grammar">Grammar</SelectItem>
+                <SelectItem value="grammar">Лексика и грамматика</SelectItem>
                 <SelectItem value="history">History</SelectItem>
                 <SelectItem value="laws">Laws</SelectItem>
                 <SelectItem value="reading">Reading</SelectItem>

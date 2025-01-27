@@ -34,7 +34,7 @@ const UserManager = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/admin/users", {
+      const response = await axios.get("/admin/users", {
         params: { page, search, limit: 10 },
       });
       setUsers(response.data.users);
@@ -52,7 +52,7 @@ const UserManager = () => {
 
   const handleUpdateUser = async (userId, updates) => {
     try {
-      await axios.put(`/api/admin/users/${userId}`, updates);
+      await axios.put(`/admin/users/${userId}`, updates);
       fetchUsers();
       setShowEditModal(false);
       setSelectedUser(null);

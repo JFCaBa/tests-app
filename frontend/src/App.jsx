@@ -13,6 +13,7 @@ import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
 import TestStatistics from "./components/admin/TestStatistics";
 import AdminRoute from "./components/auth/AdminRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -54,7 +55,14 @@ const App = () => {
         {/* Admin Routes */}
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="admin/users" element={<UserManager />} />
-        <Route path="admin/questions" element={<QuestionManager />} />
+        <Route
+          path="admin/questions"
+          element={
+            <ErrorBoundary>
+              <QuestionManager />
+            </ErrorBoundary>
+          }
+        />
         <Route path="admin/tests" element={<TestStatistics />} />
       </Route>
 

@@ -20,7 +20,7 @@ const subjects = [
   },
   {
     id: "grammar",
-    name: "Grammar",
+    name: "Лексика и грамматика",
     description: "Master language structure and rules",
     icon: Book,
     color: "bg-green-100 text-green-700",
