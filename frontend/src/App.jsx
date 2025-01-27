@@ -8,6 +8,11 @@ import { SubjectSelection } from "./components/test/SubjectSelection";
 import { PracticeMode } from "./components/test/PracticeMode";
 import { PracticeSession } from "./components/test/PracticeSession";
 import { TestContainer } from "./components/test/TestContainer";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import UserManager from "./components/admin/UserManager";
+import QuestionManager from "./components/admin/QuestionManager";
+import TestStatistics from "./components/admin/TestStatistics";
+import AdminRoute from "./components/auth/AdminRoute";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -45,6 +50,12 @@ const App = () => {
         <Route path="practice/:subject" element={<PracticeMode />} />
         <Route path="practice/:subject/:mode" element={<PracticeSession />} />
         <Route path="test" element={<TestContainer />} />
+
+        {/* Admin Routes */}
+        <Route path="admin" element={<AdminDashboard />} />
+        <Route path="admin/users" element={<UserManager />} />
+        <Route path="admin/questions" element={<QuestionManager />} />
+        <Route path="admin/tests" element={<TestStatistics />} />
       </Route>
 
       {/* Catch all */}

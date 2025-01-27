@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { LogOut, User, Settings, BarChart } from "lucide-react";
+import { LogOut, User, Settings, BarChart, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,29 +60,46 @@ export const MainLayout = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
+                    variant="outline"
+                    className="relative h-8 w-8 rounded-full border-gray-200 hover:bg-gray-100"
                   >
-                    <User className="h-5 w-5" />
+                    <Menu className="h-5 w-5 text-gray-700" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-white border border-gray-200 shadow-md"
+                >
+                  <DropdownMenuLabel className="font-bold text-gray-900">
+                    My Account
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-gray-200" />
+                  <DropdownMenuItem
+                    onClick={() => navigate("/profile")}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <DropdownMenuItem
+                    onClick={() => navigate("/settings")}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/statistics")}>
+                  <DropdownMenuItem
+                    onClick={() => navigate("/statistics")}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
                     <BarChart className="mr-2 h-4 w-4" />
                     Statistics
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuSeparator className="bg-gray-200" />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer hover:bg-gray-100 text-red-600 hover:text-red-700"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
