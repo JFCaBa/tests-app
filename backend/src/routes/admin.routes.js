@@ -131,6 +131,7 @@ router.post(
       question: q.question,
       options: q.options,
       correctAnswer: q.correctAnswer,
+      sampleResponse: q.sampleResponse,
       active: q.active,
       createdBy: req.user._id,
     }));

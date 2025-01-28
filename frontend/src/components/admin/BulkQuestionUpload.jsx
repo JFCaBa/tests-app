@@ -68,7 +68,7 @@ export const BulkQuestionUpload = ({ onUploadComplete }) => {
       setJsonContent(""); // Clear the form after successful upload
       setPreview(null);
     } catch (err) {
-      console.error("Upload error:", err.response || err);
+      console.error("Upload error:", err);
       setError(
         err.response?.data?.message ||
           err.message ||

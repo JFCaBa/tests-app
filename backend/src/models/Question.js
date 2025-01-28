@@ -60,7 +60,7 @@ const QuestionSchema = new mongoose.Schema(
     sampleResponse: {
       type: String,
       required: function () {
-        return this.type === "writing";
+        return this.type === "writing" ? true : false;
       },
     },
     explanation: {
