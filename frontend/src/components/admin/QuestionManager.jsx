@@ -89,12 +89,27 @@ const QuestionManager = () => {
   const fetchQuestions = async () => {
     try {
       setLoading(true);
+
+      // Clean up filters before sending
+      const cleanFilters = {
+        ...filters,
+        subject: filters.subject === "all" ? undefined : filters.subject,
+        type: filters.type === "all" ? undefined : filters.type,
+        difficulty:
+          filters.difficulty === "all" ? undefined : filters.difficulty,
+        search: filters.search || undefined,
+        page,
+      };
+
+      // Remove undefined values
+      const queryParams = Object.fromEntries(
+        Object.entries(cleanFilters).filter(([_, value]) => value !== undefined)
+      );
+
       const response = await axios.get("/questions", {
-        params: {
-          ...filters,
-          page,
-        },
+        params: queryParams,
       });
+
       setQuestions(response.data.questions);
       setTotalPages(response.data.pagination.pages);
     } catch (err) {

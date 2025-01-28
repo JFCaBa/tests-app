@@ -43,6 +43,124 @@ router.get(
   })
 );
 
+// @route   GET /api/questions/practice
+// @desc    Get practice questions
+// @access  Private
+router.get(
+  "/practice",
+  auth.required,
+  asyncHandler(async (req, res) => {
+    const { subject, mode, difficulty } = req.query;
+    const query = { active: true };
+
+    if (subject && subject !== "all") query.subject = subject;
+    if (difficulty && difficulty !== "all") query.difficulty = difficulty;
+
+    // Get random question based on mode
+    const question = await Question.aggregate([
+      { $match: query },
+      { $sample: { size: 1 } },
+      {
+        $project:
+          mode === "practice"
+            ? {
+                // Include all fields in practice mode
+                _id: 1,
+                question: 1,
+                subject: 1,
+                type: 1,
+                difficulty: 1,
+                options: 1,
+                audioUrl: 1,
+                imageUrl: 1,
+                timeLimit: 1,
+                correctAnswer: 1,
+                explanation: 1,
+              }
+            : {
+                // Exclude sensitive fields in test mode
+                correctAnswer: 0,
+                explanation: 0,
+                statistics: 0,
+              },
+      },
+    ]).then((results) => results[0]);
+
+    if (!question) {
+      return res
+        .status(404)
+        .json({ message: "No questions available for the selected criteria" });
+    }
+
+    res.json(question);
+  })
+);
+
+// @route   POST /api/questions/check
+// @desc    Check answer for practice question
+// @access  Private
+router.post(
+  "/check",
+  auth.required,
+  asyncHandler(async (req, res) => {
+    const { questionId, answer, timeSpent } = req.body;
+    const question = await Question.findById(questionId);
+
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    let isCorrect = false;
+    const responseData = {
+      correct: false,
+      explanation: question.explanation || "",
+    };
+
+    switch (question.type) {
+      case "multiple-choice":
+        isCorrect = answer === question.correctAnswer;
+        responseData.correct = isCorrect;
+        responseData.correctAnswer = question.correctAnswer;
+        break;
+
+      case "writing":
+        // For writing questions, we might want to implement more sophisticated checking
+        responseData.sampleResponse = question.sampleResponse;
+        break;
+
+      case "audio":
+        isCorrect = answer === question.correctAnswer;
+        responseData.correct = isCorrect;
+        responseData.correctAnswer = question.correctAnswer;
+        break;
+
+      default:
+        return res.status(400).json({ message: "Invalid question type" });
+    }
+
+    // Update question statistics
+    question.statistics = question.statistics || {};
+    question.statistics.timesAnswered =
+      (question.statistics.timesAnswered || 0) + 1;
+    if (isCorrect) {
+      question.statistics.timesCorrect =
+        (question.statistics.timesCorrect || 0) + 1;
+    }
+
+    // Update average time spent if provided
+    if (timeSpent) {
+      const oldTotal =
+        (question.statistics.timesAnswered - 1) *
+        (question.statistics.averageTimeSpent || 0);
+      question.statistics.averageTimeSpent =
+        (oldTotal + timeSpent) / question.statistics.timesAnswered;
+    }
+
+    await question.save();
+    res.json(responseData);
+  })
+);
+
 // @route   POST /api/questions
 // @desc    Create a new question
 // @access  Admin
@@ -100,10 +218,8 @@ router.put(
       return res.status(404).json({ message: "Question not found" });
     }
 
-    // Update fields
     const updateData = { ...req.body };
 
-    // Handle file uploads if any
     if (req.files) {
       if (req.files.audio) {
         updateData.audioUrl = req.files.audio[0].path;
@@ -134,7 +250,6 @@ router.delete(
       return res.status(404).json({ message: "Question not found" });
     }
 
-    // Soft delete
     question.active = false;
     await question.save();
 

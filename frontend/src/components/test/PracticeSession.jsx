@@ -75,7 +75,8 @@ export const PracticeSession = () => {
     setFeedback({
       correct: false,
       message:
-        "Time's up! The correct answer was: " + currentQuestion.correctAnswer,
+        "Time's up! The correct answer was: " +
+        currentQuestion.options[currentQuestion.correctAnswer].text,
     });
   };
 
@@ -91,9 +92,33 @@ export const PracticeSession = () => {
       });
 
       const isCorrect = response.data.correct;
+      let feedbackMessage = "";
+
+      if (isCorrect) {
+        feedbackMessage = "Correct!";
+      } else {
+        // Get the correct answer text from the current question's options
+        if (
+          currentQuestion.type === "multiple-choice" &&
+          Array.isArray(currentQuestion.options) &&
+          response.data.correctAnswer !== undefined
+        ) {
+          feedbackMessage = `Incorrect. The correct answer was: ${
+            currentQuestion.options[response.data.correctAnswer].text
+          }`;
+        } else {
+          feedbackMessage = "Incorrect.";
+        }
+
+        // Add explanation if available
+        if (response.data.explanation) {
+          feedbackMessage += ` ${response.data.explanation}`;
+        }
+      }
+
       setFeedback({
         correct: isCorrect,
-        message: response.data.explanation,
+        message: feedbackMessage,
       });
 
       setStats((prev) => ({
@@ -104,6 +129,7 @@ export const PracticeSession = () => {
 
       setProgress((stats.total + 1) * (100 / questionCount));
     } catch (err) {
+      console.error("Answer submission error:", err);
       setError(err.response?.data?.message || "Failed to check answer");
     }
   };
@@ -145,7 +171,7 @@ export const PracticeSession = () => {
                 onClick={() => !feedback && handleAnswer(index)}
                 disabled={!!feedback}
               >
-                {option}
+                {option.text}
               </Button>
             ))}
           </div>
@@ -175,7 +201,7 @@ export const PracticeSession = () => {
                 onClick={() => !feedback && handleAnswer(index)}
                 disabled={!!feedback}
               >
-                {option}
+                {option.text}
               </Button>
             ))}
           </div>

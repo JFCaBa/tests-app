@@ -82,7 +82,12 @@ const QuestionSchema = new mongoose.Schema(
         default: 1,
       },
     },
+    timeLimit: {
+      type: Number,
+      default: 60,
+    },
     statistics: {
+      timesAttempted: { type: Number, default: 0 },
       timesAnswered: {
         type: Number,
         default: 0,
@@ -145,6 +150,21 @@ QuestionSchema.pre("save", function (next) {
   }
   next();
 });
+
+// Method for checking answers
+QuestionSchema.methods.checkAnswer = function (answer) {
+  switch (this.type) {
+    case "multiple-choice":
+      return this.correctAnswer === answer;
+    case "writing":
+      // Implement writing evaluation logic
+      return true; // Placeholder
+    case "audio":
+      return this.correctAnswer === answer;
+    default:
+      return false;
+  }
+};
 
 const Question = mongoose.model("Question", QuestionSchema);
 

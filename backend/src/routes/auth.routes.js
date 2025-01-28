@@ -42,6 +42,7 @@ router.post(
         username: user.username,
         email: user.email,
         role: user.role,
+        preferences: user.preferences,
       },
     });
   })
@@ -83,6 +84,7 @@ router.post(
         username: user.username,
         email: user.email,
         role: user.role,
+        preferences: user.preferences,
       },
     });
   })

@@ -122,24 +122,20 @@ router.post(
   "/bulk-questions",
   asyncHandler(async (req, res) => {
     const { questions } = req.body;
-    const results = await Promise.all(
-      questions.map(async (question) => {
-        if (question._id) {
-          // Update existing question
-          return Question.findByIdAndUpdate(question._id, question, {
-            new: true,
-            runValidators: true,
-          });
-        } else {
-          // Create new question
-          return Question.create({
-            ...question,
-            createdBy: req.user._id,
-          });
-        }
-      })
-    );
 
+    // Validate question format
+    const validatedQuestions = questions.map((q) => ({
+      subject: q.subject,
+      type: q.type,
+      difficulty: q.difficulty,
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.correctAnswer,
+      active: q.active,
+      createdBy: req.user._id,
+    }));
+
+    const results = await Question.insertMany(validatedQuestions);
     res.json(results);
   })
 );

@@ -40,7 +40,7 @@ router.post(
     }
 
     res.json({
-      testId: Date.now().toString(), // In a real app, you'd create a Test document
+      testId: new mongoose.Types.ObjectId(), // Generate proper test ID
       questions,
       timeLimit: questions.reduce(
         (sum, q) => sum + (q.metadata?.timeLimit || 60),
@@ -108,7 +108,14 @@ router.post(
       totalQuestions: answers.length,
       correctAnswers: correctCount,
       timeSpent,
-      results,
+      results: answers.map((answer) => ({
+        questionId: answer.questionId,
+        correct: answer.isCorrect,
+        userAnswer: answer.answer,
+        correctAnswer: questions.find(
+          (q) => q._id.toString() === answer.questionId
+        ).correctAnswer,
+      })),
     });
   })
 );
