@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import TextFormatter from "../common/TextFormatter";
 import { AudioQuestion } from "./AudioQuestion";
 
 const QuestionTypes = {
@@ -38,6 +39,8 @@ export const PracticeSession = () => {
     total: 0,
     streak: 0,
   });
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
 
   useEffect(() => {
     fetchQuestion();
@@ -51,6 +54,7 @@ export const PracticeSession = () => {
         params: { subject, mode, difficulty },
       });
       setCurrentQuestion(response.data);
+      console.log(response.data);
       if (mode === "timed") {
         setTimeLeft(response.data.timeLimit || 60);
       }
@@ -90,12 +94,20 @@ export const PracticeSession = () => {
   const handleAnswer = async (answer) => {
     if (feedback) return;
 
+    // Calculate time spent on this question
+    const timeSpentOnQuestion = Math.floor(
+      (Date.now() - questionStartTime) / 1000
+    );
+    setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
+
     try {
       const response = await axios.post("/questions/check", {
         questionId: currentQuestion._id,
         answer,
         timeSpent:
-          mode === "timed" ? currentQuestion.timeLimit - timeLeft : null,
+          mode === "timed"
+            ? currentQuestion.timeLimit - timeLeft
+            : timeSpentOnQuestion,
       });
 
       const isCorrect = response.data.correct;
@@ -144,11 +156,27 @@ export const PracticeSession = () => {
 
     if (stats.total >= questionCount) {
       navigate("/practice/summary", {
-        state: { stats, subject, mode, difficulty },
+        state: {
+          stats: {
+            ...stats,
+            timeSpent: totalTimeSpent,
+          },
+          subject,
+          mode,
+          difficulty,
+        },
       });
     } else {
       fetchQuestion();
     }
+  };
+
+  const getOptionText = (option) => {
+    if (typeof option === "string") return option;
+    if (typeof option === "object" && option !== null) {
+      return option.text || "";
+    }
+    return "";
   };
 
   const renderQuestion = () => {
@@ -158,11 +186,11 @@ export const PracticeSession = () => {
       case QuestionTypes.MULTIPLE_CHOICE:
         return (
           <div className="space-y-4">
-            {currentQuestion.options.map((option, index) => (
+            {(currentQuestion.options || []).map((option, index) => (
               <Button
                 key={index}
                 variant={userAnswer === index ? "default" : "outline"}
-                className={`w-full justify-start ${
+                className={`w-full justify-start text-left whitespace-normal ${
                   feedback &&
                   (feedback.correct && userAnswer === index
                     ? "bg-green-100"
@@ -175,7 +203,7 @@ export const PracticeSession = () => {
                 onClick={() => !feedback && handleAnswer(index)}
                 disabled={!!feedback}
               >
-                {option.text}
+                <TextFormatter text={getOptionText(option)} />
               </Button>
             ))}
           </div>
@@ -211,7 +239,10 @@ export const PracticeSession = () => {
             {feedback && currentQuestion.sampleResponse && (
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-medium mb-2">Sample Response:</h4>
-                <p>{currentQuestion.sampleResponse}</p>
+                <TextFormatter
+                  text={currentQuestion.sampleResponse}
+                  className="text-gray-700"
+                />
               </div>
             )}
           </div>
@@ -263,19 +294,19 @@ export const PracticeSession = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>{currentQuestion?.question}</CardTitle>
+          <CardTitle>
+            <TextFormatter
+              text={currentQuestion?.question}
+              className="text-lg leading-relaxed"
+            />
+          </CardTitle>
         </CardHeader>
         <CardContent>{renderQuestion()}</CardContent>
         {feedback && (
           <CardFooter className="flex flex-col items-stretch space-y-4">
-            <Alert
-              variant={feedback.correct ? "default" : "destructive"}
-              className={feedback.correct ? "bg-green-100" : "bg-red-100"}
-            >
-              <AlertDescription
-                className={feedback.correct ? "text-green-800" : "text-red-800"}
-              >
-                {feedback.message}
+            <Alert variant={feedback.correct ? "default" : "destructive"}>
+              <AlertDescription>
+                <TextFormatter text={feedback.message} />
               </AlertDescription>
             </Alert>
             <Button onClick={handleNext}>
@@ -287,3 +318,5 @@ export const PracticeSession = () => {
     </div>
   );
 };
+
+export default PracticeSession;

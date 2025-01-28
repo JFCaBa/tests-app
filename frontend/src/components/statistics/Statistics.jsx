@@ -34,7 +34,7 @@ export const Statistics = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get("/api/tests/stats");
+        const response = await axios.get("/tests/stats");
         setStats(response.data);
       } catch (error) {
         console.error("Error fetching statistics:", error);

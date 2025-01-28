@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useState, useEffect } from "react";
+import { useSettings } from "../../contexts/SettingsContext";
 import {
   Card,
   CardContent,
@@ -27,17 +27,16 @@ import {
 } from "@/components/ui/select";
 
 export const Settings = () => {
-  const { user, updateProfile } = useAuth();
-  const [preferences, setPreferences] = useState({
-    notificationEnabled: user?.preferences?.notificationEnabled ?? true,
-    preferredSubjects: user?.preferences?.preferredSubjects || [],
-    defaultDifficulty: user?.preferences?.defaultDifficulty || "medium",
-    questionsPerTest: user?.preferences?.questionsPerTest || 10,
-    ...user?.preferences,
-  });
+  const { settings, updateSettings } = useSettings();
+  const [preferences, setPreferences] = useState({ ...settings });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Update local preferences when settings change
+  useEffect(() => {
+    setPreferences({ ...settings });
+  }, [settings]);
 
   const subjects = [
     { id: "listening", name: "Listening" },
@@ -89,13 +88,24 @@ export const Settings = () => {
     setSuccess("");
 
     try {
-      await updateProfile({ preferences });
+      // Make a deep copy of preferences to ensure no reference issues
+      const updatedSettings = JSON.parse(JSON.stringify(preferences));
+      await updateSettings(updatedSettings);
       setSuccess("Settings updated successfully");
     } catch (err) {
       setError(err.message || "Failed to update settings");
+      // Revert to previous settings on error
+      setPreferences({ ...settings });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Reset function in case something goes wrong
+  const handleReset = () => {
+    setPreferences({ ...settings });
+    setError("");
+    setSuccess("");
   };
 
   return (
@@ -153,7 +163,7 @@ export const Settings = () => {
               <div key={subject.id} className="flex items-center space-x-2">
                 <Switch
                   id={subject.id}
-                  checked={preferences.preferredSubjects.includes(subject.id)}
+                  checked={preferences.preferredSubjects?.includes(subject.id)}
                   onCheckedChange={() => handleToggleSubject(subject.id)}
                 />
                 <Label htmlFor={subject.id}>{subject.name}</Label>
@@ -194,7 +204,7 @@ export const Settings = () => {
           <div className="space-y-2">
             <Label>Questions per Test</Label>
             <Select
-              value={preferences.questionsPerTest.toString()}
+              value={preferences.questionsPerTest?.toString()}
               onValueChange={handleQuestionsPerTestChange}
             >
               <SelectTrigger>
@@ -211,7 +221,10 @@ export const Settings = () => {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={handleReset} disabled={loading}>
+          Reset Changes
+        </Button>
         <Button
           onClick={handleSave}
           disabled={loading}

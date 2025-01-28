@@ -91,6 +91,20 @@ const QuestionSchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+      byDifficulty: {
+        easy: {
+          attempts: { type: Number, default: 0 },
+          correct: { type: Number, default: 0 },
+        },
+        medium: {
+          attempts: { type: Number, default: 0 },
+          correct: { type: Number, default: 0 },
+        },
+        hard: {
+          attempts: { type: Number, default: 0 },
+          correct: { type: Number, default: 0 },
+        },
+      },
     },
     active: {
       type: Boolean,
@@ -111,18 +125,43 @@ const QuestionSchema = new mongoose.Schema(
 // Index for efficient querying
 QuestionSchema.index({ subject: 1, type: 1, difficulty: 1, active: 1 });
 
-// Method to update statistics
-QuestionSchema.methods.updateStatistics = function (correct, timeSpent) {
+// Method to update statistics - now returns a Promise
+QuestionSchema.methods.updateStatistics = async function (answer, timeSpent) {
+  // Check if answer is correct based on question type
+  const isCorrect = this.checkAnswer(answer);
+
+  // Update general statistics
+  this.statistics.timesAttempted += 1;
   this.statistics.timesAnswered += 1;
-  if (correct) {
+
+  if (isCorrect) {
     this.statistics.timesCorrect += 1;
   }
 
+  // Update difficulty-specific statistics
+  if (this.difficulty) {
+    this.statistics.byDifficulty[this.difficulty].attempts += 1;
+    if (isCorrect) {
+      this.statistics.byDifficulty[this.difficulty].correct += 1;
+    }
+  }
+
   // Update average time spent
-  const oldTotal =
-    (this.statistics.timesAnswered - 1) * this.statistics.averageTimeSpent;
-  this.statistics.averageTimeSpent =
-    (oldTotal + timeSpent) / this.statistics.timesAnswered;
+  if (timeSpent) {
+    const oldTotal =
+      (this.statistics.timesAnswered - 1) * this.statistics.averageTimeSpent;
+    this.statistics.averageTimeSpent =
+      (oldTotal + timeSpent) / this.statistics.timesAnswered;
+  }
+
+  // Save the updates
+  await this.save();
+
+  return {
+    isCorrect,
+    statistics: this.statistics,
+    successRate: this.successRate,
+  };
 };
 
 // Virtual for success rate

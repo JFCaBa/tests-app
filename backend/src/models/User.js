@@ -9,7 +9,7 @@ const TestResultSchema = new mongoose.Schema({
   },
   userAnswer: mongoose.Schema.Types.Mixed,
   correct: Boolean,
-  timeSpent: Number, // Time spent on this question in seconds
+  timeSpent: Number,
 });
 
 const TestHistorySchema = new mongoose.Schema({
@@ -44,10 +44,36 @@ const TestHistorySchema = new mongoose.Schema({
   },
   timeSpent: {
     type: Number,
-    required: true, // Total time spent on test in seconds
+    required: true,
   },
   questions: [TestResultSchema],
 });
+
+const StatisticsSchema = new mongoose.Schema(
+  {
+    totalAnswered: {
+      type: Number,
+      default: 0,
+    },
+    totalCorrect: {
+      type: Number,
+      default: 0,
+    },
+    bySubject: {
+      type: Map,
+      of: new mongoose.Schema(
+        {
+          answered: { type: Number, default: 0 },
+          correct: { type: Number, default: 0 },
+          averageTimeSpent: { type: Number, default: 0 },
+        },
+        { _id: false }
+      ),
+      default: new Map(),
+    },
+  },
+  { _id: false }
+);
 
 const UserSchema = new mongoose.Schema(
   {
@@ -86,6 +112,10 @@ const UserSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
+    statistics: {
+      type: StatisticsSchema,
+      default: () => ({}),
+    },
     testHistory: [TestHistorySchema],
     preferences: {
       preferredSubjects: [
@@ -106,10 +136,6 @@ const UserSchema = new mongoose.Schema(
         default: true,
       },
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     timestamps: true,
@@ -119,7 +145,6 @@ const UserSchema = new mongoose.Schema(
 // Pre-save middleware to hash password
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -138,20 +163,10 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   }
 };
 
-// Method to get user's average score by subject
-UserSchema.methods.getAverageScoreBySubject = function (subject) {
-  const subjectTests = this.testHistory.filter(
-    (test) => test.subject === subject
-  );
-  if (subjectTests.length === 0) return 0;
-
-  const totalScore = subjectTests.reduce((sum, test) => sum + test.score, 0);
-  return totalScore / subjectTests.length;
-};
-
-// Virtual for total tests taken
-UserSchema.virtual("totalTests").get(function () {
-  return this.testHistory.length;
+// Virtual for success rate
+UserSchema.virtual("successRate").get(function () {
+  if (!this.statistics || this.statistics.totalAnswered === 0) return 0;
+  return (this.statistics.totalCorrect / this.statistics.totalAnswered) * 100;
 });
 
 const User = mongoose.model("User", UserSchema);

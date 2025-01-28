@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { useSettings } from "../../contexts/SettingsContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,6 +26,7 @@ const QuestionTypes = {
 };
 
 export const TestContainer = () => {
+  const { settings } = useSettings();
   const [subject, setSubject] = useState("all");
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,7 +42,8 @@ export const TestContainer = () => {
     try {
       const response = await axios.post("/tests/start", {
         subject,
-        questionCount: 10,
+        difficulty: settings.defaultDifficulty,
+        questionCount: settings.questionsPerTest,
       });
       setQuestions(response.data.questions);
       setTestStarted(true);
@@ -190,7 +193,7 @@ export const TestContainer = () => {
               <SelectContent>
                 <SelectItem value="all">All Subjects</SelectItem>
                 <SelectItem value="listening">Listening</SelectItem>
-                <SelectItem value="grammar">Лексика и грамматика</SelectItem>
+                <SelectItem value="grammar">Grammar</SelectItem>
                 <SelectItem value="history">History</SelectItem>
                 <SelectItem value="laws">Laws</SelectItem>
                 <SelectItem value="reading">Reading</SelectItem>
@@ -251,3 +254,5 @@ export const TestContainer = () => {
     </Card>
   );
 };
+
+export default TestContainer;

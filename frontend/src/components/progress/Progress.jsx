@@ -37,8 +37,8 @@ export const Progress = () => {
     const fetchProgress = async () => {
       try {
         const [testsResponse, statsResponse] = await Promise.all([
-          axios.get("/api/tests/history"),
-          axios.get("/api/tests/stats"),
+          axios.get("/tests/history"),
+          axios.get("/tests/stats"),
         ]);
 
         setProgressData({

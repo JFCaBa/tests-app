@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Timer, Target, Infinity, Book } from "lucide-react";
+import { useSettings } from "../../contexts/SettingsContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -51,12 +52,19 @@ const practiceTypes = [
 export const PracticeMode = () => {
   const { subject } = useParams();
   const navigate = useNavigate();
-  const [difficulty, setDifficulty] = useState("medium");
-  const [questionCount, setQuestionCount] = useState("10");
+  const { settings } = useSettings();
+
+  const [difficulty, setDifficulty] = useState(settings.defaultDifficulty);
+  const [questionCount, setQuestionCount] = useState(
+    settings.questionsPerTest.toString()
+  );
 
   const handleStartPractice = (practiceType) => {
     navigate(`/practice/${subject}/${practiceType}`, {
-      state: { difficulty, questionCount: parseInt(questionCount, 10) },
+      state: {
+        difficulty,
+        questionCount: parseInt(questionCount, 10),
+      },
     });
   };
 
@@ -135,3 +143,5 @@ export const PracticeMode = () => {
     </div>
   );
 };
+
+export default PracticeMode;

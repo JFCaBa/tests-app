@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import { SettingsProvider } from "./contexts/SettingsContext";
 import { MainLayout } from "./components/layout/MainLayout";
 import { LoginForm } from "./components/auth/LoginForm";
 import { RegisterForm } from "./components/auth/RegisterForm";
@@ -12,11 +13,11 @@ import { Profile } from "./components/profile/Profile";
 import { Settings } from "./components/settings/Settings";
 import { Statistics } from "./components/statistics/Statistics";
 import { Progress } from "./components/progress/Progress";
+import { TestSummary } from "./components/test/TestSummary";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
 import TestStatistics from "./components/admin/TestStatistics";
-import AdminRoute from "./components/auth/AdminRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 // Protected Route Component
@@ -36,77 +37,80 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<LoginForm />} />
-      <Route path="/register" element={<RegisterForm />} />
+    <SettingsProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
 
-      {/* Protected Routes */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="/subjects" />} />
-        <Route path="subjects" element={<SubjectSelection />} />
-        <Route path="practice/:subject" element={<PracticeMode />} />
-        <Route path="practice/:subject/:mode" element={<PracticeSession />} />
-        <Route path="test" element={<TestContainer />} />
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/subjects" />} />
+          <Route path="subjects" element={<SubjectSelection />} />
+          <Route path="practice/summary" element={<TestSummary />} />
+          <Route path="practice/:subject" element={<PracticeMode />} />
+          <Route path="practice/:subject/:mode" element={<PracticeSession />} />
+          <Route path="test" element={<TestContainer />} />
 
-        {/* User Settings and Profile Routes */}
-        <Route
-          path="profile"
-          element={
-            <ErrorBoundary>
-              <Profile />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="settings"
-          element={
-            <ErrorBoundary>
-              <Settings />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="statistics"
-          element={
-            <ErrorBoundary>
-              <Statistics />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="progress"
-          element={
-            <ErrorBoundary>
-              <Progress />
-            </ErrorBoundary>
-          }
-        />
+          {/* User Settings and Profile Routes */}
+          <Route
+            path="profile"
+            element={
+              <ErrorBoundary>
+                <Profile />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <ErrorBoundary>
+                <Settings />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="statistics"
+            element={
+              <ErrorBoundary>
+                <Statistics />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="progress"
+            element={
+              <ErrorBoundary>
+                <Progress />
+              </ErrorBoundary>
+            }
+          />
 
-        {/* Admin Routes */}
-        <Route path="admin" element={<AdminDashboard />} />
-        <Route path="admin/users" element={<UserManager />} />
-        <Route
-          path="admin/questions"
-          element={
-            <ErrorBoundary>
-              <QuestionManager />
-            </ErrorBoundary>
-          }
-        />
-        <Route path="admin/tests" element={<TestStatistics />} />
-      </Route>
+          {/* Admin Routes */}
+          <Route path="admin" element={<AdminDashboard />} />
+          <Route path="admin/users" element={<UserManager />} />
+          <Route
+            path="admin/questions"
+            element={
+              <ErrorBoundary>
+                <QuestionManager />
+              </ErrorBoundary>
+            }
+          />
+          <Route path="admin/tests" element={<TestStatistics />} />
+        </Route>
 
-      {/* Catch all */}
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </SettingsProvider>
   );
 };
 

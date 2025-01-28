@@ -1,5 +1,5 @@
 import express from "express";
-import { Question } from "../models/index.js";
+import { Question, User } from "../models/index.js";
 import { auth, upload, validation, errors } from "../middleware/index.js";
 const { asyncHandler } = errors;
 
@@ -97,67 +97,96 @@ router.get(
 );
 
 // @route   POST /api/questions/check
-// @desc    Check answer for practice question
+// @desc    Check answer and update statistics
 // @access  Private
 router.post(
   "/check",
   auth.required,
   asyncHandler(async (req, res) => {
     const { questionId, answer, timeSpent } = req.body;
-    const question = await Question.findById(questionId);
 
+    const question = await Question.findById(questionId);
     if (!question) {
       return res.status(404).json({ message: "Question not found" });
     }
 
-    let isCorrect = false;
-    const responseData = {
-      correct: false,
-      explanation: question.explanation || "",
-    };
+    // Update question statistics and get results
+    const result = await question.updateStatistics(answer, timeSpent);
 
-    switch (question.type) {
-      case "multiple-choice":
-        isCorrect = answer === question.correctAnswer;
-        responseData.correct = isCorrect;
-        responseData.correctAnswer = question.correctAnswer;
-        break;
-
-      case "writing":
-        // For writing questions, we might want to implement more sophisticated checking
-        responseData.sampleResponse = question.sampleResponse;
-        break;
-
-      case "audio":
-        isCorrect = answer === question.correctAnswer;
-        responseData.correct = isCorrect;
-        responseData.correctAnswer = question.correctAnswer;
-        break;
-
-      default:
-        return res.status(400).json({ message: "Invalid question type" });
+    // Find and update user
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Update question statistics
-    question.statistics = question.statistics || {};
-    question.statistics.timesAnswered =
-      (question.statistics.timesAnswered || 0) + 1;
-    if (isCorrect) {
-      question.statistics.timesCorrect =
-        (question.statistics.timesCorrect || 0) + 1;
+    // Ensure statistics object exists
+    if (!user.statistics) {
+      user.statistics = {
+        totalAnswered: 0,
+        totalCorrect: 0,
+        bySubject: new Map(),
+      };
     }
 
-    // Update average time spent if provided
+    // Ensure bySubject map exists
+    if (!user.statistics.bySubject) {
+      user.statistics.bySubject = new Map();
+    }
+
+    // Get or create subject statistics
+    let subjectStats = user.statistics.bySubject.get(question.subject);
+    if (!subjectStats) {
+      subjectStats = {
+        answered: 0,
+        correct: 0,
+        averageTimeSpent: 0,
+      };
+    }
+
+    // Update statistics
+    user.statistics.totalAnswered = (user.statistics.totalAnswered || 0) + 1;
+    if (result.isCorrect) {
+      user.statistics.totalCorrect = (user.statistics.totalCorrect || 0) + 1;
+    }
+
+    // Update subject statistics
+    subjectStats.answered += 1;
+    if (result.isCorrect) {
+      subjectStats.correct += 1;
+    }
+
+    // Update average time spent
     if (timeSpent) {
       const oldTotal =
-        (question.statistics.timesAnswered - 1) *
-        (question.statistics.averageTimeSpent || 0);
-      question.statistics.averageTimeSpent =
-        (oldTotal + timeSpent) / question.statistics.timesAnswered;
+        subjectStats.averageTimeSpent * (subjectStats.answered - 1);
+      subjectStats.averageTimeSpent =
+        (oldTotal + timeSpent) / subjectStats.answered;
     }
 
-    await question.save();
-    res.json(responseData);
+    // Set updated subject statistics
+    user.statistics.bySubject.set(question.subject, subjectStats);
+
+    // Mark statistics as modified to ensure save
+    user.markModified("statistics");
+    await user.save();
+
+    // Convert Map to plain object for response
+    const subjectProgress = Object.fromEntries(user.statistics.bySubject);
+
+    res.json({
+      correct: result.isCorrect,
+      explanation: question.explanation,
+      correctAnswer: question.correctAnswer,
+      statistics: {
+        question: result.statistics,
+        successRate: result.successRate,
+        user: {
+          totalAnswered: user.statistics.totalAnswered,
+          totalCorrect: user.statistics.totalCorrect,
+          subjectProgress: subjectProgress[question.subject] || {},
+        },
+      },
+    });
   })
 );
 
