@@ -284,8 +284,15 @@ export const PracticeSession = () => {
         <CardContent>{renderQuestion()}</CardContent>
         {feedback && (
           <CardFooter className="flex flex-col items-stretch space-y-4">
-            <Alert variant={feedback.correct ? "default" : "destructive"}>
-              <AlertDescription>{feedback.message}</AlertDescription>
+            <Alert
+              variant={feedback.correct ? "default" : "destructive"}
+              className={feedback.correct ? "bg-green-100" : "bg-red-100"}
+            >
+              <AlertDescription
+                className={feedback.correct ? "text-green-800" : "text-red-800"}
+              >
+                {feedback.message}
+              </AlertDescription>
             </Alert>
             <Button onClick={handleNext}>
               {stats.total >= questionCount ? "View Results" : "Next Question"}

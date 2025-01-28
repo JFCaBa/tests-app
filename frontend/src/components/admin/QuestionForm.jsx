@@ -166,6 +166,31 @@ const QuestionForm = ({
                     setFormData({ ...formData, audioFile: e.target.files[0] })
                   }
                 />
+
+                <div className="space-y-2 mt-4">
+                  <label className="block text-sm font-medium">Options</label>
+                  {formData.options.map((option, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={option}
+                        onChange={(e) => {
+                          const newOptions = [...formData.options];
+                          newOptions[index] = e.target.value;
+                          setFormData({ ...formData, options: newOptions });
+                        }}
+                        placeholder={`Option ${index + 1}`}
+                      />
+                      <input
+                        type="radio"
+                        name="correctAnswer"
+                        checked={formData.correctAnswer === index}
+                        onChange={() =>
+                          setFormData({ ...formData, correctAnswer: index })
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

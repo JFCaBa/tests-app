@@ -1,8 +1,9 @@
+import fs from "fs/promises";
 import express from "express";
 import { User, Question } from "../models/index.js";
-import { auth, validation, errors } from "../middleware/index.js";
-const { asyncHandler } = errors;
+import { auth, validation, errors, upload } from "../middleware/index.js";
 
+const { asyncHandler } = errors;
 const router = express.Router();
 
 // All routes require admin privileges
@@ -112,6 +113,79 @@ router.get(
       },
       tests: stats[6][0] || { totalTests: 0, averageScore: 0 },
     });
+  })
+);
+
+// @route   POST /api/admin/question
+// @desc    Add a new question
+// @access  Admin
+router.post(
+  "/question",
+  upload.multiple,
+  asyncHandler(async (req, res) => {
+    try {
+      console.log("Received request:", req.body, req.files);
+
+      // Ensure required fields are present
+      if (!req.body.question || !req.body.subject) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Parse options field (ensure it's an array of objects)
+      let optionsArray = [];
+      if (req.body.options) {
+        try {
+          optionsArray = JSON.parse(req.body.options); // Convert JSON string to array
+          // Validate the structure of each option object
+          optionsArray = optionsArray.map((option) => ({
+            text: option.text || "Default option", // Ensure text is provided
+            isCorrect:
+              typeof option.isCorrect === "boolean" ? option.isCorrect : false,
+          }));
+        } catch (error) {
+          return res
+            .status(400)
+            .json({ message: "Invalid JSON format for options" });
+        }
+      }
+
+      // Create the question first
+      const questionData = {
+        ...req.body,
+        options: optionsArray,
+        createdBy: req.user._id,
+      };
+      let uploadedFiles = []; // Ensure this is initialized
+
+      let question = new Question(questionData);
+
+      if (req.files) {
+        if (req.files.audio) {
+          question.audioUrl = req.files.audio[0].path; // Assign audio URL
+          uploadedFiles.push(req.files.audio[0].path);
+        }
+        if (req.files.image) {
+          question.imageUrl = req.files.image[0].path;
+          uploadedFiles.push(req.files.image[0].path);
+        }
+      }
+
+      // Save the question document after setting all fields
+      question = await question.save();
+
+      res.status(201).json(question);
+    } catch (error) {
+      console.error("Error creating question:", error);
+
+      // Cleanup uploaded files if an error occurs
+      await Promise.all(
+        uploadedFiles.map((file) => fs.unlink(file).catch(() => {}))
+      );
+
+      res
+        .status(400)
+        .json({ message: "Failed to create question", error: error.message });
+    }
   })
 );
 

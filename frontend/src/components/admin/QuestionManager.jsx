@@ -43,7 +43,6 @@ const questionTypes = ["multiple-choice", "writing", "audio"];
 const difficultyLevels = ["easy", "medium", "hard"];
 
 const QuestionManager = () => {
-  console.log("QuestionManager rendering");
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -144,7 +143,7 @@ const QuestionManager = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await axios.post("/questions", formDataObj, {
+        await axios.post("/admin/question", formDataObj, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -154,6 +153,7 @@ const QuestionManager = () => {
       resetForm();
       fetchQuestions();
     } catch (err) {
+      console.log(err);
       setError(err.response?.data?.message || "Failed to save question");
     }
   };

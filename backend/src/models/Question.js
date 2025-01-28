@@ -44,15 +44,6 @@ const QuestionSchema = new mongoose.Schema(
     },
     audioUrl: {
       type: String,
-      required: function () {
-        return this.type === "audio";
-      },
-    },
-    audioDuration: {
-      type: Number, // Duration in seconds
-      required: function () {
-        return this.type === "audio";
-      },
     },
     imageUrl: {
       type: String,
