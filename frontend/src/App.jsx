@@ -8,6 +8,8 @@ import { SubjectSelection } from "./components/test/SubjectSelection";
 import { PracticeMode } from "./components/test/PracticeMode";
 import { PracticeSession } from "./components/test/PracticeSession";
 import { TestContainer } from "./components/test/TestContainer";
+import { Profile } from "./components/profile/Profile";
+import { Settings } from "./components/settings/Settings";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
@@ -51,6 +53,24 @@ const App = () => {
         <Route path="practice/:subject" element={<PracticeMode />} />
         <Route path="practice/:subject/:mode" element={<PracticeSession />} />
         <Route path="test" element={<TestContainer />} />
+
+        {/* User Settings and Profile Routes */}
+        <Route
+          path="profile"
+          element={
+            <ErrorBoundary>
+              <Profile />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <ErrorBoundary>
+              <Settings />
+            </ErrorBoundary>
+          }
+        />
 
         {/* Admin Routes */}
         <Route path="admin" element={<AdminDashboard />} />

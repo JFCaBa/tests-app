@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Users, FileText, BarChart2, Settings } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { Users, FileText, BarChart2, Settings, Book } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BulkQuestionUpload } from "./BulkQuestionUpload";
 import axios from "axios";
 
-const AdminDashboard = () => {
+export const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     users: { total: 0, active: 0, admins: 0 },
     questions: { total: 0, active: 0, bySubject: [] },
     tests: { totalTests: 0, averageScore: 0 },
   });
+  const [loading, setLoading] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
+
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get("/api/admin/stats");
+      setStats(response.data);
+    } catch (error) {
+      console.error("Failed to fetch admin statistics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await axios.get("/admin/stats");
-        setStats(response.data);
-      } catch (error) {
-        console.error("Failed to fetch admin statistics:", error);
-      }
-    };
-
     fetchStats();
   }, []);
 
@@ -51,11 +64,22 @@ const AdminDashboard = () => {
     },
   ];
 
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <Button onClick={() => setShowUpload(true)}>Upload Questions</Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card, index) => {
           const Icon = card.icon;
           return (
@@ -80,24 +104,19 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Manage your test application</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button
-              className="w-full"
-              onClick={() => (window.location.href = "/admin/users")}
-            >
+            <Button className="w-full" onClick={() => navigate("/admin/users")}>
               Manage Users
             </Button>
             <Button
               className="w-full"
-              onClick={() => (window.location.href = "/admin/questions")}
+              onClick={() => navigate("/admin/questions")}
             >
               Manage Questions
             </Button>
-            <Button
-              className="w-full"
-              onClick={() => (window.location.href = "/admin/tests")}
-            >
+            <Button className="w-full" onClick={() => navigate("/admin/tests")}>
               View Test Statistics
             </Button>
           </CardContent>
@@ -106,12 +125,16 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Questions by Subject</CardTitle>
+            <CardDescription>Distribution across subjects</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {stats.questions.bySubject.map((subject, index) => (
                 <div key={index} className="flex justify-between items-center">
-                  <span className="capitalize">{subject._id}</span>
+                  <div className="flex items-center">
+                    <Book className="w-4 h-4 mr-2 text-gray-500" />
+                    <span className="capitalize">{subject._id}</span>
+                  </div>
                   <span className="font-bold">{subject.count}</span>
                 </div>
               ))}
@@ -119,6 +142,25 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {showUpload && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Upload Questions</CardTitle>
+            <CardDescription>
+              Upload questions in bulk using JSON format
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BulkQuestionUpload
+              onUploadComplete={() => {
+                setShowUpload(false);
+                fetchStats();
+              }}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
