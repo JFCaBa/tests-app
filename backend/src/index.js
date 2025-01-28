@@ -8,6 +8,11 @@ import authRoutes from "./routes/auth.routes.js";
 import questionRoutes from "./routes/questions.routes.js";
 import testRoutes from "./routes/tests.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -21,8 +26,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static file serving
-app.use("/uploads", express.static("uploads"));
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -34,6 +39,20 @@ app.use("/api/admin", adminRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!" });
+});
+
+app.get("/debug-static", (req, res) => {
+  const testFile = path.join(
+    uploadsPath,
+    "audio",
+    "audio-1738069076455-15569576.mp3"
+  );
+  res.json({
+    uploadsPath,
+    testFile,
+    exists: fs.existsSync(testFile),
+    files: fs.readdirSync(path.join(uploadsPath, "audio")),
+  });
 });
 
 // Database connection

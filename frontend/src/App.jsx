@@ -10,6 +10,8 @@ import { PracticeSession } from "./components/test/PracticeSession";
 import { TestContainer } from "./components/test/TestContainer";
 import { Profile } from "./components/profile/Profile";
 import { Settings } from "./components/settings/Settings";
+import { Statistics } from "./components/statistics/Statistics";
+import { Progress } from "./components/progress/Progress";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
@@ -68,6 +70,22 @@ const App = () => {
           element={
             <ErrorBoundary>
               <Settings />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="statistics"
+          element={
+            <ErrorBoundary>
+              <Statistics />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="progress"
+          element={
+            <ErrorBoundary>
+              <Progress />
             </ErrorBoundary>
           }
         />

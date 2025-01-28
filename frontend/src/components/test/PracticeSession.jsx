@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Clock, AlertCircle, Play } from "lucide-react";
+import { Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { AudioQuestion } from "./AudioQuestion";
+
+const QuestionTypes = {
+  MULTIPLE_CHOICE: "multiple-choice",
+  WRITING: "writing",
+  AUDIO: "audio",
+};
 
 export const PracticeSession = () => {
   const { subject, mode } = useParams();
@@ -97,11 +104,9 @@ export const PracticeSession = () => {
       if (isCorrect) {
         feedbackMessage = "Correct!";
       } else {
-        // Get the correct answer text from the current question's options
         if (
-          currentQuestion.type === "multiple-choice" &&
-          Array.isArray(currentQuestion.options) &&
-          response.data.correctAnswer !== undefined
+          currentQuestion.type === QuestionTypes.MULTIPLE_CHOICE ||
+          currentQuestion.type === QuestionTypes.AUDIO
         ) {
           feedbackMessage = `Incorrect. The correct answer was: ${
             currentQuestion.options[response.data.correctAnswer].text
@@ -110,7 +115,6 @@ export const PracticeSession = () => {
           feedbackMessage = "Incorrect.";
         }
 
-        // Add explanation if available
         if (response.data.explanation) {
           feedbackMessage += ` ${response.data.explanation}`;
         }
@@ -151,7 +155,7 @@ export const PracticeSession = () => {
     if (!currentQuestion) return null;
 
     switch (currentQuestion.type) {
-      case "multiple-choice":
+      case QuestionTypes.MULTIPLE_CHOICE:
         return (
           <div className="space-y-4">
             {currentQuestion.options.map((option, index) => (
@@ -177,37 +181,17 @@ export const PracticeSession = () => {
           </div>
         );
 
-      case "audio":
+      case QuestionTypes.AUDIO:
         return (
-          <div className="space-y-6">
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => {
-                  // TODO: Implement audio playback
-                  console.log("Playing:", currentQuestion.audioUrl);
-                }}
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Play Audio
-              </Button>
-            </div>
-            {currentQuestion.options.map((option, index) => (
-              <Button
-                key={index}
-                variant={userAnswer === index ? "default" : "outline"}
-                className="w-full justify-start"
-                onClick={() => !feedback && handleAnswer(index)}
-                disabled={!!feedback}
-              >
-                {option.text}
-              </Button>
-            ))}
-          </div>
+          <AudioQuestion
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+            disabled={!!feedback}
+            selectedAnswer={userAnswer}
+          />
         );
 
-      case "writing":
+      case QuestionTypes.WRITING:
         return (
           <div className="space-y-4">
             <textarea
@@ -284,8 +268,15 @@ export const PracticeSession = () => {
         <CardContent>{renderQuestion()}</CardContent>
         {feedback && (
           <CardFooter className="flex flex-col items-stretch space-y-4">
-            <Alert variant={feedback.correct ? "default" : "destructive"}>
-              <AlertDescription>{feedback.message}</AlertDescription>
+            <Alert
+              variant={feedback.correct ? "default" : "destructive"}
+              className={feedback.correct ? "bg-green-100" : "bg-red-100"}
+            >
+              <AlertDescription
+                className={feedback.correct ? "text-green-800" : "text-red-800"}
+              >
+                {feedback.message}
+              </AlertDescription>
             </Alert>
             <Button onClick={handleNext}>
               {stats.total >= questionCount ? "View Results" : "Next Question"}
