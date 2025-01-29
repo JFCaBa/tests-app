@@ -37,7 +37,7 @@ const setupEnvironmentFile = async () => {
     }
 
     const jwtSecret = generateJwtSecret();
-    const envContent = `PORT=3000
+    const envContent = `PORT=1999
 MONGODB_URI=mongodb://localhost:27017/test-app
 JWT_SECRET=${jwtSecret}
 NODE_ENV=development

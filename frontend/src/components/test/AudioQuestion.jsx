@@ -21,8 +21,8 @@ export const AudioQuestion = ({
   const getAudioUrl = (audioPath) => {
     if (!audioPath) return "";
     const filename = audioPath.split("/").pop();
-    // Always use port 3000 for audio files
-    return `http://localhost:3000/uploads/audio/${filename}`;
+    // Always use port 1999 for audio files
+    return `http://localhost:1999/uploads/audio/${filename}`;
   };
 
   const handlePlayPause = () => {
