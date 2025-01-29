@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { config } from "../config";
 
 const AuthContext = createContext(null);
 
@@ -9,8 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Configure axios defaults
-  axios.defaults.baseURL =
-    import.meta.env.VITE_API_URL || "http://localhost:1999/api";
+  axios.defaults.baseURL = config.apiBaseUrl;
+  axios.defaults.withCredentials = true; // Important for CORS with credentials
 
   // Add token to requests if it exists
   axios.interceptors.request.use(
