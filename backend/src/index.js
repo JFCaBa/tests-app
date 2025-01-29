@@ -17,12 +17,17 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    origin: ["http://testmyrussian.com", "http://www.testmyrussian.com"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: [
+    "https://testmyrussian.com",
+    "https://www.testmyrussian.com",
+    "http://localhost:5173",
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

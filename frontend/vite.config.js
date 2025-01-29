@@ -2,32 +2,28 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  const isDevelopment = mode === "development";
-
-  return {
-    plugins: [react()],
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    host: "0.0.0.0",
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:1999",
+        changeOrigin: true,
+        secure: false,
       },
     },
-    server: {
-      host: true,
-      port: 5173,
-      proxy: isDevelopment
-        ? {
-            "/api": {
-              target: "http://localhost:1999",
-              changeOrigin: true,
-              secure: false,
-            },
-          }
-        : undefined,
+    hmr: {
+      clientPort: 443,
+      protocol: "wss",
     },
-    build: {
-      sourcemap: true,
-    },
-  };
+    https: false,
+    allowedHosts: ["testmyrussian.com", "www.testmyrussian.com"],
+  },
 });

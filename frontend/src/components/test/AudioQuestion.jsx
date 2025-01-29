@@ -22,7 +22,7 @@ export const AudioQuestion = ({
     if (!audioPath) return "";
     const filename = audioPath.split("/").pop();
     // Always use port 1999 for audio files
-    return `http://localhost:1999/uploads/audio/${filename}`;
+    return `https://testmyrussian.com/uploads/audio/${filename}`;
   };
 
   const handlePlayPause = () => {
