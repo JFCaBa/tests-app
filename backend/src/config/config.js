@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const config = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 1999,
   mongoURI: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   env: process.env.NODE_ENV || "development",

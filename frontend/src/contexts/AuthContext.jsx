@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
   // Configure axios defaults
   axios.defaults.baseURL =
-    import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+    import.meta.env.VITE_API_URL || "http://localhost:1999/api";
 
   // Add token to requests if it exists
   axios.interceptors.request.use(
