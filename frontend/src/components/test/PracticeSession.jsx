@@ -82,12 +82,36 @@ export const PracticeSession = () => {
     return () => clearInterval(timer);
   }, [timeLeft, mode, feedback]);
 
+  const getCorrectAnswerText = () => {
+    if (!currentQuestion) return "Not available";
+
+    switch (currentQuestion.type) {
+      case QuestionTypes.MULTIPLE_CHOICE:
+      case QuestionTypes.AUDIO:
+        if (
+          currentQuestion.options &&
+          Array.isArray(currentQuestion.options) &&
+          typeof currentQuestion.correctAnswer === "number" &&
+          currentQuestion.options[currentQuestion.correctAnswer]
+        ) {
+          return getOptionText(
+            currentQuestion.options[currentQuestion.correctAnswer]
+          );
+        }
+        return "Not available";
+      case QuestionTypes.WRITING:
+        return (
+          currentQuestion.sampleResponse || "Sample response not available"
+        );
+      default:
+        return "Not available";
+    }
+  };
+
   const handleTimeUp = () => {
     setFeedback({
       correct: false,
-      message:
-        "Time's up! The correct answer was: " +
-        currentQuestion.options[currentQuestion.correctAnswer].text,
+      message: `Time's up! The correct answer was: ${getCorrectAnswerText()}`,
     });
   };
 
@@ -304,9 +328,14 @@ export const PracticeSession = () => {
         <CardContent>{renderQuestion()}</CardContent>
         {feedback && (
           <CardFooter className="flex flex-col items-stretch space-y-4">
-            <Alert variant={feedback.correct ? "default" : "destructive"}>
-              <AlertDescription>
-                <TextFormatter text={feedback.message} />
+            <Alert
+              variant={feedback.correct ? "default" : "destructive"}
+              className={feedback.correct ? "bg-green-100" : "bg-red-100"}
+            >
+              <AlertDescription
+                className={feedback.correct ? "text-green-800" : "text-red-800"}
+              >
+                {feedback.message}
               </AlertDescription>
             </Alert>
             <Button onClick={handleNext}>
