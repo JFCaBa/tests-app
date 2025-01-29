@@ -19,7 +19,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: config.corsOrigin,
+    origin: ["http://testmyrussian.com", "http://www.testmyrussian.com"],
     credentials: true,
   })
 );
