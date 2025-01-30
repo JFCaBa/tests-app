@@ -57,6 +57,7 @@ const QuestionManager = () => {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState(null);
   const [formData, setFormData] = useState({
     subject: "",
     type: "",
@@ -97,7 +98,7 @@ const QuestionManager = () => {
         type: filters.type === "all" ? undefined : filters.type,
         difficulty:
           filters.difficulty === "all" ? undefined : filters.difficulty,
-        search: filters.search || undefined,
+        search: filters.search?.trim() || undefined,
         page,
       };
 
@@ -122,6 +123,30 @@ const QuestionManager = () => {
   useEffect(() => {
     fetchQuestions();
   }, [filters, page]);
+
+  // Cleanup timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
+  const handleSearch = (value) => {
+    // Clear any existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Set a new timeout to update search after typing stops
+    const timeout = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: value }));
+      setPage(1); // Reset to first page when searching
+    }, 500); // 500ms delay
+
+    setSearchTimeout(timeout);
+  };
 
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
@@ -152,7 +177,6 @@ const QuestionManager = () => {
       setShowForm(false);
       setEditingQuestion(null);
       resetForm();
-      // Refresh the questions list
       fetchQuestions();
     } catch (err) {
       console.error(err);
@@ -164,7 +188,6 @@ const QuestionManager = () => {
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
         await axios.delete(`/questions/${id}`);
-        // Refresh the questions list after deletion
         fetchQuestions();
       } catch (err) {
         setError(err.response?.data?.message || "Failed to delete question");
@@ -181,8 +204,8 @@ const QuestionManager = () => {
       options: question.options,
       correctAnswer: question.correctAnswer,
       difficulty: question.difficulty,
-      explanation: question.explanation,
-      sampleResponse: question.sampleResponse,
+      explanation: question.explanation || "",
+      sampleResponse: question.sampleResponse || "",
       audioFile: null,
       imageFile: null,
     });
@@ -197,7 +220,6 @@ const QuestionManager = () => {
 
   const handleBulkUploadComplete = () => {
     setShowBulkUpload(false);
-    // Refresh the questions list after bulk upload
     fetchQuestions();
   };
 
@@ -205,7 +227,6 @@ const QuestionManager = () => {
     setShowForm(false);
     setEditingQuestion(null);
     resetForm();
-    // Refresh the questions list
     fetchQuestions();
   };
 
@@ -334,10 +355,8 @@ const QuestionManager = () => {
               <div className="w-full md:w-auto flex-1">
                 <Input
                   placeholder="Search questions..."
-                  value={filters.search}
-                  onChange={(e) =>
-                    setFilters({ ...filters, search: e.target.value })
-                  }
+                  defaultValue={filters.search}
+                  onChange={(e) => handleSearch(e.target.value)}
                   className="w-full"
                 />
               </div>
