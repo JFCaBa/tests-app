@@ -65,6 +65,13 @@ export const PracticeSession = () => {
     }
   };
 
+  const calculateTimeSpent = () => {
+    return Math.min(
+      Math.floor((Date.now() - questionStartTime) / 1000),
+      mode === "timed" ? currentQuestion.timeLimit || 60 : Infinity
+    );
+  };
+
   useEffect(() => {
     let timer;
     if (mode === "timed" && timeLeft > 0 && !feedback) {
@@ -109,19 +116,26 @@ export const PracticeSession = () => {
   };
 
   const handleTimeUp = () => {
+    setTimerActive(false);
+    const timeSpentOnQuestion = calculateTimeSpent();
+    // Only update total time if no answer was given
+    if (!feedback) {
+      setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
+    }
+
     setFeedback({
       correct: false,
-      message: `Time's up! The correct answer was: ${getCorrectAnswerText()}`,
+      message:
+        "Time's up! The correct answer was: " +
+        currentQuestion.options[currentQuestion.correctAnswer].text,
     });
   };
 
   const handleAnswer = async (answer) => {
     if (feedback) return;
 
-    // Calculate time spent on this question
-    const timeSpentOnQuestion = Math.floor(
-      (Date.now() - questionStartTime) / 1000
-    );
+    setTimerActive(false);
+    const timeSpentOnQuestion = calculateTimeSpent();
     setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
 
     try {
@@ -138,7 +152,7 @@ export const PracticeSession = () => {
       let feedbackMessage = "";
 
       if (isCorrect) {
-        feedbackMessage = "Correct!";
+        feedbackMessage = "Correct! " + (response.data.explanation || "");
       } else {
         if (
           currentQuestion.type === QuestionTypes.MULTIPLE_CHOICE ||
