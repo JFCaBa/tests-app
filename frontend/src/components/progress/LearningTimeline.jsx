@@ -66,11 +66,16 @@ export const LearningTimeline = () => {
   useEffect(() => {
     const fetchTimeline = async () => {
       try {
-        const response = await axios.get("/tests/history");
-        const history = response.data;
+        const [historyResponse, statsResponse] = await Promise.all([
+          axios.get("/api/tests/history"),
+          axios.get("/api/tests/stats"),
+        ]);
+
+        const history = historyResponse.data;
+        const stats = statsResponse.data;
 
         // Transform test history into timeline format
-        const timelineItems = history.map((test) => ({
+        const testItems = history.map((test) => ({
           type: "test_completed",
           title: `Completed ${test.subject} Test`,
           description: `Score: ${test.score}% - ${test.correctAnswers}/${test.totalQuestions} correct`,
@@ -78,7 +83,32 @@ export const LearningTimeline = () => {
           score: test.score,
         }));
 
-        setTimelineData(timelineItems);
+        // Add achievements based on stats
+        const achievements = [];
+        if (stats.totalTests >= 10) {
+          achievements.push({
+            type: "achievement",
+            title: "Dedicated Learner",
+            description: "Completed 10 tests",
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        if (stats.highestScore >= 90) {
+          achievements.push({
+            type: "achievement",
+            title: "Excellence Achieved",
+            description: "Scored 90% or higher on a test",
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        // Combine and sort all items by timestamp
+        const allItems = [...testItems, ...achievements].sort(
+          (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+        );
+
+        setTimelineData(allItems);
       } catch (error) {
         console.error("Failed to fetch timeline data:", error);
       } finally {
@@ -107,10 +137,15 @@ export const LearningTimeline = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Learning Timeline</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <span>Learning Timeline</span>
+          <span className="text-sm font-normal text-gray-500">
+            {timelineData.length} activities
+          </span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-96 pr-4">
+        <ScrollArea className="h-[500px] pr-4">
           {timelineData.length > 0 ? (
             <div className="space-y-6">
               {timelineData.map((item, index) => (

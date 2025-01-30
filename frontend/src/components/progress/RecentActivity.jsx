@@ -43,7 +43,7 @@ export const RecentActivity = () => {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const response = await axios.get("/tests/stats");
+        const response = await axios.get("/api/tests/stats");
         const { recentTests, totalTests, statsBySubject } = response.data;
 
         // Process activity data for the chart
