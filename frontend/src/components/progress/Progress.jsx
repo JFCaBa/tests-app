@@ -25,8 +25,8 @@ import { Progress as ProgressIndicator } from "@/components/ui/progress";
 import { Trophy, Target, TrendingUp, Award, Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { LearningTimeline } from "./components/progress/LearningTimeline";
-import { RecentActivity } from "./components/progress/RecentActivity";
+import { LearningTimeline } from "@/components/progress/LearningTimeline";
+import { RecentActivity } from "@/components/progress/RecentActivity";
 
 import axios from "axios";
 
