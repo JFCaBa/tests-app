@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { MainLayout } from "./components/layout/MainLayout";
+import { LandingPage } from "./components/landing/LandingPage";
 import { LoginForm } from "./components/auth/LoginForm";
 import { RegisterForm } from "./components/auth/RegisterForm";
 import { SubjectSelection } from "./components/test/SubjectSelection";
@@ -14,6 +15,7 @@ import { Settings } from "./components/settings/Settings";
 import { Statistics } from "./components/statistics/Statistics";
 import { Progress } from "./components/progress/Progress";
 import { TestSummary } from "./components/test/TestSummary";
+import { DemoTest } from "./components/demo/DemoTest";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
@@ -29,17 +31,26 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   return children;
 };
 
 const App = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <SettingsProvider>
       <Routes>
         {/* Public Routes */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/subjects" /> : <LandingPage />
+          }
+        />
+        <Route path="/demo" element={<DemoTest />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
 
@@ -52,7 +63,6 @@ const App = () => {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/subjects" />} />
           <Route path="subjects" element={<SubjectSelection />} />
           <Route path="practice/summary" element={<TestSummary />} />
           <Route path="practice/:subject" element={<PracticeMode />} />

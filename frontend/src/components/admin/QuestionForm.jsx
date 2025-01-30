@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Card,
@@ -34,7 +34,7 @@ const difficultyLevels = ["easy", "medium", "hard"];
 const QuestionForm = ({
   formData,
   setFormData,
-  onSubmit: onSubmitProp,
+  onSubmit,
   onClose,
   editingQuestion,
   onSubmitSuccess,
@@ -42,14 +42,37 @@ const QuestionForm = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Effect to properly populate form data when editing
+  useEffect(() => {
+    if (editingQuestion) {
+      setFormData({
+        subject: editingQuestion.subject || "",
+        type: editingQuestion.type || "",
+        question: editingQuestion.question || "",
+        options: Array.isArray(editingQuestion?.options)
+          ? editingQuestion.options.map((opt) =>
+              typeof opt === "string" ? opt : opt.text
+            )
+          : ["", "", "", ""],
+        correctAnswer: editingQuestion.correctAnswer || 0,
+        difficulty: editingQuestion.difficulty || "medium",
+        explanation: editingQuestion.explanation || "",
+        sampleResponse: editingQuestion.sampleResponse || "",
+        audioFile: null,
+        imageFile: null,
+        // Keep track of existing files
+        existingAudioUrl: editingQuestion.audioUrl || null,
+        existingImageUrl: editingQuestion.imageUrl || null,
+      });
+    }
+  }, [editingQuestion, setFormData]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      console.log("Starting question submission...");
-
       const submitFormData = new FormData();
 
       // Basic fields
@@ -61,7 +84,7 @@ const QuestionForm = ({
       // Handle options based on question type
       if (formData.type === "multiple-choice" || formData.type === "audio") {
         const optionsWithCorrect = formData.options
-          .filter((option) => option.trim() !== "") // Remove empty options
+          .filter((option) => option.trim() !== "")
           .map((option, index) => ({
             text: option,
             isCorrect: index === formData.correctAnswer,
@@ -71,15 +94,13 @@ const QuestionForm = ({
         submitFormData.append("correctAnswer", formData.correctAnswer);
       }
 
-      // Handle files
+      // Handle files - only append if new files are selected
       if (formData.type === "audio" && formData.audioFile) {
         submitFormData.append("audio", formData.audioFile);
-        console.log("Added audio file:", formData.audioFile.name);
       }
 
       if (formData.imageFile) {
         submitFormData.append("image", formData.imageFile);
-        console.log("Added image file:", formData.imageFile.name);
       }
 
       // Additional fields
@@ -91,46 +112,35 @@ const QuestionForm = ({
         submitFormData.append("sampleResponse", formData.sampleResponse);
       }
 
-      // Log form data contents
-      for (let [key, value] of submitFormData.entries()) {
-        console.log(
-          "FormData entry:",
-          key,
-          value instanceof File ? value.name : value
-        );
-      }
-
-      const debugFormData = {};
-      submitFormData.forEach((value, key) => {
-        debugFormData[key] = value;
-      });
-      console.log("Final FormData payload:", debugFormData);
-
       // Make the request
-      const response = await axios.post("/admin/question", submitFormData);
-
-      console.log("Question created successfully:", response.data);
+      let response;
+      if (editingQuestion) {
+        response = await axios.put(
+          `/questions/${editingQuestion._id}`,
+          submitFormData
+        );
+      } else {
+        response = await axios.post("/admin/question", submitFormData);
+      }
 
       if (onSubmitSuccess) {
         onSubmitSuccess(response.data);
       }
 
-      if (onClose) {
-        onClose();
-      }
+      onClose();
     } catch (error) {
       console.error("Submission error:", error);
 
       let errorMessage;
       if (error.message === "Network Error") {
         errorMessage =
-          "Connection error. Please check your internet connection and try again.";
+          "Connection error. Please check your internet connection.";
       } else if (error.response?.status === 413) {
         errorMessage = "File too large. Please try a smaller file.";
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else {
-        errorMessage = "Failed to create question. Please try again.";
+        errorMessage = "Failed to save question. Please try again.";
       }
 
       setError(errorMessage);
@@ -144,20 +154,33 @@ const QuestionForm = ({
       return false;
     }
 
-    if (formData.type === "audio" && !formData.audioFile && !editingQuestion) {
+    if (
+      formData.type === "audio" &&
+      !formData.audioFile &&
+      !editingQuestion?.audioUrl &&
+      !formData.existingAudioUrl
+    ) {
       return false;
     }
 
     if (
       (formData.type === "audio" || formData.type === "multiple-choice") &&
-      (!formData.options?.length || formData.correctAnswer === undefined)
+      (!formData.options?.some((opt) =>
+        typeof opt === "string" ? opt.trim() !== "" : opt.text?.trim() !== ""
+      ) ||
+        formData.correctAnswer === undefined)
     ) {
+      return false;
+    }
+
+    if (formData.type === "writing" && !formData.sampleResponse) {
       return false;
     }
 
     return true;
   };
 
+  // Rest of the component remains the same with the form UI
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -179,6 +202,7 @@ const QuestionForm = ({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Subject and Type Selection */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -227,6 +251,7 @@ const QuestionForm = ({
               </div>
             </div>
 
+            {/* Question Text */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Question Text
@@ -240,7 +265,9 @@ const QuestionForm = ({
               />
             </div>
 
-            {formData.type === "multiple-choice" && (
+            {/* Multiple Choice Options */}
+            {(formData.type === "multiple-choice" ||
+              formData.type === "audio") && (
               <div className="space-y-2">
                 <label className="block text-sm font-medium">Options</label>
                 {formData.options.map((option, index) => (
@@ -267,6 +294,7 @@ const QuestionForm = ({
               </div>
             )}
 
+            {/* Writing Sample Response */}
             {formData.type === "writing" && (
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -282,11 +310,18 @@ const QuestionForm = ({
               </div>
             )}
 
+            {/* Audio Upload */}
             {formData.type === "audio" && (
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Audio File
                 </label>
+                {formData.existingAudioUrl && (
+                  <div className="mb-2 text-sm text-gray-500">
+                    Current audio file:{" "}
+                    {formData.existingAudioUrl.split("/").pop()}
+                  </div>
+                )}
                 <Input
                   type="file"
                   accept="audio/*"
@@ -294,38 +329,19 @@ const QuestionForm = ({
                     setFormData({ ...formData, audioFile: e.target.files[0] })
                   }
                 />
-
-                <div className="space-y-2 mt-4">
-                  <label className="block text-sm font-medium">Options</label>
-                  {formData.options.map((option, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={option}
-                        onChange={(e) => {
-                          const newOptions = [...formData.options];
-                          newOptions[index] = e.target.value;
-                          setFormData({ ...formData, options: newOptions });
-                        }}
-                        placeholder={`Option ${index + 1}`}
-                      />
-                      <input
-                        type="radio"
-                        name="correctAnswer"
-                        checked={formData.correctAnswer === index}
-                        onChange={() =>
-                          setFormData({ ...formData, correctAnswer: index })
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
+            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Image (Optional)
               </label>
+              {formData.existingImageUrl && (
+                <div className="mb-2 text-sm text-gray-500">
+                  Current image: {formData.existingImageUrl.split("/").pop()}
+                </div>
+              )}
               <Input
                 type="file"
                 accept="image/*"
@@ -335,6 +351,7 @@ const QuestionForm = ({
               />
             </div>
 
+            {/* Difficulty Selection */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Difficulty
@@ -358,6 +375,7 @@ const QuestionForm = ({
               </Select>
             </div>
 
+            {/* Explanation */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Explanation
@@ -378,7 +396,7 @@ const QuestionForm = ({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading || !validateForm()}>
-            {loading ? "Submitting..." : editingQuestion ? "Update" : "Create"}{" "}
+            {loading ? "Saving..." : editingQuestion ? "Update" : "Create"}{" "}
             Question
           </Button>
         </CardFooter>

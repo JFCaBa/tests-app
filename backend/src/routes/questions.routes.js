@@ -247,8 +247,33 @@ router.put(
       return res.status(404).json({ message: "Question not found" });
     }
 
+    // Create update data object
     const updateData = { ...req.body };
 
+    // Handle options data
+    if (updateData.options) {
+      try {
+        // If options is a string, parse it
+        if (typeof updateData.options === "string") {
+          const parsedOptions = JSON.parse(updateData.options);
+          // Validate the structure of each option
+          if (!Array.isArray(parsedOptions)) {
+            return res
+              .status(400)
+              .json({ message: "Options must be an array" });
+          }
+          updateData.options = parsedOptions.map((option) => ({
+            text: option.text,
+            isCorrect: option.isCorrect,
+          }));
+        }
+      } catch (error) {
+        console.error("Error parsing options:", error);
+        return res.status(400).json({ message: "Invalid options format" });
+      }
+    }
+
+    // Handle file uploads
     if (req.files) {
       if (req.files.audio) {
         updateData.audioUrl = req.files.audio[0].path;
@@ -258,12 +283,29 @@ router.put(
       }
     }
 
-    question = await Question.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    // Remove any undefined or null values
+    Object.keys(updateData).forEach(
+      (key) =>
+        (updateData[key] === undefined || updateData[key] === null) &&
+        delete updateData[key]
+    );
 
-    res.json(question);
+    try {
+      question = await Question.findByIdAndUpdate(req.params.id, updateData, {
+        new: true,
+        runValidators: true,
+      });
+      res.json(question);
+    } catch (error) {
+      // Handle Mongoose validation errors
+      if (error.name === "ValidationError") {
+        return res.status(400).json({
+          message: "Validation Error",
+          details: Object.values(error.errors).map((err) => err.message),
+        });
+      }
+      throw error;
+    }
   })
 );
 

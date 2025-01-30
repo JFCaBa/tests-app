@@ -88,6 +88,7 @@ const QuestionManager = () => {
   const fetchQuestions = async () => {
     try {
       setLoading(true);
+      setError("");
 
       // Clean up filters before sending
       const cleanFilters = {
@@ -143,7 +144,7 @@ const QuestionManager = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await axios.post("/admin/question", formDataObj, {
+        await axios.post("/questions", formDataObj, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -151,9 +152,10 @@ const QuestionManager = () => {
       setShowForm(false);
       setEditingQuestion(null);
       resetForm();
+      // Refresh the questions list
       fetchQuestions();
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError(err.response?.data?.message || "Failed to save question");
     }
   };
@@ -162,6 +164,7 @@ const QuestionManager = () => {
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
         await axios.delete(`/questions/${id}`);
+        // Refresh the questions list after deletion
         fetchQuestions();
       } catch (err) {
         setError(err.response?.data?.message || "Failed to delete question");
@@ -186,8 +189,23 @@ const QuestionManager = () => {
     setShowForm(true);
   };
 
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditingQuestion(null);
+    resetForm();
+  };
+
   const handleBulkUploadComplete = () => {
     setShowBulkUpload(false);
+    // Refresh the questions list after bulk upload
+    fetchQuestions();
+  };
+
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingQuestion(null);
+    resetForm();
+    // Refresh the questions list
     fetchQuestions();
   };
 
@@ -247,7 +265,7 @@ const QuestionManager = () => {
                   onValueChange={(value) =>
                     setFilters({
                       ...filters,
-                      subject: value === "all" ? "" : value,
+                      subject: value,
                     })
                   }
                 >
@@ -271,7 +289,7 @@ const QuestionManager = () => {
                   onValueChange={(value) =>
                     setFilters({
                       ...filters,
-                      type: value === "all" ? "" : value,
+                      type: value,
                     })
                   }
                 >
@@ -295,7 +313,7 @@ const QuestionManager = () => {
                   onValueChange={(value) =>
                     setFilters({
                       ...filters,
-                      difficulty: value === "all" ? "" : value,
+                      difficulty: value,
                     })
                   }
                 >
@@ -421,12 +439,9 @@ const QuestionManager = () => {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleCreateOrUpdate}
-          onClose={() => {
-            setShowForm(false);
-            setEditingQuestion(null);
-            resetForm();
-          }}
+          onClose={handleFormClose}
           editingQuestion={editingQuestion}
+          onSubmitSuccess={handleFormSuccess}
         />
       )}
     </div>
