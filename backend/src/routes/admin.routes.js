@@ -229,6 +229,7 @@ router.post(
         question: req.body.question,
         difficulty: req.body.difficulty || "medium",
         options: options,
+        sampleResponse: req.body.sampleResponse,
         correctAnswer: parseInt(req.body.correctAnswer, 10),
         explanation: req.body.explanation,
         createdBy: req.user._id,
