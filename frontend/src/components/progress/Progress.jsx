@@ -27,77 +27,57 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Default state structure
-const defaultProgressData = {
-  history: [],
-  stats: {
-    totalTests: 0,
-    averageScore: 0,
-    level: "Beginner",
-    bestSubject: null,
-    statsBySubject: {},
-  },
-  recentTests: [],
+const calculatePercentage = (correct, total) => {
+  if (!total) return 0;
+  return (correct / total) * 100;
 };
 
-const EmptyState = ({ message }) => (
-  <div className="flex items-center justify-center h-full text-gray-500">
-    {message}
-  </div>
-);
-
 export const Progress = () => {
+  const { user } = useAuth();
+  const [progressData, setProgressData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [progressData, setProgressData] = useState(defaultProgressData);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get("/tests/history");
-        setProgressData({
-          ...defaultProgressData,
-          ...response.data,
-          stats: {
-            ...defaultProgressData.stats,
-            ...response.data?.stats,
-          },
-        });
-      } catch (err) {
-        console.error("Error fetching progress data:", err);
-        setError("Failed to load progress data");
-        setProgressData(defaultProgressData);
+        if (user?.statistics) {
+          const progressData = {
+            stats: {
+              totalTests: user.statistics.totalAnswered,
+              averageScore: calculatePercentage(
+                user.statistics.totalCorrect,
+                user.statistics.totalAnswered
+              ),
+              statsBySubject: Object.entries(user.statistics.bySubject).reduce(
+                (acc, [subject, data]) => {
+                  acc[subject] = {
+                    totalTests: data.answered,
+                    averageScore: calculatePercentage(
+                      data.correct,
+                      data.answered
+                    ),
+                    bestScore: calculatePercentage(data.correct, data.answered),
+                    totalTime: data.averageTimeSpent * data.answered,
+                  };
+                  return acc;
+                },
+                {}
+              ),
+            },
+          };
+
+          setProgressData(progressData);
+        }
+      } catch (error) {
+        console.error("Error processing progress data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProgress();
-  }, []);
-
-  const handleStartPractice = (subject) => {
-    navigate(`/practice/${subject.toLowerCase()}`);
-  };
-
-  // Prepare data for visualizations
-  const subjectProgress = Object.entries(
-    progressData?.stats?.statsBySubject || {}
-  ).map(([subject, data]) => ({
-    subject: subject.charAt(0).toUpperCase() + subject.slice(1),
-    progress: Number(data.progress) || 0,
-    tests: Number(data.totalTests) || 0,
-    bestScore: Number(data.bestScore) || 0,
-  }));
-
-  // Format timeline data
-  const timelineData = (progressData?.history || []).map((entry) => ({
-    date: new Date(entry.date).toLocaleDateString(),
-    score: Number(entry.score) || 0,
-    subject: entry.subject,
-  }));
+  }, [user]);
 
   if (loading) {
     return (
@@ -107,14 +87,45 @@ export const Progress = () => {
     );
   }
 
+  // Prepare data for visualization
+  const subjectProgress = Object.entries(user?.statistics?.bySubject || {}).map(
+    ([subject, data]) => ({
+      subject: subject.charAt(0).toUpperCase() + subject.slice(1),
+      progress: (data.correct / data.answered) * 100,
+      tests: data.answered,
+      bestScore: (data.correct / data.answered) * 100,
+      totalTime: data.averageTimeSpent * data.answered,
+    })
+  );
+
+  const timelineData =
+    progressData?.history?.map((test) => ({
+      date: new Date(test.testDate).toLocaleDateString(),
+      score: test.score,
+      subject: test.subject,
+    })) || [];
+
+  const calculateLevel = (tests, avgScore) => {
+    if (tests < 5) return "Beginner";
+    if (tests < 15) return avgScore > 70 ? "Intermediate" : "Beginner";
+    return avgScore > 80
+      ? "Advanced"
+      : avgScore > 60
+      ? "Intermediate"
+      : "Beginner";
+  };
+
+  const overallProgress =
+    progressData?.stats?.statsBySubject?.all?.averageScore || 0;
+  const totalTests = progressData?.stats?.totalTests || 0;
+  const level = calculateLevel(totalTests, overallProgress);
+
+  const handleStartPractice = (subject) => {
+    navigate(`/practice/${subject.toLowerCase()}`);
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      {error && (
-        <div className="bg-red-50 p-4 rounded-md text-red-700 mb-4">
-          {error}
-        </div>
-      )}
-
       {/* Achievement Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
@@ -125,9 +136,7 @@ export const Progress = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {progressData?.stats?.level || "Beginner"}
-            </div>
+            <div className="text-2xl font-bold">{level}</div>
             <p className="text-sm text-gray-500">Based on your performance</p>
           </CardContent>
         </Card>
@@ -140,9 +149,7 @@ export const Progress = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {progressData?.stats?.totalTests || 0}
-            </div>
+            <div className="text-2xl font-bold">{totalTests}</div>
             <p className="text-sm text-gray-500">Total tests taken</p>
           </CardContent>
         </Card>
@@ -156,7 +163,7 @@ export const Progress = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(progressData?.stats?.averageScore || 0).toFixed(1)}%
+              {progressData?.stats?.averageScore.toFixed(1) || 0}%
             </div>
             <p className="text-sm text-gray-500">Across all subjects</p>
           </CardContent>
@@ -171,14 +178,18 @@ export const Progress = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold capitalize">
-              {progressData?.stats?.bestSubject || "N/A"}
+              {subjectProgress.reduce(
+                (best, current) =>
+                  current.progress > (best?.progress || 0) ? current : best,
+                {}
+              )?.subject || "N/A"}
             </div>
             <p className="text-sm text-gray-500">Highest performance</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts */}
+      {/* Progress Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -187,40 +198,20 @@ export const Progress = () => {
           </CardHeader>
           <CardContent>
             <div className="h-80">
-              {timelineData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={timelineData}
-                    margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                    <YAxis
-                      domain={[0, 100]}
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => `${value}%`}
-                    />
-                    <Tooltip
-                      formatter={(value) => [`${value}%`, "Score"]}
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #ccc",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="score"
-                      stroke="#8884d8"
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <EmptyState message="No test history available" />
-              )}
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={timelineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="#8884d8"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
@@ -234,25 +225,20 @@ export const Progress = () => {
           </CardHeader>
           <CardContent>
             <div className="h-80">
-              {subjectProgress.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={subjectProgress}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="subject" />
-                    <PolarRadiusAxis domain={[0, 100]} />
-                    <Radar
-                      name="Progress"
-                      dataKey="progress"
-                      stroke="#8884d8"
-                      fill="#8884d8"
-                      fillOpacity={0.6}
-                      isAnimationActive={false}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-              ) : (
-                <EmptyState message="No subject data available" />
-              )}
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={subjectProgress}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="subject" />
+                  <PolarRadiusAxis domain={[0, 100]} />
+                  <Radar
+                    name="Progress"
+                    dataKey="progress"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                    fillOpacity={0.6}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
@@ -261,48 +247,44 @@ export const Progress = () => {
       {/* Detailed Subject Progress */}
       <Card>
         <CardHeader>
-          <CardTitle>Subject Progress</CardTitle>
-          <CardDescription>Progress breakdown by subject</CardDescription>
+          <CardTitle>Detailed Subject Progress</CardTitle>
+          <CardDescription>Your progress breakdown by subject</CardDescription>
         </CardHeader>
         <CardContent>
-          {subjectProgress.length > 0 ? (
-            <div className="space-y-6">
-              {subjectProgress.map((subject) => (
-                <div key={subject.subject} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <Book className="w-4 h-4 mr-2" />
-                      <span className="font-medium">{subject.subject}</span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleStartPractice(subject.subject)}
-                    >
-                      Practice
-                    </Button>
+          <div className="space-y-6">
+            {subjectProgress.map((subject) => (
+              <div key={subject.subject} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Book className="w-4 h-4 mr-2" />
+                    <span className="font-medium">{subject.subject}</span>
                   </div>
-                  <ProgressIndicator value={subject.progress} className="h-2" />
-                  <div className="grid grid-cols-3 gap-4 text-sm text-gray-500">
-                    <div>
-                      <span className="font-medium">Average Score:</span>{" "}
-                      {subject.progress.toFixed(1)}%
-                    </div>
-                    <div>
-                      <span className="font-medium">Tests Taken:</span>{" "}
-                      {subject.tests}
-                    </div>
-                    <div>
-                      <span className="font-medium">Best Score:</span>{" "}
-                      {subject.bestScore.toFixed(1)}%
-                    </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleStartPractice(subject.subject)}
+                  >
+                    Practice
+                  </Button>
+                </div>
+                <ProgressIndicator value={subject.progress} className="h-2" />
+                <div className="grid grid-cols-3 gap-4 text-sm text-gray-500">
+                  <div>
+                    <span className="font-medium">Average Score:</span>{" "}
+                    {subject.progress.toFixed(1)}%
+                  </div>
+                  <div>
+                    <span className="font-medium">Tests Taken:</span>{" "}
+                    {subject.tests}
+                  </div>
+                  <div>
+                    <span className="font-medium">Best Score:</span>{" "}
+                    {subject.bestScore.toFixed(1)}%
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState message="No subject progress available yet" />
-          )}
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -313,33 +295,27 @@ export const Progress = () => {
           <CardDescription>Your latest test results</CardDescription>
         </CardHeader>
         <CardContent>
-          {progressData.recentTests?.length > 0 ? (
-            <div className="space-y-4">
-              {progressData.recentTests.map((test, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium capitalize">{test.subject}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(test.testDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">
-                      {Number(test.score).toFixed(1)}%
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {test.correctAnswers}/{test.totalQuestions} correct
-                    </p>
-                  </div>
+          <div className="space-y-4">
+            {progressData?.history?.slice(0, 5).map((test, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <div>
+                  <p className="font-medium capitalize">{test.subject}</p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(test.testDate).toLocaleDateString()}
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState message="No recent activity available" />
-          )}
+                <div className="text-right">
+                  <p className="font-medium">{test.score.toFixed(1)}%</p>
+                  <p className="text-sm text-gray-500">
+                    {test.correctAnswers}/{test.totalQuestions} correct
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>
