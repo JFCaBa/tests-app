@@ -159,7 +159,7 @@ export const TestContainer = () => {
               className="w-full h-32 p-2 border rounded"
               value={userAnswers[question._id] || ""}
               onChange={(e) => handleAnswer(e.target.value)}
-              placeholder="Write your answer here..."
+              placeholder="You can write your answer here and see an example after submitting..."
             />
             {question.sampleResponse && (
               <div className="bg-gray-50 p-4 rounded">
