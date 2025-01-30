@@ -41,6 +41,7 @@ export const PracticeSession = () => {
   });
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [timerActive, setTimerActive] = useState(true);
 
   useEffect(() => {
     fetchQuestion();
@@ -49,15 +50,17 @@ export const PracticeSession = () => {
   const fetchQuestion = async () => {
     setLoading(true);
     setError(null);
+    setTimerActive(true);
     try {
       const response = await axios.get("/questions/practice", {
         params: { subject, mode, difficulty },
       });
       setCurrentQuestion(response.data);
-      console.log(response.data);
       if (mode === "timed") {
         setTimeLeft(response.data.timeLimit || 60);
       }
+      setQuestionStartTime(Date.now());
+      setUserAnswer(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load question");
     } finally {
@@ -68,13 +71,13 @@ export const PracticeSession = () => {
   const calculateTimeSpent = () => {
     return Math.min(
       Math.floor((Date.now() - questionStartTime) / 1000),
-      mode === "timed" ? currentQuestion.timeLimit || 60 : Infinity
+      mode === "timed" ? currentQuestion?.timeLimit || 60 : Infinity
     );
   };
 
   useEffect(() => {
     let timer;
-    if (mode === "timed" && timeLeft > 0 && !feedback) {
+    if (mode === "timed" && timeLeft > 0 && timerActive && !feedback) {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -87,7 +90,7 @@ export const PracticeSession = () => {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [timeLeft, mode, feedback]);
+  }, [timeLeft, mode, feedback, timerActive]);
 
   const getCorrectAnswerText = () => {
     if (!currentQuestion) return "Not available";
@@ -116,18 +119,15 @@ export const PracticeSession = () => {
   };
 
   const handleTimeUp = () => {
+    if (feedback) return;
+
     setTimerActive(false);
     const timeSpentOnQuestion = calculateTimeSpent();
-    // Only update total time if no answer was given
-    if (!feedback) {
-      setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
-    }
+    setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
 
     setFeedback({
       correct: false,
-      message:
-        "Time's up! The correct answer was: " +
-        currentQuestion.options[currentQuestion.correctAnswer].text,
+      message: "Time's up! The correct answer was: " + getCorrectAnswerText(),
     });
   };
 
@@ -142,10 +142,7 @@ export const PracticeSession = () => {
       const response = await axios.post("/questions/check", {
         questionId: currentQuestion._id,
         answer,
-        timeSpent:
-          mode === "timed"
-            ? currentQuestion.timeLimit - timeLeft
-            : timeSpentOnQuestion,
+        timeSpent: timeSpentOnQuestion,
       });
 
       const isCorrect = response.data.correct;
@@ -158,9 +155,7 @@ export const PracticeSession = () => {
           currentQuestion.type === QuestionTypes.MULTIPLE_CHOICE ||
           currentQuestion.type === QuestionTypes.AUDIO
         ) {
-          feedbackMessage = `Incorrect. The correct answer was: ${
-            currentQuestion.options[response.data.correctAnswer].text
-          }`;
+          feedbackMessage = `Incorrect. The correct answer was: ${getCorrectAnswerText()}`;
         } else {
           feedbackMessage = "Incorrect.";
         }
