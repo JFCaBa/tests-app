@@ -28,7 +28,8 @@
     "react-router-dom": "^6.10.0",
     "recharts": "^2.7.2",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "@radix-ui/react-scroll-area": "^1.0.2"
   },
   "devDependencies": {
     "@types/papaparse": "^5.3.15",
