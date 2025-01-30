@@ -25,6 +25,9 @@ import { Progress as ProgressIndicator } from "@/components/ui/progress";
 import { Trophy, Target, TrendingUp, Award, Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { LearningTimeline } from "./components/progress/LearningTimeline";
+import { RecentActivity } from "./components/progress/RecentActivity";
+
 import axios from "axios";
 
 const calculatePercentage = (correct, total) => {
@@ -191,30 +194,7 @@ export const Progress = () => {
 
       {/* Progress Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Learning Timeline</CardTitle>
-            <CardDescription>Your test scores over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={timelineData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="#8884d8"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <LearningTimeline />
 
         <Card>
           <CardHeader>
@@ -289,35 +269,9 @@ export const Progress = () => {
       </Card>
 
       {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Your latest test results</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {progressData?.history?.slice(0, 5).map((test, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium capitalize">{test.subject}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(test.testDate).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">{test.score.toFixed(1)}%</p>
-                  <p className="text-sm text-gray-500">
-                    {test.correctAnswers}/{test.totalQuestions} correct
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="lg:col-span-2">
+        <RecentActivity />
+      </div>
     </div>
   );
 };
