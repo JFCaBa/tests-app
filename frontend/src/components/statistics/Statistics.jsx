@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   LineChart,
   Line,
@@ -34,11 +35,32 @@ const calculatePercentage = (correct, total) => {
 export const Statistics = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
+  const [testHistory, setTestHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        setError("");
+
+        // Fetch test history
+        const historyResponse = await axios.get("/tests/history");
+        const history = historyResponse.data;
+
+        // Sort history by date and format for chart
+        const sortedHistory = history
+          .sort((a, b) => new Date(a.testDate) - new Date(b.testDate))
+          .map((test) => ({
+            date: new Date(test.testDate).toLocaleDateString(),
+            score: test.score,
+            subject: test.subject,
+          }));
+
+        setTestHistory(sortedHistory);
+
+        // Process user statistics
         if (user?.statistics) {
           setStats({
             totalTests: user.statistics.totalAnswered,
@@ -63,14 +85,15 @@ export const Statistics = () => {
             ),
           });
         }
-      } catch (error) {
-        console.error("Error processing statistics:", error);
+      } catch (err) {
+        console.error("Error fetching statistics:", err);
+        setError("Failed to load statistics. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStats();
+    fetchData();
   }, [user]);
 
   if (loading) {
@@ -82,12 +105,6 @@ export const Statistics = () => {
   }
 
   // Prepare data for charts
-  const progressData =
-    stats?.recentTests?.map((test) => ({
-      date: new Date(test.testDate).toLocaleDateString(),
-      score: test.score,
-    })) || [];
-
   const subjectData = Object.entries(stats?.statsBySubject || {}).map(
     ([subject, data]) => ({
       subject,
@@ -98,6 +115,12 @@ export const Statistics = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader>
@@ -143,9 +166,7 @@ export const Statistics = () => {
             <CardTitle className="text-lg">Recent Tests</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">
-              {stats?.recentTests?.length || 0}
-            </p>
+            <p className="text-3xl font-bold">{testHistory.length}</p>
           </CardContent>
         </Card>
       </div>
@@ -158,12 +179,23 @@ export const Statistics = () => {
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={progressData}>
+                <LineChart data={testHistory}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
+                  <XAxis
+                    dataKey="date"
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
                   <YAxis domain={[0, 100]} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="score" stroke="#8884d8" />
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="#8884d8"
+                    dot={{ fill: "#8884d8" }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -179,7 +211,12 @@ export const Statistics = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={subjectData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="subject" />
+                  <XAxis
+                    dataKey="subject"
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
                   <YAxis domain={[0, 100]} />
                   <Tooltip />
                   <Bar dataKey="avgScore" fill="#8884d8" />
