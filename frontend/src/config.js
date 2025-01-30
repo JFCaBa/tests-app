@@ -1,4 +1,4 @@
-const isDevelopment = import.meta.env.MODE === "development";
+const isDevelopment = import.meta.env.MODE_ENV === "development";
 
 export const config = {
   // Using relative URL so it uses the same domain as the frontend

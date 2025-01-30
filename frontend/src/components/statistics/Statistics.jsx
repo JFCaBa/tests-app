@@ -26,6 +26,11 @@ const COLORS = [
   "#82ca9d",
 ];
 
+const calculatePercentage = (correct, total) => {
+  if (!total) return 0;
+  return (correct / total) * 100;
+};
+
 export const Statistics = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
@@ -34,17 +39,39 @@ export const Statistics = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get("/tests/stats");
-        setStats(response.data);
+        if (user?.statistics) {
+          setStats({
+            totalTests: user.statistics.totalAnswered,
+            averageScore: calculatePercentage(
+              user.statistics.totalCorrect,
+              user.statistics.totalAnswered
+            ),
+            statsBySubject: Object.entries(user.statistics.bySubject).reduce(
+              (acc, [subject, data]) => {
+                acc[subject] = {
+                  totalTests: data.answered,
+                  averageScore: calculatePercentage(
+                    data.correct,
+                    data.answered
+                  ),
+                  averageTimeSpent: data.averageTimeSpent,
+                  bestScore: calculatePercentage(data.correct, data.answered),
+                };
+                return acc;
+              },
+              {}
+            ),
+          });
+        }
       } catch (error) {
-        console.error("Error fetching statistics:", error);
+        console.error("Error processing statistics:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -87,7 +114,7 @@ export const Statistics = () => {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">
-              {(stats?.statsBySubject?.all?.averageScore || 0).toFixed(1)}%
+              {stats?.averageScore.toFixed(1) || 0}%
             </p>
           </CardContent>
         </Card>

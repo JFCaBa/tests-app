@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BulkQuestionUpload } from "./BulkQuestionUpload";
+import QuestionForm from "./QuestionForm";
 import axios from "axios";
 
 export const AdminDashboard = () => {
@@ -21,6 +22,21 @@ export const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
+  const [showQuestionForm, setShowQuestionForm] = useState(false);
+
+  // Initialize question form data
+  const [formData, setFormData] = useState({
+    subject: "",
+    type: "",
+    question: "",
+    options: ["", "", "", ""],
+    correctAnswer: undefined,
+    difficulty: "medium",
+    explanation: "",
+    sampleResponse: "",
+    audioFile: null,
+    imageFile: null,
+  });
 
   const fetchStats = async () => {
     try {
@@ -36,6 +52,32 @@ export const AdminDashboard = () => {
   useEffect(() => {
     fetchStats();
   }, []);
+
+  const handleQuestionSubmit = async (questionData) => {
+    try {
+      await fetchStats(); // Refresh stats after successful submission
+      setShowQuestionForm(false); // Close the form
+    } catch (error) {
+      console.error("Error handling question submission:", error);
+    }
+  };
+
+  const handleCloseForm = () => {
+    setShowQuestionForm(false);
+    // Reset form data
+    setFormData({
+      subject: "",
+      type: "",
+      question: "",
+      options: ["", "", "", ""],
+      correctAnswer: undefined,
+      difficulty: "medium",
+      explanation: "",
+      sampleResponse: "",
+      audioFile: null,
+      imageFile: null,
+    });
+  };
 
   const statCards = [
     {
@@ -76,7 +118,9 @@ export const AdminDashboard = () => {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <Button onClick={() => setShowUpload(true)}>Upload Questions</Button>
+        <Button onClick={() => setShowQuestionForm(true)}>
+          Upload Questions
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -143,23 +187,16 @@ export const AdminDashboard = () => {
         </Card>
       </div>
 
-      {showUpload && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Upload Questions</CardTitle>
-            <CardDescription>
-              Upload questions in bulk using JSON format
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BulkQuestionUpload
-              onUploadComplete={() => {
-                setShowUpload(false);
-                fetchStats();
-              }}
-            />
-          </CardContent>
-        </Card>
+      {/* Question Form Modal */}
+      {showQuestionForm && (
+        <QuestionForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleQuestionSubmit}
+          onClose={handleCloseForm}
+          editingQuestion={false}
+          onSubmitSuccess={handleQuestionSubmit}
+        />
       )}
     </div>
   );

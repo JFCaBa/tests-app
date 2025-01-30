@@ -9,6 +9,8 @@ const router = express.Router();
 // All routes require admin privileges
 router.use(auth.required, auth.admin);
 
+console.log("Admin routes loaded");
+
 // @route   GET /api/admin/users
 // @desc    Get all users
 // @access  Admin
@@ -69,50 +71,96 @@ router.put(
 router.get(
   "/stats",
   asyncHandler(async (req, res) => {
-    const stats = await Promise.all([
-      // User statistics
-      User.countDocuments(),
-      User.countDocuments({ role: "admin" }),
-      User.countDocuments({ isActive: true }),
+    try {
+      // Get user statistics
+      const [
+        totalUsers,
+        activeUsers,
+        adminUsers,
+        totalQuestions,
+        activeQuestions,
+        questionsBySubject,
+      ] = await Promise.all([
+        // User statistics
+        User.countDocuments(),
+        User.countDocuments({ isActive: true }),
+        User.countDocuments({ role: "admin" }),
 
-      // Question statistics
-      Question.countDocuments(),
-      Question.countDocuments({ active: true }),
-      Question.aggregate([
-        {
-          $group: {
-            _id: "$subject",
-            count: { $sum: 1 },
+        // Question statistics
+        Question.countDocuments(),
+        Question.countDocuments({ active: true }),
+        Question.aggregate([
+          { $match: { active: true } },
+          {
+            $group: {
+              _id: "$subject",
+              count: { $sum: 1 },
+            },
           },
-        },
-      ]),
+          { $sort: { _id: 1 } },
+        ]),
+      ]);
 
-      // Test statistics from user history
-      User.aggregate([
+      // Calculate test statistics
+      const testStats = await User.aggregate([
+        // Unwind the testHistory array to work with individual tests
         { $unwind: "$testHistory" },
+        // Group all tests together
         {
           $group: {
             _id: null,
             totalTests: { $sum: 1 },
-            averageScore: { $avg: "$testHistory.score" },
+            totalScore: { $sum: "$testHistory.score" },
+            totalCorrectAnswers: { $sum: "$testHistory.correctAnswers" },
+            totalQuestions: { $sum: "$testHistory.totalQuestions" },
           },
         },
-      ]),
-    ]);
+        // Calculate averages
+        {
+          $project: {
+            _id: 0,
+            totalTests: 1,
+            averageScore: {
+              $cond: [
+                { $eq: ["$totalTests", 0] },
+                0,
+                { $divide: ["$totalScore", "$totalTests"] },
+              ],
+            },
+          },
+        },
+      ]);
 
-    res.json({
-      users: {
-        total: stats[0],
-        admins: stats[1],
-        active: stats[2],
-      },
-      questions: {
-        total: stats[3],
-        active: stats[4],
-        bySubject: stats[5],
-      },
-      tests: stats[6][0] || { totalTests: 0, averageScore: 0 },
-    });
+      // Get the test statistics or use defaults if no tests exist
+      const testStatistics = testStats[0] || {
+        totalTests: 0,
+        averageScore: 0,
+      };
+
+      // Format the response
+      const response = {
+        users: {
+          total: totalUsers,
+          active: activeUsers,
+          admins: adminUsers,
+        },
+        questions: {
+          total: totalQuestions,
+          active: activeQuestions,
+          bySubject: questionsBySubject,
+        },
+        tests: {
+          totalTests: testStatistics.totalTests,
+          averageScore: testStatistics.averageScore || 0,
+        },
+        lastUpdated: new Date(),
+      };
+
+      res.json(response);
+    } catch (error) {
+      console.error("Error fetching admin statistics:", error);
+      throw new errors.ErrorResponse("Error fetching statistics", 500);
+    }
   })
 );
 
@@ -124,67 +172,107 @@ router.post(
   upload.multiple,
   asyncHandler(async (req, res) => {
     try {
-      console.log("Received request:", req.body, req.files);
+      // Debug logging
+      console.log("Request body:", req.body);
+      console.log("Request files:", req.files);
+      console.log("Content type:", req.headers["content-type"]);
 
-      // Ensure required fields are present
-      if (!req.body.question || !req.body.subject) {
-        return res.status(400).json({ message: "Missing required fields" });
+      // Validate required fields
+      if (!req.body.question || !req.body.subject || !req.body.type) {
+        return res.status(400).json({
+          message: "Missing required fields",
+          received: {
+            question: !!req.body.question,
+            subject: !!req.body.subject,
+            type: !!req.body.type,
+          },
+        });
       }
 
-      // Parse options field (ensure it's an array of objects)
-      let optionsArray = [];
+      // Parse options with error handling
+      let options = [];
       if (req.body.options) {
         try {
-          optionsArray = JSON.parse(req.body.options); // Convert JSON string to array
-          // Validate the structure of each option object
-          optionsArray = optionsArray.map((option) => ({
-            text: option.text || "Default option", // Ensure text is provided
-            isCorrect:
-              typeof option.isCorrect === "boolean" ? option.isCorrect : false,
-          }));
+          // Handle both string and array inputs
+          if (typeof req.body.options === "string") {
+            console.log("Parsing options string:", req.body.options);
+            options = JSON.parse(req.body.options);
+          } else if (Array.isArray(req.body.options)) {
+            options = req.body.options;
+          }
+
+          // Validate options structure
+          options = options.map((option, index) => {
+            const optionObj =
+              typeof option === "string" ? { text: option } : option;
+            return {
+              text: optionObj.text || "",
+              isCorrect: index === parseInt(req.body.correctAnswer, 10),
+            };
+          });
+
+          console.log("Processed options:", options);
         } catch (error) {
-          return res
-            .status(400)
-            .json({ message: "Invalid JSON format for options" });
+          console.error("Options parsing error:", error);
+          return res.status(400).json({
+            message: "Invalid options format",
+            error: error.message,
+            receivedOptions: req.body.options,
+          });
         }
       }
 
-      // Create the question first
+      // Create question data
       const questionData = {
-        ...req.body,
-        options: optionsArray,
+        subject: req.body.subject,
+        type: req.body.type,
+        question: req.body.question,
+        difficulty: req.body.difficulty || "medium",
+        options: options,
+        correctAnswer: parseInt(req.body.correctAnswer, 10),
+        explanation: req.body.explanation,
         createdBy: req.user._id,
       };
-      let uploadedFiles = []; // Ensure this is initialized
 
-      let question = new Question(questionData);
-
+      // Handle file uploads
       if (req.files) {
+        console.log("Processing files:", Object.keys(req.files));
+
         if (req.files.audio) {
-          question.audioUrl = req.files.audio[0].path; // Assign audio URL
-          uploadedFiles.push(req.files.audio[0].path);
+          questionData.audioUrl = req.files.audio[0].path;
+          console.log("Audio file path:", questionData.audioUrl);
         }
+
         if (req.files.image) {
-          question.imageUrl = req.files.image[0].path;
-          uploadedFiles.push(req.files.image[0].path);
+          questionData.imageUrl = req.files.image[0].path;
+          console.log("Image file path:", questionData.imageUrl);
         }
       }
 
-      // Save the question document after setting all fields
-      question = await question.save();
+      // Validate audio questions
+      if (questionData.type === "audio" && !questionData.audioUrl) {
+        return res.status(400).json({
+          message: "Audio file is required for audio questions",
+          receivedFiles: req.files ? Object.keys(req.files) : [],
+        });
+      }
+
+      console.log("Final question data:", questionData);
+
+      // Create and save the question
+      const question = new Question(questionData);
+      await question.save();
 
       res.status(201).json(question);
     } catch (error) {
       console.error("Error creating question:", error);
 
-      // Cleanup uploaded files if an error occurs
-      await Promise.all(
-        uploadedFiles.map((file) => fs.unlink(file).catch(() => {}))
-      );
-
-      res
-        .status(400)
-        .json({ message: "Failed to create question", error: error.message });
+      // Return detailed error response
+      res.status(400).json({
+        message: "Failed to create question",
+        error: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      });
     }
   })
 );

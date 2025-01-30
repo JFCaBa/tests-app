@@ -27,6 +27,11 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const calculatePercentage = (correct, total) => {
+  if (!total) return 0;
+  return (correct / total) * 100;
+};
+
 export const Progress = () => {
   const { user } = useAuth();
   const [progressData, setProgressData] = useState(null);
@@ -36,24 +41,43 @@ export const Progress = () => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const [testsResponse, statsResponse] = await Promise.all([
-          axios.get("/tests/history"),
-          axios.get("/tests/stats"),
-        ]);
+        if (user?.statistics) {
+          const progressData = {
+            stats: {
+              totalTests: user.statistics.totalAnswered,
+              averageScore: calculatePercentage(
+                user.statistics.totalCorrect,
+                user.statistics.totalAnswered
+              ),
+              statsBySubject: Object.entries(user.statistics.bySubject).reduce(
+                (acc, [subject, data]) => {
+                  acc[subject] = {
+                    totalTests: data.answered,
+                    averageScore: calculatePercentage(
+                      data.correct,
+                      data.answered
+                    ),
+                    bestScore: calculatePercentage(data.correct, data.answered),
+                    totalTime: data.averageTimeSpent * data.answered,
+                  };
+                  return acc;
+                },
+                {}
+              ),
+            },
+          };
 
-        setProgressData({
-          history: testsResponse.data,
-          stats: statsResponse.data,
-        });
+          setProgressData(progressData);
+        }
       } catch (error) {
-        console.error("Error fetching progress data:", error);
+        console.error("Error processing progress data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProgress();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -64,15 +88,15 @@ export const Progress = () => {
   }
 
   // Prepare data for visualization
-  const subjectProgress = Object.entries(
-    progressData?.stats?.statsBySubject || {}
-  ).map(([subject, data]) => ({
-    subject: subject.charAt(0).toUpperCase() + subject.slice(1),
-    progress: data.averageScore,
-    tests: data.totalTests,
-    bestScore: data.bestScore,
-    totalTime: data.totalTime,
-  }));
+  const subjectProgress = Object.entries(user?.statistics?.bySubject || {}).map(
+    ([subject, data]) => ({
+      subject: subject.charAt(0).toUpperCase() + subject.slice(1),
+      progress: (data.correct / data.answered) * 100,
+      tests: data.answered,
+      bestScore: (data.correct / data.answered) * 100,
+      totalTime: data.averageTimeSpent * data.answered,
+    })
+  );
 
   const timelineData =
     progressData?.history?.map((test) => ({
@@ -139,7 +163,7 @@ export const Progress = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {overallProgress.toFixed(1)}%
+              {progressData?.stats?.averageScore.toFixed(1) || 0}%
             </div>
             <p className="text-sm text-gray-500">Across all subjects</p>
           </CardContent>

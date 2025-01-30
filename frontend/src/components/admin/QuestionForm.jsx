@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { X } from "lucide-react";
 
 const subjects = [
@@ -32,10 +34,130 @@ const difficultyLevels = ["easy", "medium", "hard"];
 const QuestionForm = ({
   formData,
   setFormData,
-  onSubmit,
+  onSubmit: onSubmitProp,
   onClose,
   editingQuestion,
+  onSubmitSuccess,
 }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      console.log("Starting question submission...");
+
+      const submitFormData = new FormData();
+
+      // Basic fields
+      submitFormData.append("subject", formData.subject);
+      submitFormData.append("type", formData.type);
+      submitFormData.append("question", formData.question);
+      submitFormData.append("difficulty", formData.difficulty || "medium");
+
+      // Handle options based on question type
+      if (formData.type === "multiple-choice" || formData.type === "audio") {
+        const optionsWithCorrect = formData.options
+          .filter((option) => option.trim() !== "") // Remove empty options
+          .map((option, index) => ({
+            text: option,
+            isCorrect: index === formData.correctAnswer,
+          }));
+
+        submitFormData.append("options", JSON.stringify(optionsWithCorrect));
+        submitFormData.append("correctAnswer", formData.correctAnswer);
+      }
+
+      // Handle files
+      if (formData.type === "audio" && formData.audioFile) {
+        submitFormData.append("audio", formData.audioFile);
+        console.log("Added audio file:", formData.audioFile.name);
+      }
+
+      if (formData.imageFile) {
+        submitFormData.append("image", formData.imageFile);
+        console.log("Added image file:", formData.imageFile.name);
+      }
+
+      // Additional fields
+      if (formData.explanation) {
+        submitFormData.append("explanation", formData.explanation);
+      }
+
+      if (formData.type === "writing" && formData.sampleResponse) {
+        submitFormData.append("sampleResponse", formData.sampleResponse);
+      }
+
+      // Log form data contents
+      for (let [key, value] of submitFormData.entries()) {
+        console.log(
+          "FormData entry:",
+          key,
+          value instanceof File ? value.name : value
+        );
+      }
+
+      const debugFormData = {};
+      submitFormData.forEach((value, key) => {
+        debugFormData[key] = value;
+      });
+      console.log("Final FormData payload:", debugFormData);
+
+      // Make the request
+      const response = await axios.post("/admin/question", submitFormData);
+
+      console.log("Question created successfully:", response.data);
+
+      if (onSubmitSuccess) {
+        onSubmitSuccess(response.data);
+      }
+
+      if (onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+
+      let errorMessage;
+      if (error.message === "Network Error") {
+        errorMessage =
+          "Connection error. Please check your internet connection and try again.";
+      } else if (error.response?.status === 413) {
+        errorMessage = "File too large. Please try a smaller file.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else {
+        errorMessage = "Failed to create question. Please try again.";
+      }
+
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateForm = () => {
+    if (!formData.subject || !formData.type || !formData.question) {
+      return false;
+    }
+
+    if (formData.type === "audio" && !formData.audioFile && !editingQuestion) {
+      return false;
+    }
+
+    if (
+      (formData.type === "audio" || formData.type === "multiple-choice") &&
+      (!formData.options?.length || formData.correctAnswer === undefined)
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -50,7 +172,13 @@ const QuestionForm = ({
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -246,11 +374,12 @@ const QuestionForm = ({
           </form>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={onSubmit}>
-            {editingQuestion ? "Update" : "Create"} Question
+          <Button onClick={handleSubmit} disabled={loading || !validateForm()}>
+            {loading ? "Submitting..." : editingQuestion ? "Update" : "Create"}{" "}
+            Question
           </Button>
         </CardFooter>
       </Card>
