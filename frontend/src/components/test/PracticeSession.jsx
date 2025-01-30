@@ -98,21 +98,41 @@ export const PracticeSession = () => {
     switch (currentQuestion.type) {
       case QuestionTypes.MULTIPLE_CHOICE:
       case QuestionTypes.AUDIO:
-        if (
-          currentQuestion.options &&
-          Array.isArray(currentQuestion.options) &&
-          typeof currentQuestion.correctAnswer === "number" &&
-          currentQuestion.options[currentQuestion.correctAnswer]
-        ) {
-          return getOptionText(
-            currentQuestion.options[currentQuestion.correctAnswer]
+        // First try to get the text using response.data.correctAnswer
+        if (currentQuestion.options && Array.isArray(currentQuestion.options)) {
+          // Log for debugging
+          console.log("Current question:", currentQuestion);
+          console.log("Correct answer index:", currentQuestion.correctAnswer);
+          console.log("Options:", currentQuestion.options);
+
+          const correctOption =
+            currentQuestion.options[currentQuestion.correctAnswer];
+          if (correctOption) {
+            if (typeof correctOption === "string") {
+              return correctOption;
+            } else if (
+              typeof correctOption === "object" &&
+              correctOption.text
+            ) {
+              return correctOption.text;
+            }
+          }
+
+          // Fallback: try to find the correct option by checking isCorrect property
+          const correctOptionByFlag = currentQuestion.options.find(
+            (opt) => typeof opt === "object" && opt.isCorrect
           );
+          if (correctOptionByFlag) {
+            return correctOptionByFlag.text;
+          }
         }
-        return "Not available";
+        return "Error retrieving correct answer";
+
       case QuestionTypes.WRITING:
         return (
           currentQuestion.sampleResponse || "Sample response not available"
         );
+
       default:
         return "Not available";
     }
