@@ -4,7 +4,7 @@ import fs from "fs/promises";
 
 const backupDatabase = async (config = {}) => {
   const {
-    dbName = "testapp",
+    dbName = "test-app",
     backupDir = "./mongodb_backup",
     host = "localhost",
     port = "27017",

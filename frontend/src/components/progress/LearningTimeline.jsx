@@ -67,8 +67,8 @@ export const LearningTimeline = () => {
     const fetchTimeline = async () => {
       try {
         const [historyResponse, statsResponse] = await Promise.all([
-          axios.get("/api/tests/history"),
-          axios.get("/api/tests/stats"),
+          axios.get("/tests/history"),
+          axios.get("/tests/stats"),
         ]);
 
         const history = historyResponse.data;
