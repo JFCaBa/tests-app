@@ -107,7 +107,7 @@ const QuestionManager = () => {
         Object.entries(cleanFilters).filter(([_, value]) => value !== undefined)
       );
 
-      const response = await axios.get("/api/questions", {
+      const response = await axios.get("/questions", {
         params: queryParams,
       });
 
