@@ -15,12 +15,25 @@ router.get(
   validation.rules.query.search,
   validation.validate,
   asyncHandler(async (req, res) => {
-    const { subject, type, difficulty, page = 1, limit = 10 } = req.query;
+    const {
+      subject,
+      type,
+      difficulty,
+      page = 1,
+      limit = 10,
+      search,
+    } = req.query;
 
     const query = { active: true };
     if (subject) query.subject = subject;
     if (type) query.type = type;
     if (difficulty) query.difficulty = difficulty;
+    if (search) {
+      query.$or = [
+        { question: { $regex: search, $options: "i" } },
+        { explanation: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const skip = (page - 1) * limit;
 

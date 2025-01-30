@@ -107,7 +107,7 @@ const QuestionManager = () => {
         Object.entries(cleanFilters).filter(([_, value]) => value !== undefined)
       );
 
-      const response = await axios.get("/questions", {
+      const response = await axios.get("/api/questions", {
         params: queryParams,
       });
 
@@ -139,11 +139,14 @@ const QuestionManager = () => {
       clearTimeout(searchTimeout);
     }
 
+    // Set loading state immediately
+    setLoading(true);
+
     // Set a new timeout to update search after typing stops
     const timeout = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: value }));
       setPage(1); // Reset to first page when searching
-    }, 500); // 500ms delay
+    }, 300); // Reduced to 300ms for better responsiveness
 
     setSearchTimeout(timeout);
   };
@@ -165,11 +168,11 @@ const QuestionManager = () => {
       });
 
       if (editingQuestion) {
-        await axios.put(`/questions/${editingQuestion._id}`, formDataObj, {
+        await axios.put(`/api/questions/${editingQuestion._id}`, formDataObj, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await axios.post("/questions", formDataObj, {
+        await axios.post("/api/questions", formDataObj, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -187,7 +190,7 @@ const QuestionManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
-        await axios.delete(`/questions/${id}`);
+        await axios.delete(`/api/questions/${id}`);
         fetchQuestions();
       } catch (err) {
         setError(err.response?.data?.message || "Failed to delete question");
@@ -220,13 +223,6 @@ const QuestionManager = () => {
 
   const handleBulkUploadComplete = () => {
     setShowBulkUpload(false);
-    fetchQuestions();
-  };
-
-  const handleFormSuccess = () => {
-    setShowForm(false);
-    setEditingQuestion(null);
-    resetForm();
     fetchQuestions();
   };
 
@@ -352,13 +348,16 @@ const QuestionManager = () => {
                 </Select>
               </div>
 
-              <div className="w-full md:w-auto flex-1">
-                <Input
-                  placeholder="Search questions..."
-                  defaultValue={filters.search}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full"
-                />
+              <div className="w-full md:w-auto flex-1 relative">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <Input
+                    placeholder="Search questions..."
+                    value={filters.search}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="w-full pl-8"
+                  />
+                </div>
               </div>
             </div>
 
@@ -460,7 +459,6 @@ const QuestionManager = () => {
           onSubmit={handleCreateOrUpdate}
           onClose={handleFormClose}
           editingQuestion={editingQuestion}
-          onSubmitSuccess={handleFormSuccess}
         />
       )}
     </div>
