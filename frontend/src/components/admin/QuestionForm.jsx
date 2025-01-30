@@ -110,6 +110,12 @@ const QuestionForm = ({
 
       if (formData.type === "writing" && formData.sampleResponse) {
         submitFormData.append("sampleResponse", formData.sampleResponse);
+        submitFormData.append("correctAnswer", 0);
+      }
+
+      console.log("Submitting form data:");
+      for (let pair of submitFormData.entries()) {
+        console.log(pair[0], pair[1]);
       }
 
       // Make the request
