@@ -191,7 +191,7 @@ export const DemoTest = () => {
                   showFeedback && index === currentQuestion.correctAnswer
                     ? "bg-green-100 hover:bg-green-100 text-black"
                     : showFeedback && userAnswers[currentQuestion.id] === index
-                    ? "bg-red-100 hover:bg-red-100"
+                    ? "bg-red-100 hover:bg-red-100 text-black"
                     : ""
                 }`}
                 onClick={() => handleAnswer(index)}
