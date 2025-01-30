@@ -16,6 +16,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -95,6 +96,11 @@ export const LandingPage = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Ad Banner Section */}
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <YandexAdBanner />
       </div>
 
       {/* Quick Stats */}

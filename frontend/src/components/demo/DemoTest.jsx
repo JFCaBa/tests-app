@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 // Demo questions covering different types
 const demoQuestions = [
@@ -170,6 +171,10 @@ export const DemoTest = () => {
             </Button>
           </CardFooter>
         </Card>
+        {/* Ad Banner Section */}
+        <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
+          <YandexAdBanner />
+        </div>
       </div>
     );
   }
