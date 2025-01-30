@@ -29,7 +29,7 @@ const COLORS = [
 
 const calculatePercentage = (correct, total) => {
   if (!total) return 0;
-  return Number(((correct / total) * 100).toFixed(1));
+  return (correct / total) * 100;
 };
 
 export const Statistics = () => {
@@ -45,15 +45,12 @@ export const Statistics = () => {
         setLoading(true);
         setError("");
 
-        // Fetch both test stats and history
-        const [statsResponse, historyResponse] = await Promise.all([
-          axios.get("/tests/stats"),
-          axios.get("/tests/history"),
-        ]);
+        // Fetch test history
+        const historyResponse = await axios.get("/tests/history");
+        const history = historyResponse.data;
 
-        // Process test history
-        const history = historyResponse.data || [];
-        const sortedHistory = [...history]
+        // Sort history by date and format for chart
+        const sortedHistory = history
           .sort((a, b) => new Date(a.testDate) - new Date(b.testDate))
           .map((test) => ({
             date: new Date(test.testDate).toLocaleDateString(),
@@ -63,28 +60,29 @@ export const Statistics = () => {
 
         setTestHistory(sortedHistory);
 
-        // Process statistics
-        const statsData = statsResponse.data;
-        if (statsData) {
+        // Process user statistics
+        if (user?.statistics) {
           setStats({
-            totalTests: statsData.totalTests,
+            totalTests: user.statistics.totalAnswered,
             averageScore: calculatePercentage(
-              statsData.totalCorrect,
-              statsData.totalTests
+              user.statistics.totalCorrect,
+              user.statistics.totalAnswered
             ),
-            statsBySubject: Object.entries(
-              statsData.statsBySubject || {}
-            ).reduce((acc, [subject, data]) => {
-              acc[subject] = {
-                totalTests: data.totalTests,
-                averageScore: calculatePercentage(
-                  data.correctAnswers,
-                  data.totalTests
-                ),
-                bestScore: data.bestScore,
-              };
-              return acc;
-            }, {}),
+            statsBySubject: Object.entries(user.statistics.bySubject).reduce(
+              (acc, [subject, data]) => {
+                acc[subject] = {
+                  totalTests: data.answered,
+                  averageScore: calculatePercentage(
+                    data.correct,
+                    data.answered
+                  ),
+                  averageTimeSpent: data.averageTimeSpent,
+                  bestScore: calculatePercentage(data.correct, data.answered),
+                };
+                return acc;
+              },
+              {}
+            ),
           });
         }
       } catch (err) {
@@ -96,7 +94,7 @@ export const Statistics = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -106,22 +104,7 @@ export const Statistics = () => {
     );
   }
 
-  // Find best subject
-  const getBestSubject = () => {
-    if (!stats?.statsBySubject) return "None";
-
-    return Object.entries(stats.statsBySubject).reduce(
-      (best, [subject, data]) => {
-        if (data.averageScore > best.score) {
-          return { subject, score: data.averageScore };
-        }
-        return best;
-      },
-      { subject: "None", score: 0 }
-    ).subject;
-  };
-
-  // Prepare data for the bar chart
+  // Prepare data for charts
   const subjectData = Object.entries(stats?.statsBySubject || {}).map(
     ([subject, data]) => ({
       subject,
@@ -129,15 +112,6 @@ export const Statistics = () => {
       avgScore: data.averageScore,
     })
   );
-
-  // Get recent tests count (last 30 days)
-  const getRecentTestsCount = () => {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    return testHistory.filter((test) => new Date(test.date) >= thirtyDaysAgo)
-      .length;
-  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
@@ -162,7 +136,9 @@ export const Statistics = () => {
             <CardTitle className="text-lg">Average Score</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{stats?.averageScore || 0}%</p>
+            <p className="text-3xl font-bold">
+              {stats?.averageScore.toFixed(1) || 0}%
+            </p>
           </CardContent>
         </Card>
 
@@ -171,7 +147,17 @@ export const Statistics = () => {
             <CardTitle className="text-lg">Best Subject</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{getBestSubject()}</p>
+            <p className="text-3xl font-bold">
+              {
+                Object.entries(stats?.statsBySubject || {}).reduce(
+                  (best, [subject, data]) =>
+                    data.averageScore > (best?.score || 0)
+                      ? { subject, score: data.averageScore }
+                      : best,
+                  { subject: "None", score: 0 }
+                ).subject
+              }
+            </p>
           </CardContent>
         </Card>
 
@@ -180,7 +166,7 @@ export const Statistics = () => {
             <CardTitle className="text-lg">Recent Tests</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{getRecentTestsCount()}</p>
+            <p className="text-3xl font-bold">{testHistory.length}</p>
           </CardContent>
         </Card>
       </div>
@@ -200,21 +186,15 @@ export const Statistics = () => {
                     angle={-45}
                     textAnchor="end"
                     height={60}
-                    interval="preserveStartEnd"
-                    minTickGap={50}
+                    interval={0}
                   />
-                  <YAxis
-                    domain={[0, 100]}
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
                   <Line
                     type="monotone"
                     dataKey="score"
                     stroke="#8884d8"
-                    strokeWidth={2}
-                    dot={{ fill: "#8884d8", r: 4 }}
-                    activeDot={{ r: 6 }}
+                    dot={{ fill: "#8884d8" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -236,20 +216,10 @@ export const Statistics = () => {
                     angle={-45}
                     textAnchor="end"
                     height={60}
-                    interval={0}
                   />
-                  <YAxis
-                    domain={[0, 100]}
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <Tooltip
-                    formatter={(value) => [`${value}%`, "Average Score"]}
-                  />
-                  <Bar
-                    dataKey="avgScore"
-                    fill="#8884d8"
-                    animationDuration={1000}
-                  />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Bar dataKey="avgScore" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -271,8 +241,7 @@ export const Statistics = () => {
                     cx="50%"
                     cy="50%"
                     outerRadius={150}
-                    label={({ name, value }) => `${name}: ${value}`}
-                    labelLine={true}
+                    label
                   >
                     {subjectData.map((entry, index) => (
                       <Cell
