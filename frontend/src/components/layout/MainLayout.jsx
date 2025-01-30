@@ -45,7 +45,7 @@ export const MainLayout = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/landing");
   };
 
   const isPathActive = (path) => location.pathname === path;
