@@ -145,7 +145,7 @@ export const LearningTimeline = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[500px] pr-4">
+        <ScrollArea className="h-[300px] pr-4">
           {timelineData.length > 0 ? (
             <div className="space-y-6">
               {timelineData.map((item, index) => (

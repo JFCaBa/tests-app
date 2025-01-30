@@ -143,7 +143,7 @@ export const RecentActivity = () => {
           </div>
         </div>
 
-        <div className="h-72">
+        <div className="h-48">
           {filteredData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={filteredData}>
