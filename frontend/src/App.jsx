@@ -86,19 +86,20 @@ const App = () => {
               </ErrorBoundary>
             }
           />
-          <Route
-            path="statistics"
-            element={
-              <ErrorBoundary>
-                <Statistics />
-              </ErrorBoundary>
-            }
-          />
+          {/* Progress and Statistic Routes */}
           <Route
             path="progress"
             element={
               <ErrorBoundary>
                 <Progress />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="statistics"
+            element={
+              <ErrorBoundary>
+                <Statistics />
               </ErrorBoundary>
             }
           />
