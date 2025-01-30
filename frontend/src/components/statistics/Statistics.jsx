@@ -177,7 +177,7 @@ export const Statistics = () => {
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={subjectData.toFixed(1)}>
+                <BarChart data={subjectData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="subject" />
                   <YAxis domain={[0, 100]} />
