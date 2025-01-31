@@ -6,7 +6,7 @@ const backupDatabase = async (config = {}) => {
   const {
     dbName = "test-app",
     backupDir = "./mongodb_backup",
-    host = "localhost",
+    host = "testmyrussian.com",
     port = "27017",
   } = config;
 

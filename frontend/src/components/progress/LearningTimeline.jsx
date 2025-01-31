@@ -10,6 +10,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import axios from "axios";
+import { testService } from "../../services/test.service";
 
 const TimelineItem = ({ item }) => {
   const getIcon = () => {
@@ -66,13 +67,10 @@ export const LearningTimeline = () => {
   useEffect(() => {
     const fetchTimeline = async () => {
       try {
-        const [historyResponse, statsResponse] = await Promise.all([
-          axios.get("/tests/history"),
-          axios.get("/tests/stats"),
+        const [history, stats] = await Promise.all([
+          testService.getHistory(),
+          testService.getStats(),
         ]);
-
-        const history = historyResponse.data;
-        const stats = statsResponse.data;
 
         console.log("History:", history);
 

@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import TextFormatter from "../common/TextFormatter";
 import { AudioQuestion } from "./AudioQuestion";
+import { testService } from "../../services/test.service";
 
 const QuestionTypes = {
   MULTIPLE_CHOICE: "multiple-choice",
@@ -46,6 +47,14 @@ export const PracticeSession = () => {
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [timerActive, setTimerActive] = useState(true);
   const [questionTimers, setQuestionTimers] = useState({}); // Track time per question
+
+  useEffect(() => {
+    // Initialize session time on first load
+    if (!sessionStartTime) {
+      setSessionStartTime(Date.now());
+    }
+    fetchQuestion();
+  }, [subject, mode, difficulty]);
 
   const fetchQuestion = async () => {
     setLoading(true);
@@ -150,6 +159,7 @@ export const PracticeSession = () => {
     }
   };
 
+  // Move handleAnswer outside of handleTimeUp
   const handleTimeUp = () => {
     if (feedback) return;
 
@@ -164,17 +174,51 @@ export const PracticeSession = () => {
       correct: false,
     };
 
-    setStats((prev) => ({
-      ...prev,
-      total: prev.total + 1,
-      streak: 0,
-      answers: [...prev.answers, answer],
-    }));
+    // Update stats with the timed-out answer
+    setStats((prev) => {
+      const newTotal = prev.total + 1;
+      const newStats = {
+        ...prev,
+        total: newTotal,
+        streak: 0,
+        answers: [...prev.answers, answer],
+      };
 
-    setFeedback({
-      correct: false,
-      message: "Time's up! The correct answer was: " + getCorrectAnswerText(),
+      setProgress((newTotal * 100) / questionCount);
+
+      // If this was the last question, navigate to summary
+      if (newTotal >= questionCount) {
+        // Small delay to ensure state is updated before navigating
+        setTimeout(() => {
+          const sessionTimeSpent = Math.floor(
+            (Date.now() - sessionStartTime) / 1000
+          );
+          navigate("/practice/summary", {
+            state: {
+              stats: {
+                ...newStats,
+                timeSpent: sessionTimeSpent,
+                questionTimers,
+                totalTimeSpent: totalTimeSpent + timeSpentOnQuestion,
+              },
+              subject,
+              mode,
+              difficulty,
+            },
+          });
+        }, 0);
+      }
+
+      return newStats;
     });
+
+    // Only show feedback if not the last question
+    if (stats.total < questionCount) {
+      setFeedback({
+        correct: false,
+        message: "Time's up! The correct answer was: " + getCorrectAnswerText(),
+      });
+    }
   };
 
   const handleAnswer = async (answer) => {
@@ -203,12 +247,19 @@ export const PracticeSession = () => {
         correct: isCorrect,
       };
 
-      setStats((prev) => ({
-        correct: prev.correct + (isCorrect ? 1 : 0),
-        total: prev.total + 1,
-        streak: isCorrect ? prev.streak + 1 : 0,
-        answers: [...prev.answers, answerDetails],
-      }));
+      setStats((prev) => {
+        const newStats = {
+          correct: prev.correct + (isCorrect ? 1 : 0),
+          total: prev.total + 1,
+          streak: isCorrect ? prev.streak + 1 : 0,
+          answers: [...prev.answers, answerDetails],
+        };
+
+        // Calculate progress right after updating stats
+        setProgress((newStats.total * 100) / questionCount);
+
+        return newStats;
+      });
 
       let feedbackMessage = isCorrect
         ? "Correct! " + (response.data.explanation || "")
@@ -222,26 +273,25 @@ export const PracticeSession = () => {
         correct: isCorrect,
         message: feedbackMessage,
       });
-
-      setProgress((prev) => ((prev + 1) * 100) / questionCount);
     } catch (err) {
       console.error("Answer submission error:", err);
       setError(err.response?.data?.message || "Failed to check answer");
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setUserAnswer(null);
     setFeedback(null);
 
     if (stats.total >= questionCount) {
-      // Calculate final session statistics
-      const sessionTimeSpent = Math.floor(
-        (Date.now() - sessionStartTime) / 1000
-      );
+      try {
+        // Calculate final session statistics
+        const sessionTimeSpent = Math.floor(
+          (Date.now() - sessionStartTime) / 1000
+        );
 
-      navigate("/practice/summary", {
-        state: {
+        // Prepare test data
+        const testData = {
           stats: {
             ...stats,
             timeSpent: sessionTimeSpent,
@@ -251,8 +301,19 @@ export const PracticeSession = () => {
           subject,
           mode,
           difficulty,
-        },
-      });
+        };
+
+        // Submit test results to backend
+        await testService.submitTest(testData);
+
+        // Navigate to summary
+        navigate("/practice/summary", {
+          state: testData,
+        });
+      } catch (error) {
+        setError(error.message);
+        console.error("Failed to submit test results:", error);
+      }
     } else {
       fetchQuestion();
     }

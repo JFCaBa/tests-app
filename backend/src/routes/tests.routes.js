@@ -51,72 +51,78 @@ router.post(
 );
 
 // @route   POST /api/tests/submit
-// @desc    Submit test answers
+// @desc    Submit test answers and save to history
 // @access  Private
 router.post(
   "/submit",
   auth.required,
-  validation.rules.test.submit,
-  validation.validate,
   asyncHandler(async (req, res) => {
-    const { testId, answers, timeSpent } = req.body;
+    const {
+      answers,
+      timeSpent,
+      subject,
+      mode,
+      difficulty,
+      score,
+      totalQuestions,
+      correctAnswers,
+    } = req.body;
 
-    // Get all questions
-    const questionIds = answers.map((a) => a.questionId);
-    const questions = await Question.find({ _id: { $in: questionIds } });
+    try {
+      // Find the user
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-    // Calculate results
-    let correctCount = 0;
-    const results = answers.map((answer) => {
-      const question = questions.find(
-        (q) => q._id.toString() === answer.questionId
-      );
-      const isCorrect = question.correctAnswer === answer.answer;
-      if (isCorrect) correctCount++;
+      // Create test history entry
+      const testResult = {
+        testDate: new Date(),
+        subject,
+        score: score || (correctAnswers / totalQuestions) * 100,
+        totalQuestions,
+        correctAnswers,
+        timeSpent,
+        mode,
+        difficulty,
+        questions: answers.map((answer) => ({
+          questionId: answer.questionId,
+          userAnswer: answer.answer,
+          correct: answer.correct,
+          timeSpent: answer.timeSpent,
+        })),
+      };
+
+      // Add to user's test history
+      user.testHistory.push(testResult);
+      await user.save();
 
       // Update question statistics
-      question.statistics.timesAnswered++;
-      if (isCorrect) question.statistics.timesCorrect++;
-      question.save();
+      for (const answer of answers) {
+        const question = await Question.findById(answer.questionId);
+        if (question) {
+          question.statistics = question.statistics || {};
+          question.statistics.timesAnswered =
+            (question.statistics.timesAnswered || 0) + 1;
+          if (answer.correct) {
+            question.statistics.timesCorrect =
+              (question.statistics.timesCorrect || 0) + 1;
+          }
+          question.statistics.averageTimeSpent =
+            ((question.statistics.averageTimeSpent || 0) *
+              (question.statistics.timesAnswered - 1) +
+              answer.timeSpent) /
+            question.statistics.timesAnswered;
 
-      return {
-        questionId: answer.questionId,
-        correct: isCorrect,
-        userAnswer: answer.answer,
-        correctAnswer: question.correctAnswer,
-      };
-    });
+          await question.save();
+        }
+      }
 
-    // Calculate score
-    const score = (correctCount / answers.length) * 100;
-
-    // Save test results to user history
-    const user = await User.findById(req.user._id);
-    user.testHistory.push({
-      testDate: new Date(),
-      subject: questions[0].subject,
-      score,
-      totalQuestions: answers.length,
-      correctAnswers: correctCount,
-      timeSpent,
-      questions: results,
-    });
-    await user.save();
-
-    res.json({
-      score,
-      totalQuestions: answers.length,
-      correctAnswers: correctCount,
-      timeSpent,
-      results: answers.map((answer) => ({
-        questionId: answer.questionId,
-        correct: answer.isCorrect,
-        userAnswer: answer.answer,
-        correctAnswer: questions.find(
-          (q) => q._id.toString() === answer.questionId
-        ).correctAnswer,
-      })),
-    });
+      res.json(testResult);
+    } catch (error) {
+      console.error("Test submission error:", error);
+      res.status(500).json({ message: "Failed to save test results" });
+    }
   })
 );
 
@@ -129,9 +135,18 @@ router.get(
   asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
       .select("testHistory")
-      .sort({ "testHistory.testDate": -1 });
+      .populate("testHistory.questions.questionId", "question");
 
-    res.json(user.testHistory);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Sort history by date descending
+    const sortedHistory = user.testHistory.sort(
+      (a, b) => b.testDate - a.testDate
+    );
+
+    res.json(sortedHistory);
   })
 );
 
