@@ -74,6 +74,8 @@ export const LearningTimeline = () => {
         const history = historyResponse.data;
         const stats = statsResponse.data;
 
+        console.log("History:", history);
+
         // Transform test history into timeline format
         const testItems = history.map((test) => ({
           type: "test_completed",

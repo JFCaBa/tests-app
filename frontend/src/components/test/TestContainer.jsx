@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, ChevronLeft, ChevronRight, Timer } from "lucide-react";
 import { useSettings } from "../../contexts/SettingsContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,21 +35,28 @@ export const TestContainer = () => {
   const [error, setError] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
+  const [testId, setTestId] = useState(null);
+  const [startTime, setStartTime] = useState(null);
+  const [questionStartTimes, setQuestionStartTimes] = useState({});
 
   const startTest = async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/tests/start", {
+      const response = await axios.post("/api/tests/start", {
         subject,
-        difficulty: settings.defaultDifficulty,
-        questionCount: settings.questionsPerTest,
+        difficulty: settings?.defaultDifficulty || "medium",
+        questionCount: settings?.questionsPerTest || 10,
       });
+
       setQuestions(response.data.questions);
+      setTestId(response.data.testId);
       setTestStarted(true);
       setUserAnswers({});
       setCurrentIndex(0);
       setShowResults(false);
+      setStartTime(Date.now());
+      setQuestionStartTimes({ 0: Date.now() });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to start test");
     } finally {
@@ -58,21 +65,32 @@ export const TestContainer = () => {
   };
 
   const handleAnswer = (answer) => {
+    const questionId = questions[currentIndex]._id;
     setUserAnswers((prev) => ({
       ...prev,
-      [questions[currentIndex]._id]: answer,
+      [questionId]: {
+        answer,
+        timeSpent: Math.floor(
+          (Date.now() - questionStartTimes[currentIndex]) / 1000
+        ),
+      },
     }));
   };
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setQuestionStartTimes((prev) => ({
+        ...prev,
+        [nextIndex]: Date.now(),
+      }));
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
+      setCurrentIndex(currentIndex - 1);
     }
   };
 
@@ -80,20 +98,30 @@ export const TestContainer = () => {
     setLoading(true);
     setError("");
     try {
-      const answers = Object.entries(userAnswers).map(
-        ([questionId, answer]) => ({
+      // Calculate total time spent
+      const totalTimeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+      // Format answers for submission
+      const formattedAnswers = Object.entries(userAnswers).map(
+        ([questionId, data]) => ({
           questionId,
-          answer,
+          answer: data.answer,
+          timeSpent: data.timeSpent,
         })
       );
 
-      const response = await axios.post("/tests/submit", {
-        answers,
-        timeSpent: 0, // TODO: Implement timer
+      const response = await axios.post("/api/tests/submit", {
+        testId,
+        answers: formattedAnswers,
+        timeSpent: totalTimeSpent,
       });
 
       setShowResults(true);
-      // TODO: Handle test results
+      // Handle test results - you might want to navigate to a results page
+      if (response.data) {
+        // Navigate to results or show results modal
+        console.log("Test Results:", response.data);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to submit test");
     } finally {
@@ -113,12 +141,14 @@ export const TestContainer = () => {
               <Button
                 key={index}
                 variant={
-                  userAnswers[question._id] === index ? "default" : "outline"
+                  userAnswers[question._id]?.answer === index
+                    ? "default"
+                    : "outline"
                 }
                 className="w-full justify-start"
                 onClick={() => handleAnswer(index)}
               >
-                {option}
+                {typeof option === "object" ? option.text : option}
               </Button>
             ))}
           </div>
@@ -130,8 +160,9 @@ export const TestContainer = () => {
             <Button
               variant="outline"
               onClick={() => {
-                // TODO: Implement audio playback
-                console.log("Playing audio:", question.audioUrl);
+                // Audio playback implementation
+                const audio = new Audio(`/api/${question.audioUrl}`);
+                audio.play().catch(console.error);
               }}
             >
               <Play className="mr-2 h-4 w-4" />
@@ -141,12 +172,14 @@ export const TestContainer = () => {
               <Button
                 key={index}
                 variant={
-                  userAnswers[question._id] === index ? "default" : "outline"
+                  userAnswers[question._id]?.answer === index
+                    ? "default"
+                    : "outline"
                 }
                 className="w-full justify-start"
                 onClick={() => handleAnswer(index)}
               >
-                {option}
+                {typeof option === "object" ? option.text : option}
               </Button>
             ))}
           </div>
@@ -157,16 +190,10 @@ export const TestContainer = () => {
           <div className="space-y-4">
             <textarea
               className="w-full h-32 p-2 border rounded"
-              value={userAnswers[question._id] || ""}
+              value={userAnswers[question._id]?.answer || ""}
               onChange={(e) => handleAnswer(e.target.value)}
-              placeholder="You can write your answer here and see an example after submitting..."
+              placeholder="Write your answer here..."
             />
-            {question.sampleResponse && (
-              <div className="bg-gray-50 p-4 rounded">
-                <h4 className="font-medium mb-2">Sample Response:</h4>
-                <p>{question.sampleResponse}</p>
-              </div>
-            )}
           </div>
         );
 
@@ -212,8 +239,16 @@ export const TestContainer = () => {
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>
-          Question {currentIndex + 1} of {questions.length}
+        <CardTitle className="flex justify-between items-center">
+          <span>
+            Question {currentIndex + 1} of {questions.length}
+          </span>
+          {startTime && (
+            <div className="flex items-center text-sm text-gray-500">
+              <Timer className="w-4 h-4 mr-1" />
+              <span>{Math.floor((Date.now() - startTime) / 1000)}s</span>
+            </div>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -38,14 +38,14 @@ export const PracticeSession = () => {
     correct: 0,
     total: 0,
     streak: 0,
+    answers: [],
   });
+  // Timer related state
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [questionStartTime, setQuestionStartTime] = useState(null);
+  const [sessionStartTime, setSessionStartTime] = useState(null);
   const [timerActive, setTimerActive] = useState(true);
-
-  useEffect(() => {
-    fetchQuestion();
-  }, [subject, mode, difficulty]);
+  const [questionTimers, setQuestionTimers] = useState({}); // Track time per question
 
   const fetchQuestion = async () => {
     setLoading(true);
@@ -55,11 +55,22 @@ export const PracticeSession = () => {
       const response = await axios.get("/questions/practice", {
         params: { subject, mode, difficulty },
       });
+
       setCurrentQuestion(response.data);
+
       if (mode === "timed") {
         setTimeLeft(response.data.timeLimit || 60);
       }
-      setQuestionStartTime(Date.now());
+
+      // Reset question timer
+      const newQuestionStartTime = Date.now();
+
+      setQuestionStartTime(newQuestionStartTime);
+      setQuestionTimers((prev) => ({
+        ...prev,
+        [response.data._id]: newQuestionStartTime,
+      }));
+
       setUserAnswer(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load question");
@@ -69,6 +80,7 @@ export const PracticeSession = () => {
   };
 
   const calculateTimeSpent = () => {
+    if (!questionStartTime) return 0;
     return Math.min(
       Math.floor((Date.now() - questionStartTime) / 1000),
       mode === "timed" ? currentQuestion?.timeLimit || 60 : Infinity
@@ -145,6 +157,20 @@ export const PracticeSession = () => {
     const timeSpentOnQuestion = calculateTimeSpent();
     setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
 
+    const answer = {
+      questionId: currentQuestion._id,
+      answer: null,
+      timeSpent: timeSpentOnQuestion,
+      correct: false,
+    };
+
+    setStats((prev) => ({
+      ...prev,
+      total: prev.total + 1,
+      streak: 0,
+      answers: [...prev.answers, answer],
+    }));
+
     setFeedback({
       correct: false,
       message: "Time's up! The correct answer was: " + getCorrectAnswerText(),
@@ -156,7 +182,6 @@ export const PracticeSession = () => {
 
     setTimerActive(false);
     const timeSpentOnQuestion = calculateTimeSpent();
-    setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
 
     try {
       const response = await axios.post("/questions/check", {
@@ -166,23 +191,31 @@ export const PracticeSession = () => {
       });
 
       const isCorrect = response.data.correct;
-      let feedbackMessage = "";
 
-      if (isCorrect) {
-        feedbackMessage = "Correct! " + (response.data.explanation || "");
-      } else {
-        if (
-          currentQuestion.type === QuestionTypes.MULTIPLE_CHOICE ||
-          currentQuestion.type === QuestionTypes.AUDIO
-        ) {
-          feedbackMessage = `Incorrect. The correct answer was: ${getCorrectAnswerText()}`;
-        } else {
-          feedbackMessage = "Incorrect.";
-        }
+      // Update total time and answer history
+      setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
 
-        if (response.data.explanation) {
-          feedbackMessage += ` ${response.data.explanation}`;
-        }
+      // Store answer details
+      const answerDetails = {
+        questionId: currentQuestion._id,
+        answer,
+        timeSpent: timeSpentOnQuestion,
+        correct: isCorrect,
+      };
+
+      setStats((prev) => ({
+        correct: prev.correct + (isCorrect ? 1 : 0),
+        total: prev.total + 1,
+        streak: isCorrect ? prev.streak + 1 : 0,
+        answers: [...prev.answers, answerDetails],
+      }));
+
+      let feedbackMessage = isCorrect
+        ? "Correct! " + (response.data.explanation || "")
+        : `Incorrect. The correct answer was: ${getCorrectAnswerText()}`;
+
+      if (!isCorrect && response.data.explanation) {
+        feedbackMessage += ` ${response.data.explanation}`;
       }
 
       setFeedback({
@@ -190,13 +223,7 @@ export const PracticeSession = () => {
         message: feedbackMessage,
       });
 
-      setStats((prev) => ({
-        correct: prev.correct + (isCorrect ? 1 : 0),
-        total: prev.total + 1,
-        streak: isCorrect ? prev.streak + 1 : 0,
-      }));
-
-      setProgress((stats.total + 1) * (100 / questionCount));
+      setProgress((prev) => ((prev + 1) * 100) / questionCount);
     } catch (err) {
       console.error("Answer submission error:", err);
       setError(err.response?.data?.message || "Failed to check answer");
@@ -208,11 +235,18 @@ export const PracticeSession = () => {
     setFeedback(null);
 
     if (stats.total >= questionCount) {
+      // Calculate final session statistics
+      const sessionTimeSpent = Math.floor(
+        (Date.now() - sessionStartTime) / 1000
+      );
+
       navigate("/practice/summary", {
         state: {
           stats: {
             ...stats,
-            timeSpent: totalTimeSpent,
+            timeSpent: sessionTimeSpent,
+            questionTimers,
+            totalTimeSpent,
           },
           subject,
           mode,
@@ -336,9 +370,14 @@ export const PracticeSession = () => {
             </p>
           </div>
           {mode === "timed" && timeLeft !== null && (
-            <div className="flex items-center">
-              <Clock className="mr-2 h-5 w-5 text-gray-500" />
-              <span className="text-xl font-semibold">{timeLeft}s</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center">
+                <Clock className="mr-2 h-5 w-5 text-gray-500" />
+                <span className="text-xl font-semibold">{timeLeft}s</span>
+              </div>
+              <div className="text-sm text-gray-500">
+                Total: {Math.floor(totalTimeSpent)}s
+              </div>
             </div>
           )}
         </div>
