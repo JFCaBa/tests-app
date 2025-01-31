@@ -42,6 +42,36 @@ const subjects = [
 const questionTypes = ["multiple-choice", "writing", "audio"];
 const difficultyLevels = ["easy", "medium", "hard"];
 
+const loadLastSelected = () => {
+  try {
+    return {
+      subject: localStorage.getItem("lastSelected_subject") || "",
+      type: localStorage.getItem("lastSelected_type") || "",
+      difficulty: localStorage.getItem("lastSelected_difficulty") || "medium",
+      question: "",
+      options: ["", "", "", ""],
+      correctAnswer: 0,
+      explanation: "",
+      sampleResponse: "",
+      audioFile: null,
+      imageFile: null,
+    };
+  } catch {
+    return {
+      subject: "",
+      type: "",
+      difficulty: "medium",
+      question: "",
+      options: ["", "", "", ""],
+      correctAnswer: 0,
+      explanation: "",
+      sampleResponse: "",
+      audioFile: null,
+      imageFile: null,
+    };
+  }
+};
+
 const QuestionManager = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,32 +88,10 @@ const QuestionManager = () => {
   const [showForm, setShowForm] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState(null);
-  const [formData, setFormData] = useState({
-    subject: "",
-    type: "",
-    question: "",
-    options: ["", "", "", ""],
-    correctAnswer: 0,
-    difficulty: "medium",
-    explanation: "",
-    sampleResponse: "",
-    audioFile: null,
-    imageFile: null,
-  });
+  const [formData, setFormData] = useState(loadLastSelected());
 
   const resetForm = () => {
-    setFormData({
-      subject: "",
-      type: "",
-      question: "",
-      options: ["", "", "", ""],
-      correctAnswer: 0,
-      difficulty: "medium",
-      explanation: "",
-      sampleResponse: "",
-      audioFile: null,
-      imageFile: null,
-    });
+    setFormData(loadLastSelected());
   };
 
   const fetchQuestions = async () => {
@@ -91,7 +99,6 @@ const QuestionManager = () => {
       setLoading(true);
       setError("");
 
-      // Clean up filters before sending
       const cleanFilters = {
         ...filters,
         subject: filters.subject === "all" ? undefined : filters.subject,
@@ -102,7 +109,6 @@ const QuestionManager = () => {
         page,
       };
 
-      // Remove undefined values
       const queryParams = Object.fromEntries(
         Object.entries(cleanFilters).filter(([_, value]) => value !== undefined)
       );
@@ -124,7 +130,6 @@ const QuestionManager = () => {
     fetchQuestions();
   }, [filters, page]);
 
-  // Cleanup timeout on component unmount
   useEffect(() => {
     return () => {
       if (searchTimeout) {
@@ -134,68 +139,18 @@ const QuestionManager = () => {
   }, [searchTimeout]);
 
   const handleSearch = (value) => {
-    // Clear any existing timeout
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
 
-    // Set loading state immediately
     setLoading(true);
 
-    // Set a new timeout to update search after typing stops
     const timeout = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: value }));
-      setPage(1); // Reset to first page when searching
-    }, 300); // Reduced to 300ms for better responsiveness
+      setPage(1);
+    }, 300);
 
     setSearchTimeout(timeout);
-  };
-
-  const handleCreateOrUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const formDataObj = new FormData();
-      Object.keys(formData).forEach((key) => {
-        if (key === "options") {
-          formDataObj.append(key, JSON.stringify(formData[key]));
-        } else if (key === "audioFile" && formData[key]) {
-          formDataObj.append("audio", formData[key]);
-        } else if (key === "imageFile" && formData[key]) {
-          formDataObj.append("image", formData[key]);
-        } else {
-          formDataObj.append(key, formData[key]);
-        }
-      });
-
-      if (editingQuestion) {
-        await axios.put(`/api/questions/${editingQuestion._id}`, formDataObj, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      } else {
-        await axios.post("/api/questions", formDataObj, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      }
-
-      setShowForm(false);
-      setEditingQuestion(null);
-      resetForm();
-      fetchQuestions();
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Failed to save question");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this question?")) {
-      try {
-        await axios.delete(`/api/questions/${id}`);
-        fetchQuestions();
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to delete question");
-      }
-    }
   };
 
   const handleEdit = (question) => {
@@ -204,15 +159,32 @@ const QuestionManager = () => {
       subject: question.subject,
       type: question.type,
       question: question.question,
-      options: question.options,
-      correctAnswer: question.correctAnswer,
+      options: Array.isArray(question.options)
+        ? question.options.map((opt) =>
+            typeof opt === "string" ? opt : opt.text
+          )
+        : ["", "", "", ""],
+      correctAnswer: question.correctAnswer || 0,
       difficulty: question.difficulty,
       explanation: question.explanation || "",
       sampleResponse: question.sampleResponse || "",
       audioFile: null,
       imageFile: null,
+      existingAudioUrl: question.audioUrl || null,
+      existingImageUrl: question.imageUrl || null,
     });
     setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this question?")) {
+      try {
+        await axios.delete(`/questions/${id}`);
+        fetchQuestions();
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to delete question");
+      }
+    }
   };
 
   const handleFormClose = () => {
@@ -456,9 +428,12 @@ const QuestionManager = () => {
         <QuestionForm
           formData={formData}
           setFormData={setFormData}
-          onSubmit={handleCreateOrUpdate}
           onClose={handleFormClose}
           editingQuestion={editingQuestion}
+          onSubmitSuccess={() => {
+            handleFormClose();
+            fetchQuestions();
+          }}
         />
       )}
     </div>

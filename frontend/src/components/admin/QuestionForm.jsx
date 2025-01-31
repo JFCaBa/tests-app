@@ -31,10 +31,27 @@ const subjects = [
 const questionTypes = ["multiple-choice", "writing", "audio"];
 const difficultyLevels = ["easy", "medium", "hard"];
 
+// Helper functions for localStorage
+const getLastSelected = (key, defaultValue) => {
+  try {
+    const value = localStorage.getItem(`lastSelected_${key}`);
+    return value !== null ? value : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const saveLastSelected = (key, value) => {
+  try {
+    localStorage.setItem(`lastSelected_${key}`, value);
+  } catch (error) {
+    console.warn("Failed to save to localStorage:", error);
+  }
+};
+
 const QuestionForm = ({
   formData,
   setFormData,
-  onSubmit,
   onClose,
   editingQuestion,
   onSubmitSuccess,
@@ -42,30 +59,20 @@ const QuestionForm = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Effect to properly populate form data when editing
+  // Save selections to localStorage when they change (only for new questions)
   useEffect(() => {
-    if (editingQuestion) {
-      setFormData({
-        subject: editingQuestion.subject || "",
-        type: editingQuestion.type || "",
-        question: editingQuestion.question || "",
-        options: Array.isArray(editingQuestion?.options)
-          ? editingQuestion.options.map((opt) =>
-              typeof opt === "string" ? opt : opt.text
-            )
-          : ["", "", "", ""],
-        correctAnswer: editingQuestion.correctAnswer || 0,
-        difficulty: editingQuestion.difficulty || "medium",
-        explanation: editingQuestion.explanation || "",
-        sampleResponse: editingQuestion.sampleResponse || "",
-        audioFile: null,
-        imageFile: null,
-        // Keep track of existing files
-        existingAudioUrl: editingQuestion.audioUrl || null,
-        existingImageUrl: editingQuestion.imageUrl || null,
-      });
+    if (!editingQuestion && formData) {
+      if (formData.subject) saveLastSelected("subject", formData.subject);
+      if (formData.type) saveLastSelected("type", formData.type);
+      if (formData.difficulty)
+        saveLastSelected("difficulty", formData.difficulty);
     }
-  }, [editingQuestion, setFormData]);
+  }, [
+    formData?.subject,
+    formData?.type,
+    formData?.difficulty,
+    editingQuestion,
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,7 +101,7 @@ const QuestionForm = ({
         submitFormData.append("correctAnswer", formData.correctAnswer);
       }
 
-      // Handle files - only append if new files are selected
+      // Handle files
       if (formData.type === "audio" && formData.audioFile) {
         submitFormData.append("audio", formData.audioFile);
       }
@@ -103,7 +110,6 @@ const QuestionForm = ({
         submitFormData.append("image", formData.imageFile);
       }
 
-      // Additional fields
       if (formData.explanation) {
         submitFormData.append("explanation", formData.explanation);
       }
@@ -113,12 +119,6 @@ const QuestionForm = ({
         submitFormData.append("correctAnswer", 0);
       }
 
-      console.log("Submitting form data:");
-      for (let pair of submitFormData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
-      // Make the request
       let response;
       if (editingQuestion) {
         response = await axios.put(
@@ -132,24 +132,9 @@ const QuestionForm = ({
       if (onSubmitSuccess) {
         onSubmitSuccess(response.data);
       }
-
-      onClose();
     } catch (error) {
       console.error("Submission error:", error);
-
-      let errorMessage;
-      if (error.message === "Network Error") {
-        errorMessage =
-          "Connection error. Please check your internet connection.";
-      } else if (error.response?.status === 413) {
-        errorMessage = "File too large. Please try a smaller file.";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else {
-        errorMessage = "Failed to save question. Please try again.";
-      }
-
-      setError(errorMessage);
+      setError(error.response?.data?.message || "Failed to save question");
     } finally {
       setLoading(false);
     }
@@ -186,7 +171,6 @@ const QuestionForm = ({
     return true;
   };
 
-  // Rest of the component remains the same with the form UI
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">

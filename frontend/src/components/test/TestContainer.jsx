@@ -43,7 +43,7 @@ export const TestContainer = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/tests/start", {
+      const response = await axios.post("/tests/start", {
         subject,
         difficulty: settings?.defaultDifficulty || "medium",
         questionCount: settings?.questionsPerTest || 10,
@@ -110,7 +110,7 @@ export const TestContainer = () => {
         })
       );
 
-      const response = await axios.post("/api/tests/submit", {
+      const response = await axios.post("/tests/submit", {
         testId,
         answers: formattedAnswers,
         timeSpent: totalTimeSpent,
