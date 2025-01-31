@@ -22,8 +22,6 @@ import { useNavigate } from "react-router-dom";
 import { LearningTimeline } from "@/components/progress/LearningTimeline";
 import { RecentActivity } from "@/components/progress/RecentActivity";
 
-import axios from "axios";
-
 const calculatePercentage = (correct, total) => {
   if (!total) return 0;
   return (correct / total) * 100;
@@ -38,24 +36,45 @@ export const Progress = () => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        if (user?.statistics) {
+        if (user?.testHistory) {
+          // Calculate statistics from test history
+          const statsBySubject = user.testHistory.reduce((acc, test) => {
+            const subject = test.subject;
+            if (!acc[subject]) {
+              acc[subject] = {
+                totalTests: 0,
+                totalScore: 0,
+                bestScore: 0,
+                totalTime: 0,
+              };
+            }
+
+            acc[subject].totalTests++;
+            acc[subject].totalScore += test.score;
+            acc[subject].bestScore = Math.max(
+              acc[subject].bestScore,
+              test.score
+            );
+            acc[subject].totalTime += test.timeSpent;
+
+            return acc;
+          }, {});
+
+          // Calculate averages and prepare final data
           const progressData = {
             stats: {
-              totalTests: user.statistics.totalAnswered,
+              totalTests: user.testHistory.length,
               averageScore: calculatePercentage(
-                user.statistics.totalCorrect,
-                user.statistics.totalAnswered
+                user.testHistory.reduce((sum, test) => sum + test.score, 0),
+                user.testHistory.length * 100
               ),
-              statsBySubject: Object.entries(user.statistics.bySubject).reduce(
+              statsBySubject: Object.entries(statsBySubject).reduce(
                 (acc, [subject, data]) => {
                   acc[subject] = {
-                    totalTests: data.answered,
-                    averageScore: calculatePercentage(
-                      data.correct,
-                      data.answered
-                    ),
-                    bestScore: calculatePercentage(data.correct, data.answered),
-                    totalTime: data.averageTimeSpent * data.answered,
+                    totalTests: data.totalTests,
+                    averageScore: data.totalScore / data.totalTests,
+                    bestScore: data.bestScore,
+                    totalTime: data.totalTime,
                   };
                   return acc;
                 },
@@ -85,26 +104,19 @@ export const Progress = () => {
   }
 
   // Prepare data for visualization
-  const subjectProgress = Object.entries(user?.statistics?.bySubject || {}).map(
-    ([subject, data]) => ({
-      subject: subject.charAt(0).toUpperCase() + subject.slice(1),
-      progress: (data.correct / data.answered) * 100,
-      tests: data.answered,
-      bestScore: (data.correct / data.answered) * 100,
-      totalTime: data.averageTimeSpent * data.answered,
-    })
-  );
-
-  const timelineData =
-    progressData?.history?.map((test) => ({
-      date: new Date(test.testDate).toLocaleDateString(),
-      score: test.score,
-      subject: test.subject,
-    })) || [];
+  const subjectProgress = Object.entries(
+    progressData?.stats?.statsBySubject || {}
+  ).map(([subject, data]) => ({
+    subject: subject.charAt(0).toUpperCase() + subject.slice(1),
+    progress: data.averageScore,
+    tests: data.totalTests,
+    bestScore: data.bestScore,
+    totalTime: data.totalTime,
+  }));
 
   const calculateLevel = (tests, avgScore) => {
-    if (tests < 5) return "Beginner";
-    if (tests < 15) return avgScore > 70 ? "Intermediate" : "Beginner";
+    if (tests < 3) return "Beginner";
+    if (tests < 8) return avgScore > 70 ? "Intermediate" : "Beginner";
     return avgScore > 80
       ? "Advanced"
       : avgScore > 60
@@ -112,8 +124,7 @@ export const Progress = () => {
       : "Beginner";
   };
 
-  const overallProgress =
-    progressData?.stats?.statsBySubject?.all?.averageScore || 0;
+  const overallProgress = progressData?.stats?.averageScore || 0;
   const totalTests = progressData?.stats?.totalTests || 0;
   const level = calculateLevel(totalTests, overallProgress);
 
@@ -160,7 +171,7 @@ export const Progress = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {progressData?.stats?.averageScore.toFixed(1) || 0}%
+              {overallProgress.toFixed(1)}%
             </div>
             <p className="text-sm text-gray-500">Across all subjects</p>
           </CardContent>
