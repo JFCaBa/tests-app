@@ -114,9 +114,34 @@ router.put(
 
     if (username) user.username = username;
     if (email) user.email = email;
-    if (preferences) user.preferences = { ...user.preferences, ...preferences };
+
+    // Handle preferences update with proper type checking
+    if (preferences) {
+      user.preferences = {
+        // Keep existing preferences that aren't being updated
+        ...user.preferences,
+        // Update with new preferences
+        notificationEnabled:
+          typeof preferences.notificationEnabled === "boolean"
+            ? preferences.notificationEnabled
+            : user.preferences.notificationEnabled,
+        preferredSubjects: Array.isArray(preferences.preferredSubjects)
+          ? preferences.preferredSubjects
+          : user.preferences.preferredSubjects || [],
+        defaultDifficulty: ["easy", "medium", "hard"].includes(
+          preferences.defaultDifficulty
+        )
+          ? preferences.defaultDifficulty
+          : user.preferences.defaultDifficulty || "medium",
+        questionsPerTest: Number.isInteger(Number(preferences.questionsPerTest))
+          ? Number(preferences.questionsPerTest)
+          : user.preferences.questionsPerTest || 10,
+      };
+    }
 
     await user.save();
+
+    // Return the complete updated user object
     res.json({
       user: {
         id: user._id,
