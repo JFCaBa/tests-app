@@ -18,7 +18,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { X, Play, Pause, Volume2, VolumeX } from "lucide-react";
+import {
+  X,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const subjects = [
   "listening",
@@ -101,9 +109,87 @@ const QuestionForm = ({
   onClose,
   editingQuestion,
   onSubmitSuccess,
+  currentQuestionId,
+  onNavigate,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [allQuestions, setAllQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (editingQuestion) {
+        try {
+          // Create filters object with all possible parameters
+          const filters = {
+            page: 1,
+            limit: 10, // Match the limit used in QuestionManager
+            subject:
+              editingQuestion.subject !== "all"
+                ? editingQuestion.subject
+                : undefined,
+            type:
+              editingQuestion.type !== "all" ? editingQuestion.type : undefined,
+            difficulty:
+              editingQuestion.difficulty !== "all"
+                ? editingQuestion.difficulty
+                : undefined,
+          };
+
+          // Clean filters to remove undefined values - same as QuestionManager
+          const queryParams = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value !== undefined)
+          );
+
+          const response = await axios.get("/questions", {
+            params: queryParams,
+          });
+
+          if (response.data.questions) {
+            setAllQuestions(response.data.questions);
+
+            if (editingQuestion._id) {
+              const index = response.data.questions.findIndex(
+                (q) => q._id === editingQuestion._id
+              );
+              setCurrentIndex(index >= 0 ? index : 0);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch questions:", error);
+          setError("Failed to fetch questions");
+        }
+      }
+    };
+    fetchQuestions();
+  }, [editingQuestion]);
+
+  const handleNavigation = async (direction) => {
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < allQuestions.length && !loading) {
+      try {
+        const questionToLoad = allQuestions[newIndex];
+        const response = await axios.get(`/questions/${questionToLoad._id}`);
+
+        // Transform the data for the form
+        const questionData = response.data;
+        const formattedData = {
+          ...questionData,
+          options: questionData.options?.map((opt) => opt.text || opt) || [],
+          existingAudioUrl: questionData.audioUrl,
+          existingImageUrl: questionData.imageUrl,
+          correctAnswer: questionData.correctAnswer,
+        };
+
+        onNavigate(formattedData);
+        setCurrentIndex(newIndex);
+      } catch (error) {
+        console.error("Navigation error:", error);
+        setError("Failed to load question");
+      }
+    }
+  };
 
   useEffect(() => {
     if (!editingQuestion && formData) {
@@ -226,13 +312,40 @@ const QuestionForm = ({
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="sticky top-0 bg-white z-10">
           <div className="flex justify-between items-center">
-            <CardTitle>
-              {editingQuestion ? "Edit Question" : "Create New Question"}
-            </CardTitle>
+            <div className="flex items-center space-x-2">
+              {editingQuestion && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigation(-1)}
+                  disabled={currentIndex <= 0 || loading}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
+              <CardTitle>
+                {editingQuestion ? "Edit Question" : "Create New Question"}
+              </CardTitle>
+              {editingQuestion && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigation(1)}
+                  disabled={currentIndex >= allQuestions.length - 1 || loading}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
           </div>
+          {editingQuestion && (
+            <div className="text-sm text-gray-500 mt-1">
+              Question {currentIndex + 1} of {allQuestions.length}
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           {error && (
@@ -428,14 +541,54 @@ const QuestionForm = ({
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading || !validateForm()}>
-            {loading ? "Saving..." : editingQuestion ? "Update" : "Create"}{" "}
-            Question
-          </Button>
+        <CardFooter className="flex justify-between space-x-2">
+          {editingQuestion ? (
+            <>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleNavigation(-1)}
+                  disabled={currentIndex <= 0 || loading}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleNavigation(1)}
+                  disabled={currentIndex >= allQuestions.length - 1 || loading}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline" onClick={onClose} disabled={loading}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={loading || !validateForm()}
+                >
+                  {loading ? "Saving..." : "Update"} Question
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="flex w-full justify-end space-x-2">
+              <Button variant="outline" onClick={onClose} disabled={loading}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading || !validateForm()}
+              >
+                {loading ? "Creating..." : "Create Question"}
+              </Button>
+            </div>
+          )}
         </CardFooter>
       </Card>
     </div>

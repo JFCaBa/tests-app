@@ -434,6 +434,27 @@ const QuestionManager = () => {
             handleFormClose();
             fetchQuestions();
           }}
+          onNavigate={(question) => {
+            setFormData({
+              subject: question.subject,
+              type: question.type,
+              question: question.question,
+              options: Array.isArray(question.options)
+                ? question.options.map((opt) =>
+                    typeof opt === "string" ? opt : opt.text
+                  )
+                : ["", "", "", ""],
+              correctAnswer: question.correctAnswer || 0,
+              difficulty: question.difficulty,
+              explanation: question.explanation || "",
+              sampleResponse: question.sampleResponse || "",
+              audioFile: null,
+              imageFile: null,
+              existingAudioUrl: question.audioUrl || null,
+              existingImageUrl: question.imageUrl || null,
+            });
+            setEditingQuestion(question);
+          }}
         />
       )}
     </div>
