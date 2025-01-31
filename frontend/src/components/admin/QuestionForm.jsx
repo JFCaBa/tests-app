@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { X } from "lucide-react";
+import { X, Play, Pause, Volume2, VolumeX } from "lucide-react";
 
 const subjects = [
   "listening",
@@ -31,7 +31,6 @@ const subjects = [
 const questionTypes = ["multiple-choice", "writing", "audio"];
 const difficultyLevels = ["easy", "medium", "hard"];
 
-// Helper functions for localStorage
 const getLastSelected = (key, defaultValue) => {
   try {
     const value = localStorage.getItem(`lastSelected_${key}`);
@@ -49,6 +48,53 @@ const saveLastSelected = (key, value) => {
   }
 };
 
+const AudioPlayer = ({ audioUrl }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [audio] = useState(new Audio(audioUrl));
+
+  useEffect(() => {
+    audio.addEventListener("ended", () => setIsPlaying(false));
+    return () => {
+      audio.removeEventListener("ended", () => setIsPlaying(false));
+      audio.pause();
+    };
+  }, [audio]);
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const toggleMute = () => {
+    audio.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
+  return (
+    <div className="flex items-center space-x-2 my-2">
+      <Button size="sm" variant="outline" onClick={togglePlay}>
+        {isPlaying ? (
+          <Pause className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        )}
+      </Button>
+      <Button size="sm" variant="outline" onClick={toggleMute}>
+        {isMuted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
+  );
+};
+
 const QuestionForm = ({
   formData,
   setFormData,
@@ -59,7 +105,6 @@ const QuestionForm = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Save selections to localStorage when they change (only for new questions)
   useEffect(() => {
     if (!editingQuestion && formData) {
       if (formData.subject) saveLastSelected("subject", formData.subject);
@@ -82,13 +127,11 @@ const QuestionForm = ({
     try {
       const submitFormData = new FormData();
 
-      // Basic fields
       submitFormData.append("subject", formData.subject);
       submitFormData.append("type", formData.type);
       submitFormData.append("question", formData.question);
       submitFormData.append("difficulty", formData.difficulty || "medium");
 
-      // Handle options based on question type
       if (formData.type === "multiple-choice" || formData.type === "audio") {
         const optionsWithCorrect = formData.options
           .filter((option) => option.trim() !== "")
@@ -101,7 +144,6 @@ const QuestionForm = ({
         submitFormData.append("correctAnswer", formData.correctAnswer);
       }
 
-      // Handle files
       if (formData.type === "audio" && formData.audioFile) {
         submitFormData.append("audio", formData.audioFile);
       }
@@ -171,6 +213,14 @@ const QuestionForm = ({
     return true;
   };
 
+  const getAudioUrl = (audioPath) => {
+    if (!audioPath) return "";
+    const cleanPath = audioPath.replace(/^\//, "");
+    return `https://testmyrussian.com/uploads/audio/${cleanPath
+      .split("/")
+      .pop()}`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -192,7 +242,6 @@ const QuestionForm = ({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Subject and Type Selection */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -241,7 +290,6 @@ const QuestionForm = ({
               </div>
             </div>
 
-            {/* Question Text */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Question Text
@@ -255,7 +303,6 @@ const QuestionForm = ({
               />
             </div>
 
-            {/* Multiple Choice Options */}
             {(formData.type === "multiple-choice" ||
               formData.type === "audio") && (
               <div className="space-y-2">
@@ -284,7 +331,6 @@ const QuestionForm = ({
               </div>
             )}
 
-            {/* Writing Sample Response */}
             {formData.type === "writing" && (
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -300,17 +346,21 @@ const QuestionForm = ({
               </div>
             )}
 
-            {/* Audio Upload */}
             {formData.type === "audio" && (
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Audio File
                 </label>
                 {formData.existingAudioUrl && (
-                  <div className="mb-2 text-sm text-gray-500">
-                    Current audio file:{" "}
-                    {formData.existingAudioUrl.split("/").pop()}
-                  </div>
+                  <>
+                    <div className="mb-2 text-sm text-gray-500">
+                      Current audio file:{" "}
+                      {formData.existingAudioUrl.split("/").pop()}
+                    </div>
+                    <AudioPlayer
+                      audioUrl={getAudioUrl(formData.existingAudioUrl)}
+                    />
+                  </>
                 )}
                 <Input
                   type="file"
@@ -322,7 +372,6 @@ const QuestionForm = ({
               </div>
             )}
 
-            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Image (Optional)
@@ -341,7 +390,6 @@ const QuestionForm = ({
               />
             </div>
 
-            {/* Difficulty Selection */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Difficulty
@@ -365,7 +413,6 @@ const QuestionForm = ({
               </Select>
             </div>
 
-            {/* Explanation */}
             <div>
               <label className="block text-sm font-medium mb-1">
                 Explanation
