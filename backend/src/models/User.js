@@ -135,12 +135,12 @@ const UserSchema = new mongoose.Schema(
         type: Boolean,
         default: true,
       },
-      difficulty: {
+      defaultDifficulty: {
         type: String,
         enum: ["easy", "medium", "hard"],
         default: "medium",
       },
-      numberOfQuestions: {
+      questionsPerTest: {
         type: Number,
         default: 10,
       },
