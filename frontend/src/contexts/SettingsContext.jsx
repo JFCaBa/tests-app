@@ -18,20 +18,62 @@ export const SettingsProvider = ({ children }) => {
   // Load settings from user profile on mount and when user changes
   useEffect(() => {
     if (user?.preferences) {
-      setSettings({
+      // Ensure all settings fields are properly typed
+      const userSettings = {
         ...defaultSettings,
-        ...user.preferences,
-      });
+        notificationEnabled: Boolean(user.preferences.notificationEnabled),
+        preferredSubjects: Array.isArray(user.preferences.preferredSubjects)
+          ? user.preferences.preferredSubjects
+          : defaultSettings.preferredSubjects,
+        defaultDifficulty: ["easy", "medium", "hard"].includes(
+          user.preferences.defaultDifficulty
+        )
+          ? user.preferences.defaultDifficulty
+          : defaultSettings.defaultDifficulty,
+        questionsPerTest: Number.isInteger(
+          Number(user.preferences.questionsPerTest)
+        )
+          ? Number(user.preferences.questionsPerTest)
+          : defaultSettings.questionsPerTest,
+      };
+      setSettings(userSettings);
+    } else {
+      setSettings(defaultSettings);
     }
     setLoading(false);
   }, [user]);
 
   const updateSettings = async (newSettings) => {
     try {
+      // Validate and process new settings
+      const processedSettings = {
+        notificationEnabled: Boolean(newSettings.notificationEnabled),
+        preferredSubjects: Array.isArray(newSettings.preferredSubjects)
+          ? newSettings.preferredSubjects
+          : settings.preferredSubjects,
+        defaultDifficulty: ["easy", "medium", "hard"].includes(
+          newSettings.defaultDifficulty
+        )
+          ? newSettings.defaultDifficulty
+          : settings.defaultDifficulty,
+        questionsPerTest: Number.isInteger(Number(newSettings.questionsPerTest))
+          ? Number(newSettings.questionsPerTest)
+          : settings.questionsPerTest,
+      };
+
       // Update API
-      await updateProfile({ preferences: newSettings });
-      // Update local state
-      setSettings(newSettings);
+      const updatedUser = await updateProfile({
+        preferences: processedSettings,
+      });
+
+      // Verify the update was successful
+      if (!updatedUser?.preferences) {
+        throw new Error("Failed to update settings");
+      }
+
+      // Update local state with the processed settings
+      setSettings(processedSettings);
+
       return true;
     } catch (error) {
       console.error("Failed to update settings:", error);

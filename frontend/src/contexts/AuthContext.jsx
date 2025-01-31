@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
 
   // Configure axios defaults
   axios.defaults.baseURL = config.apiBaseUrl;
-  axios.defaults.withCredentials = true; // Important for CORS with credentials
 
   // Add token to requests if it exists
   axios.interceptors.request.use(
@@ -21,9 +20,7 @@ export const AuthProvider = ({ children }) => {
       }
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
 
   // Handle token expiration
@@ -44,6 +41,7 @@ export const AuthProvider = ({ children }) => {
           const response = await axios.get("/auth/me");
           setUser(response.data);
         } catch (error) {
+          console.error("Auth initialization error:", error);
           localStorage.removeItem("token");
           setToken(null);
         }
@@ -98,9 +96,13 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (data) => {
     try {
       const response = await axios.put("/auth/me", data);
+
+      // Important: Update the entire user object
       setUser(response.data.user);
+
       return response.data.user;
     } catch (error) {
+      console.error("Profile update error:", error);
       throw new Error(error.response?.data?.message || "Profile update failed");
     }
   };
@@ -118,7 +120,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Replace with proper loading component
+    return <div>Loading...</div>;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
