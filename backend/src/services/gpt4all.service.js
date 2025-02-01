@@ -1,16 +1,19 @@
 import pkg from "gpt4all";
-const { loadModel, createCompletion } = pkg;
+const { GPT4All } = pkg;
 import path from "path";
-import fs from "fs"; // Added fs to check for file existence
+import fs from "fs";
+import os from "os";
 
 class GPT4AllService {
   constructor() {
     this.model = null;
     this.chatSession = null;
     this.isInitialized = false;
-    this.modelPath = path.resolve(
-      "/home/debian/tests-app/backend/models/gpt4all-lora-quantized.bin"
-    ); // Absolute path
+    this.modelName = "gpt4all-falcon-q4_0.gguf"; // Updated model name
+    this.modelPath = path.join(
+      os.homedir(),
+      `.cache/gpt4all/${this.modelName}`
+    );
   }
 
   async initialize() {
@@ -20,23 +23,25 @@ class GPT4AllService {
       console.log("Initializing GPT4All...");
       console.log(`🔍 Model Path: ${this.modelPath}`);
 
-      // Check if the model file exists locally before loading
-      if (!fs.existsSync(this.modelPath)) {
-        console.error("Model file does not exist at the specified path.");
-        return false;
+      // Create directory if it doesn't exist
+      const dir = path.dirname(this.modelPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
       }
 
-      // Load the model and set the device to 'cpu' (or 'gpu' if available)
-      this.model = await loadModel(this.modelPath, {
+      this.model = new GPT4All(this.modelName, {
+        modelPath: dir,
         verbose: true,
-        device: "cpu", // Change to "gpu" if using GPU
-        nCtx: 2048, // Set max context size
+        device: "cpu",
+        nCtx: 2048,
       });
 
-      // Create a chat session
-      this.chatSession = await this.model.createChatSession({
+      await this.model.init();
+      await this.model.open();
+
+      this.chatSession = this.model.createChatSession({
         temperature: 0.7,
-        systemPrompt: "### System:\nYou are a Russian language exam coach.\n\n", // Customize system prompt
+        systemPrompt: "### System:\nYou are a Russian language exam coach.\n\n",
       });
 
       this.isInitialized = true;
@@ -49,16 +54,13 @@ class GPT4AllService {
   }
 
   async generateResponse(input, subject, context = {}) {
-    if (!this.isInitialized) {
-      await this.initialize();
+    if (!this.isInitialized && !(await this.initialize())) {
+      throw new Error("Failed to initialize GPT4All");
     }
 
     try {
       const prompt = this.createPrompt(input, subject, context);
-
-      // Create a completion using the chat session
-      const response = await createCompletion(this.chatSession, prompt);
-
+      const response = await this.chatSession.prompt(prompt);
       return this.formatResponse(response);
     } catch (error) {
       console.error("Generation error:", error);
