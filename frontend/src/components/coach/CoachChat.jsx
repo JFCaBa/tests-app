@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useCoach } from "../../contexts/CoachContext";
 import coachService from "../../services/coach.service";
 import {
   Card,
@@ -21,16 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send, Bot, User, Book, Brain, AlertCircle } from "lucide-react";
-
-const SUBJECTS = [
-  { id: "listening", name: "Listening", icon: "🎧" },
-  { id: "grammar", name: "Grammar", icon: "📝" },
-  { id: "history", name: "History", icon: "📚" },
-  { id: "laws", name: "Laws", icon: "⚖️" },
-  { id: "reading", name: "Reading", icon: "📖" },
-  { id: "writing", name: "Writing", icon: "✍️" },
-];
+import { Send, Bot, User, Book, Brain } from "lucide-react";
 
 const Message = ({ message, isUser, isError }) => (
   <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
@@ -55,87 +45,31 @@ const Message = ({ message, isUser, isError }) => (
   </div>
 );
 
-// Suggestions component for quick questions
-const Suggestions = ({ onSelect, subject }) => {
-  const suggestions = {
-    listening: [
-      "How can I improve my listening comprehension?",
-      "What are common mistakes in listening tests?",
-      "Tips for understanding fast speech",
-    ],
-    grammar: [
-      "Help with case usage",
-      "Verb aspects explanation",
-      "Common grammar mistakes",
-    ],
-    history: [
-      "Key historical dates to remember",
-      "Important historical figures",
-      "Tips for history exam preparation",
-    ],
-    laws: [
-      "Essential legal concepts",
-      "Common law test questions",
-      "How to study legal terminology",
-    ],
-    reading: [
-      "Reading comprehension strategies",
-      "How to improve reading speed",
-      "Tips for understanding context",
-    ],
-    writing: [
-      "Writing structure tips",
-      "Common writing mistakes",
-      "How to improve essay writing",
-    ],
-  };
-
-  return (
-    <div className="flex flex-wrap gap-2 mt-4">
-      {suggestions[subject]?.map((suggestion, index) => (
-        <Button
-          key={index}
-          variant="outline"
-          size="sm"
-          onClick={() => onSelect(suggestion)}
-          className="text-xs"
-        >
-          {suggestion}
-        </Button>
-      ))}
-    </div>
-  );
-};
-
 const CoachChat = () => {
   const { user } = useAuth();
-  const { isInitialized, lastError, initializeCoach, getLearningContext } =
-    useCoach();
-  const [modelStatus, setModelStatus] = useState({
-    isInitialized: false,
-    modelLoaded: false,
+  const [serviceStatus, setServiceStatus] = useState({
+    available: false,
+    error: null,
   });
-
-  // Check model status periodically
-  useEffect(() => {
-    const checkStatus = async () => {
-      const status = await coachService.getStatus();
-      setModelStatus(status);
-    };
-
-    checkStatus();
-    const interval = setInterval(checkStatus, 5000);
-    return () => clearInterval(interval);
-  }, []);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
 
+  // Check service status
   useEffect(() => {
-    initializeCoach();
-  }, [initializeCoach]);
+    const checkStatus = async () => {
+      try {
+        const status = await coachService.initialize();
+        setServiceStatus({ available: status, error: null });
+      } catch (error) {
+        setServiceStatus({ available: false, error: error.message });
+      }
+    };
+
+    checkStatus();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -146,30 +80,20 @@ const CoachChat = () => {
   // Initial greeting
   useEffect(() => {
     if (messages.length === 0) {
-      const context = getLearningContext();
       let greeting = `Hello ${user?.username}! I'm your study coach. `;
 
-      if (context) {
-        if (context.totalTests > 0) {
-          greeting += `I see you've taken ${
-            context.totalTests
-          } tests with an average score of ${context.progress.toFixed(1)}%. `;
-        }
-        if (context.preferredSubjects.length > 0) {
-          greeting += `I notice you've been focusing on ${context.preferredSubjects.join(
-            ", "
-          )}. `;
-        }
+      if (user?.testHistory?.length > 0) {
+        greeting += `I see you've taken ${user.testHistory.length} tests. `;
       }
 
       greeting += `Select a subject, and I'll help you prepare for your exam.`;
 
       setMessages([{ text: greeting, isUser: false }]);
     }
-  }, [user, getLearningContext]);
+  }, [user]);
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedSubject) return;
+    if (!input.trim() || !selectedSubject || loading) return;
 
     const userMessage = { text: input, isUser: true };
     setMessages((prev) => [...prev, userMessage]);
@@ -177,7 +101,20 @@ const CoachChat = () => {
     setLoading(true);
 
     try {
-      const context = getLearningContext();
+      const context = {
+        progress:
+          user?.testHistory?.length > 0
+            ? user.testHistory.reduce((acc, test) => acc + test.score, 0) /
+              user.testHistory.length
+            : 0,
+        recentScores:
+          user?.testHistory
+            ?.slice(-3)
+            .map((test) => test.score)
+            .join(", ") || "No tests taken",
+        totalTests: user?.testHistory?.length || 0,
+      };
+
       const response = await coachService.generateResponse(
         input,
         selectedSubject,
@@ -201,7 +138,6 @@ const CoachChat = () => {
 
   const handleSuggestionSelect = (suggestion) => {
     setInput(suggestion);
-    handleSend();
   };
 
   return (
@@ -211,26 +147,29 @@ const CoachChat = () => {
           <CardTitle className="flex items-center gap-2">
             <Brain className="w-6 h-6" />
             Study Coach
-            {modelStatus.isInitialized ? (
-              <div className="flex items-center gap-2 text-sm text-green-500">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                AI Ready
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-sm text-yellow-500">
-                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                Loading AI Model
-              </div>
-            )}
+            <div
+              className={`flex items-center gap-2 text-sm ${
+                serviceStatus.available ? "text-green-500" : "text-yellow-500"
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  serviceStatus.available
+                    ? "bg-green-500"
+                    : "bg-yellow-500 animate-pulse"
+                }`}
+              ></div>
+              {serviceStatus.available ? "Ready" : "Using Basic Assistance"}
+            </div>
           </CardTitle>
           <CardDescription>
             Select a subject and ask questions about exam preparation
           </CardDescription>
 
-          {lastError && (
+          {serviceStatus.error && (
             <Alert variant="destructive">
               <AlertDescription>
-                AI features might be limited. Falling back to basic assistance.
+                Using basic assistance mode. AI features are currently limited.
               </AlertDescription>
             </Alert>
           )}
@@ -261,17 +200,6 @@ const CoachChat = () => {
                 isError={message.isError}
               />
             ))}
-            {selectedSubject && messages.length === 1 && (
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Here are some suggestions to get started:
-                </p>
-                <Suggestions
-                  subject={selectedSubject}
-                  onSelect={handleSuggestionSelect}
-                />
-              </div>
-            )}
           </ScrollArea>
 
           <CardFooter className="p-4 border-t">
@@ -296,7 +224,11 @@ const CoachChat = () => {
                   onClick={handleSend}
                   disabled={!input.trim() || !selectedSubject || loading}
                 >
-                  <Send className="h-4 w-4" />
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
