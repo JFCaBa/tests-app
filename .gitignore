@@ -10,6 +10,12 @@
 /public/models
 .vscode
 package-lock.json
+/backend/models
+/backend/.env
+/backend/uploads
+/backend/package.json.lock
+/frontend/.env
+/frontend/package.json.lock
 
 # testing
 /coverage
