@@ -1,17 +1,10 @@
-import axios from "axios";
+import { GPT4All } from "gpt4all";
 
 class CoachService {
   constructor() {
+    this.model = null;
     this.isInitialized = false;
     this.initPromise = null;
-    // Create axios instance with proper config
-    this.api = axios.create({
-      baseURL: "/api/coach",
-      timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
   }
 
   async initialize() {
@@ -21,16 +14,19 @@ class CoachService {
 
     this.initPromise = new Promise(async (resolve, reject) => {
       try {
-        // Check if the service is available
-        await this.api.get("/health");
+        console.log("Initializing GPT4All...");
+        // Initialize GPT4All with the model you want to use
+        this.model = new GPT4All("ggml-gpt4all-j-v1.3-groovy");
+        await this.model.init();
+        console.log("Model initialization started...");
+        await this.model.open();
+        console.log("Model loaded successfully");
         this.isInitialized = true;
-        console.log("Coach service initialized successfully");
-        resolve();
+        resolve(true);
       } catch (error) {
-        console.error("Failed to initialize coach service:", error);
+        console.error("Failed to initialize GPT4All:", error);
         this.isInitialized = false;
-        // Don't reject, just resolve with fallback mode
-        resolve(false);
+        resolve(false); // Resolve with false instead of rejecting
       }
     });
 
@@ -39,22 +35,68 @@ class CoachService {
 
   async generateResponse(userInput, subject, context) {
     try {
-      // First try to get AI response
-      const response = await this.api.post("/generate", {
-        input: userInput,
-        subject,
-        context,
+      if (!this.isInitialized || !this.model) {
+        console.log("Model not initialized, attempting to initialize...");
+        const initialized = await this.initialize();
+        if (!initialized) {
+          console.log("Falling back to default responses...");
+          return this.getFallbackResponse(subject, userInput);
+        }
+      }
+
+      // Create a structured prompt for better responses
+      const prompt = this.createPrompt(userInput, subject, context);
+
+      console.log("Generating response with GPT4All...");
+      const response = await this.model.prompt(prompt, {
+        temp: 0.7, // Control response creativity (0.0-1.0)
+        topK: 40,
+        topP: 0.9,
+        maxTokens: 200,
+        systemPrompt: this.getSystemPrompt(subject),
       });
 
-      return response.data.response;
+      console.log("GPT4All response received");
+      return this.formatResponse(response);
     } catch (error) {
-      console.warn("AI response failed, falling back to rule-based:", error);
+      console.error("Error generating AI response:", error);
       return this.getFallbackResponse(subject, userInput);
     }
   }
 
+  getSystemPrompt(subject) {
+    return `You are an expert Russian language tutor specializing in ${subject}. 
+        Provide clear, concise, and practical advice to help students prepare for their Russian language exams. 
+        Focus on specific examples and actionable tips. Be encouraging but professional.`;
+  }
+
+  createPrompt(userInput, subject, context) {
+    const contextInfo = context
+      ? `
+            Current progress: ${context.progress}%
+            Recent scores: ${context.recentScores}
+            Total tests taken: ${context.totalTests}
+        `
+      : "";
+
+    return `[INST]
+        As a Russian language exam coach specializing in ${subject}, please help with this question.
+        ${contextInfo}
+        Student's question: ${userInput}
+        
+        Provide a specific, practical response focused on exam preparation for ${subject}.
+        [/INST]`;
+  }
+
+  formatResponse(response) {
+    return response
+      .trim()
+      .replace(/^Assistant:|^AI:|^Coach:/, "")
+      .trim();
+  }
+
   getFallbackResponse(subject, userInput) {
-    // Enhanced fallback system that attempts to match input with predefined responses
+    // This is our fallback response system when GPT4All is not available
     const input = userInput.toLowerCase();
 
     const fallbacks = {
@@ -78,38 +120,13 @@ class CoachService {
           "Create a daily listening routine with varied content.",
         ],
       },
-      grammar: {
-        tips: [
-          "Learn one case at a time and practice extensively before moving to the next.",
-          "Focus on verb aspects and their usage.",
-          "Study motion verbs and their prefixes systematically.",
-          "Pay attention to gender agreement in different cases.",
-        ],
-        practice: [
-          "Create your own sentences using new grammar patterns daily.",
-          "Use grammar tables and charts for reference.",
-          "Practice with real-world examples.",
-          "Write short texts focusing on specific grammar points.",
-        ],
-        methodology: [
-          "Use spaced repetition to review grammar rules regularly.",
-          "Create mind maps for complex grammar concepts.",
-          "Practice with both written and spoken exercises.",
-          "Keep a grammar journal for common mistakes.",
-        ],
-      },
       // Add other subjects similarly...
     };
 
-    // Try to match the input with appropriate category
-    let category = "tips"; // default
+    let category = "tips";
     if (input.includes("practice") || input.includes("exercise")) {
       category = "practice";
-    } else if (
-      input.includes("how") ||
-      input.includes("method") ||
-      input.includes("way")
-    ) {
+    } else if (input.includes("how") || input.includes("method")) {
       category = "methodology";
     }
 
@@ -118,47 +135,15 @@ class CoachService {
       return "I'm here to help you with your studies. Could you be more specific about what you'd like to know?";
     }
 
-    // Return a random response from the appropriate category
     return responses[Math.floor(Math.random() * responses.length)];
   }
 
-  async getSubjectStats(subject) {
-    try {
-      const response = await this.api.get(`/stats/${subject}`);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to get subject stats:", error);
-      return null;
-    }
-  }
-
-  async getSuggestions(subject) {
-    try {
-      const response = await this.api.get(`/suggestions/${subject}`);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to get suggestions:", error);
-      return this.getDefaultSuggestions(subject);
-    }
-  }
-
-  getDefaultSuggestions(subject) {
-    // Default suggestions when API fails
-    const suggestions = {
-      listening: [
-        "How can I improve my listening comprehension?",
-        "Tips for understanding fast speech",
-        "Common listening test mistakes",
-      ],
-      grammar: [
-        "Explain verb aspects",
-        "Help with case usage",
-        "Common grammar mistakes",
-      ],
-      // Add more subjects...
+  async getStatus() {
+    return {
+      isInitialized: this.isInitialized,
+      modelLoaded: !!this.model,
+      timestamp: new Date(),
     };
-
-    return suggestions[subject] || [];
   }
 }
 

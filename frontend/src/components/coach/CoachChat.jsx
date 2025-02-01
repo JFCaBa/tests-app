@@ -111,6 +111,22 @@ const CoachChat = () => {
   const { user } = useAuth();
   const { isInitialized, lastError, initializeCoach, getLearningContext } =
     useCoach();
+  const [modelStatus, setModelStatus] = useState({
+    isInitialized: false,
+    modelLoaded: false,
+  });
+
+  // Check model status periodically
+  useEffect(() => {
+    const checkStatus = async () => {
+      const status = await coachService.getStatus();
+      setModelStatus(status);
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 5000);
+    return () => clearInterval(interval);
+  }, []);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -195,8 +211,16 @@ const CoachChat = () => {
           <CardTitle className="flex items-center gap-2">
             <Brain className="w-6 h-6" />
             Study Coach
-            {!isInitialized && (
-              <AlertCircle className="w-4 h-4 text-yellow-500" />
+            {modelStatus.isInitialized ? (
+              <div className="flex items-center gap-2 text-sm text-green-500">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                AI Ready
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-yellow-500">
+                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                Loading AI Model
+              </div>
             )}
           </CardTitle>
           <CardDescription>
