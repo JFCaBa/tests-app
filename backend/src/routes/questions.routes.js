@@ -377,11 +377,11 @@ router.post(
       return res.status(400).json({ message: "Question has no audio file" });
     }
 
+    const fullPath = path.join("https://testmyrussian.com", question.audioUrl);
+
     try {
       // Get the audio file
-      const audioFile = await fetch(question.audioUrl).then((res) =>
-        res.blob()
-      );
+      const audioFile = await fetch(fullPath).then((res) => res.blob());
 
       // Get transcription
       const { text, confidence } =
