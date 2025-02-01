@@ -386,12 +386,31 @@ router.post(
       // Get the audio file
       const audioFile = await fetch(fullPath).then((res) => res.blob());
 
+      /*
+      Response example:
+      [
+          {
+          id: 11,
+          seek: 5450,
+          start: 54.5,
+          end: 60.7,
+          text: ' Мы предлагаем высокое качество работы за небольшие деньги.',
+          tokens: [Array],
+          temperature: 0,
+          avg_logprob: -0.14912901984320748,
+          compression_ratio: 1.7773109243697478,
+          no_speech_prob: 0.0026220460422337055
+        },
+      ]
+      */
       // Get transcription
-      const { text, confidence } =
-        await localTranscriptionService.transcribeAudio(audioFile);
+      const { texts } = await localTranscriptionService.transcribeAudio(
+        audioFile
+      );
       res.json({
         message: "Audio transcribed successfully",
-        text,
+        // Extract all text from response based on the structure
+        text: texts.map((segment) => segment.text).join("\r\t"),
       });
     } catch (error) {
       console.error("Transcription error:", error);

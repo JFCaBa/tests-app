@@ -203,10 +203,10 @@ const QuestionForm = ({
         `/questions/${editingQuestion._id}/transcribe`
       );
 
-      if (response.data?.transcription?.text) {
+      if (response.data?.text) {
         setFormData((prev) => ({
           ...prev,
-          explanation: prev.explanation || response.data.transcription.text,
+          explanation: response.data.text,
         }));
       }
     } catch (error) {
