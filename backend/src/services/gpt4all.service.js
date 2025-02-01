@@ -17,7 +17,7 @@ class GPT4AllService {
 
     try {
       console.log("Initializing GPT4All...");
-      this.model = new GPT4All("ggml-gpt4all-j-v1.3-groovy", this.modelPath);
+      this.model = new GPT4All("gpt4all-lora-quantized", this.modelPath);
       await this.model.init();
       await this.model.open();
       this.isInitialized = true;
