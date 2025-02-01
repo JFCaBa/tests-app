@@ -15,6 +15,7 @@ import { Statistics } from "./components/statistics/Statistics";
 import { Progress } from "./components/progress/Progress";
 import { TestSummary } from "./components/test/TestSummary";
 import { DemoTest } from "./components/demo/DemoTest";
+import CoachChat from "./components/coach/CoachChat";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
@@ -98,6 +99,16 @@ const App = () => {
             element={
               <ErrorBoundary>
                 <Statistics />
+              </ErrorBoundary>
+            }
+          />
+
+          {/* Coach Chat Route */}
+          <Route
+            path="coach"
+            element={
+              <ErrorBoundary>
+                <CoachChat />
               </ErrorBoundary>
             }
           />
