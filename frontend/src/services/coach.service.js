@@ -1,23 +1,16 @@
-import axios from "axios";
+import axiosInstance from "../config/axios";
 
 class CoachService {
   constructor() {
     this.isInitialized = false;
     this.checkingStatus = false;
 
-    // Create axios instance
-    this.api = axios.create({
-      baseURL: "/api/coach",
-      timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    this.api = axiosInstance;
   }
 
   async initialize() {
     try {
-      const status = await this.api.get("/health");
+      const status = await this.api.get("/api/coach/health");
       this.isInitialized = status.data.aiInitialized;
       return this.isInitialized;
     } catch (error) {
@@ -28,7 +21,7 @@ class CoachService {
 
   async generateResponse(userInput, subject, context) {
     try {
-      const response = await this.api.post("/generate", {
+      const response = await this.api.post("/api/coach/generate", {
         input: userInput,
         subject,
         context,
@@ -46,7 +39,7 @@ class CoachService {
 
     this.checkingStatus = true;
     try {
-      const response = await this.api.get("/status");
+      const response = await this.api.get("/api/coach/status");
       this.isInitialized = response.data.initialized;
       this.checkingStatus = false;
       return response.data;
