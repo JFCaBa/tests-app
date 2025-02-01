@@ -378,6 +378,7 @@ router.post(
     }
 
     const fullPath = path.join("https://testmyrussian.com", question.audioUrl);
+    console.log("Transcribing audio:", fullPath);
 
     try {
       // Get the audio file
@@ -388,7 +389,7 @@ router.post(
         await localTranscriptionService.transcribeAudio(audioFile);
       res.json({
         message: "Audio transcribed successfully",
-        transcription,
+        text,
       });
     } catch (error) {
       console.error("Transcription error:", error);
