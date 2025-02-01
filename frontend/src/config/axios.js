@@ -12,7 +12,7 @@ const currentDomain = isBrowser
 const axiosInstance = axios.create({
   baseURL: currentDomain,
   withCredentials: true,
-  timeout: 30000,
+  timeout: 120000,
   headers: {
     Accept: "application/json",
     "Cache-Control": "no-cache",
