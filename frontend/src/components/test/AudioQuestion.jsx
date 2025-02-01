@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import TextToSpeech from "@/components/common/TextToSpeech";
 
 export const AudioQuestion = ({
   question,
@@ -17,11 +18,17 @@ export const AudioQuestion = ({
   const [error, setError] = useState("");
   const audioRef = useRef(null);
 
+  // Add this at the beginning of the AudioQuestion component
+  console.log("Audio Question Data:", {
+    questionText: question.question,
+    transcription: question.transcription,
+    fullQuestion: question,
+  });
+
   // Get the audio URL directly from backend
   const getAudioUrl = (audioPath) => {
     if (!audioPath) return "";
     const filename = audioPath.split("/").pop();
-    // Always use port 1999 for audio files
     return `https://testmyrussian.com/uploads/audio/${filename}`;
   };
 
@@ -43,7 +50,6 @@ export const AudioQuestion = ({
 
   const handleTimeUpdate = () => {
     if (!audioRef.current) return;
-
     const progress =
       (audioRef.current.currentTime / audioRef.current.duration) * 100;
     setProgress(progress);
@@ -51,14 +57,12 @@ export const AudioQuestion = ({
 
   const handleReplay = () => {
     if (!audioRef.current) return;
-
     audioRef.current.currentTime = 0;
     audioRef.current.play();
   };
 
   const handleToggleMute = () => {
     if (!audioRef.current) return;
-
     audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
@@ -66,16 +70,6 @@ export const AudioQuestion = ({
   const handleEnded = () => {
     setIsPlaying(false);
     setProgress(0);
-  };
-
-  const handleLoadedMetadata = () => {
-    setError("");
-  };
-
-  const handleError = (e) => {
-    console.error("Audio loading error:", e);
-    setError("Error loading audio file. Please try again.");
-    setIsPlaying(false);
   };
 
   return (
@@ -88,6 +82,7 @@ export const AudioQuestion = ({
 
       <Card className="bg-gray-50">
         <CardContent className="pt-6">
+          {/* Original audio controls */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-4">
               <Button
@@ -136,9 +131,30 @@ export const AudioQuestion = ({
             onPause={() => setIsPlaying(false)}
             onTimeUpdate={handleTimeUpdate}
             onEnded={handleEnded}
-            onLoadedMetadata={handleLoadedMetadata}
-            onError={handleError}
+            onError={(e) => {
+              console.error("Audio error:", e);
+              setError("Failed to load audio file");
+            }}
           />
+
+          {/* Text to Speech for explanation */}
+          {question.explanation && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 font-medium">
+                  Listen to explanation:
+                </span>
+                <TextToSpeech
+                  text={question.explanation}
+                  language="ru-RU"
+                  size="sm"
+                />
+              </div>
+              <p className="mt-2 text-sm text-gray-600">
+                {question.explanation}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -158,3 +174,5 @@ export const AudioQuestion = ({
     </div>
   );
 };
+
+export default AudioQuestion;
