@@ -18,13 +18,6 @@ export const AudioQuestion = ({
   const [error, setError] = useState("");
   const audioRef = useRef(null);
 
-  // Add this at the beginning of the AudioQuestion component
-  console.log("Audio Question Data:", {
-    questionText: question.question,
-    transcription: question.transcription,
-    fullQuestion: question,
-  });
-
   // Get the audio URL directly from backend
   const getAudioUrl = (audioPath) => {
     if (!audioPath) return "";
@@ -141,8 +134,8 @@ export const AudioQuestion = ({
           {question.explanation && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 font-medium">
-                  Listen to explanation:
+                <span className="text-sm font-medium text-gray-700">
+                  Listen faster with text to speech:
                 </span>
                 <TextToSpeech
                   text={question.explanation}
@@ -150,9 +143,6 @@ export const AudioQuestion = ({
                   size="sm"
                 />
               </div>
-              <p className="mt-2 text-sm text-gray-600">
-                {question.explanation}
-              </p>
             </div>
           )}
         </CardContent>
