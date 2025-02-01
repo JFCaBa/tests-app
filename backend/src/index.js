@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.routes.js";
 import questionRoutes from "./routes/questions.routes.js";
 import testRoutes from "./routes/tests.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import coachRoutes from "./routes/coach.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/coach", coachRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -19,6 +19,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/coach": {
+        target: "https://testmyrussian.com",
+        changeOrigin: true,
+        secure: false,
+      },
     },
     hmr: {
       clientPort: 443,
