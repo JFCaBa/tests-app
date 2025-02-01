@@ -1,15 +1,10 @@
-import pkg from "gpt4all";
-const { loadModel, createCompletion } = pkg;
-import path from "path";
-import fs from "fs"; // Added fs to check for file existence
+import { loadModel, createCompletion } from "gpt4all";
 
 class GPT4AllService {
   constructor() {
     this.model = null;
     this.chatSession = null;
     this.isInitialized = false;
-    this.modelName = "ggml-gpt4all-j-v1.3-groovy"; // Verified working model
-    this.modelBasePath = path.join(os.homedir(), ".cache/gpt4all");
   }
 
   async initialize() {
@@ -17,25 +12,18 @@ class GPT4AllService {
 
     try {
       console.log("Initializing GPT4All...");
-      console.log(`🔍 Model Path: ${this.modelPath}`);
 
-      // Check if the model file exists locally before loading
-      if (!fs.existsSync(this.modelPath)) {
-        console.error("Model file does not exist at the specified path.");
-        return false;
-      }
-
-      // Load the model and set the device to 'cpu' (or 'gpu' if available)
-      this.model = await loadModel(this.modelPath, {
+      // Load the model (this will trigger a download if not already cached)
+      this.model = await loadModel("orca-mini-3b-gguf2-q4_0.gguf", {
         verbose: true,
-        device: "cpu", // Change to "gpu" if using GPU
+        device: "cpu", // You can change to "gpu" if available
         nCtx: 2048, // Set max context size
       });
 
       // Create a chat session
       this.chatSession = await this.model.createChatSession({
-        temperature: 0.7,
-        systemPrompt: "### System:\nYou are a Russian language exam coach.\n\n", // Customize system prompt
+        temperature: 0.8,
+        systemPrompt: "### System:\nYou are a Russian language exam coach.\n\n", // Customize the system prompt as needed
       });
 
       this.isInitialized = true;
