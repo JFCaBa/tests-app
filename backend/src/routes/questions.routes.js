@@ -379,7 +379,6 @@ router.post(
     }
 
     const fullPath = path.join("https://testmyrussian.com", question.audioUrl);
-    console.log("Transcribing audio:", fullPath);
 
     try {
       // Get the audio file
