@@ -205,10 +205,10 @@ const QuestionForm = ({
 
       console.log("Transcription response:", response.data);
 
-      if (response.data.text) {
+      if (response.data) {
         setFormData((prev) => ({
           ...prev,
-          explanation: response.data.text,
+          explanation: response.data,
         }));
       }
     } catch (error) {
