@@ -1,6 +1,7 @@
 import pkg from "gpt4all";
 const { loadModel, createCompletion } = pkg;
 import path from "path";
+import fs from "fs"; // Added fs to check for file existence
 
 class GPT4AllService {
   constructor() {
@@ -18,6 +19,12 @@ class GPT4AllService {
     try {
       console.log("Initializing GPT4All...");
       console.log(`🔍 Model Path: ${this.modelPath}`);
+
+      // Check if the model file exists locally before loading
+      if (!fs.existsSync(this.modelPath)) {
+        console.error("Model file does not exist at the specified path.");
+        return false;
+      }
 
       // Load the model and set the device to 'cpu' (or 'gpu' if available)
       this.model = await loadModel(this.modelPath, {
@@ -72,7 +79,7 @@ class GPT4AllService {
         ${contextInfo}
         Student's question: ${input}
         
-        Provide a specific, practical response focused on exam preparation for the working permission, temporaly residence premission and permanent residence permission.`;
+        Provide a specific, practical response focused on exam preparation for the working permission, temporary residence permission, and permanent residence permission.`;
   }
 
   formatResponse(response) {
