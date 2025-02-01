@@ -30,8 +30,9 @@ class CoachService {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Use the token from your local storage or context
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          timeout: 240000, // Timeout in milliseconds (240000 ms = 4 minutes)
         }
       );
 
