@@ -1,6 +1,8 @@
 import express from "express";
 import { Question, User } from "../models/index.js";
 import { auth, upload, validation, errors } from "../middleware/index.js";
+import { localTranscriptionService } from "../services/local-transcription.service.js";
+
 const { asyncHandler } = errors;
 
 const router = express.Router();
@@ -355,6 +357,46 @@ router.get(
     }).sort({ createdAt: -1 });
 
     res.json(questions);
+  })
+);
+
+// @route   POST /questions/:id/transcribe
+// @desc    Transcribe audio for a question
+// @access  Admin
+router.post(
+  "/:id/transcribe",
+  [auth.required, auth.admin],
+  asyncHandler(async (req, res) => {
+    const question = await Question.findById(req.params.id);
+
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    if (!question.audioUrl) {
+      return res.status(400).json({ message: "Question has no audio file" });
+    }
+
+    try {
+      // Get the audio file
+      const audioFile = await fetch(question.audioUrl).then((res) =>
+        res.blob()
+      );
+
+      // Get transcription
+      const { text, confidence } =
+        await localTranscriptionService.transcribeAudio(audioFile);
+      res.json({
+        message: "Audio transcribed successfully",
+        transcription,
+      });
+    } catch (error) {
+      console.error("Transcription error:", error);
+      res.status(500).json({
+        message: "Failed to transcribe audio",
+        error: error.message,
+      });
+    }
   })
 );
 
