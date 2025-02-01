@@ -1,4 +1,5 @@
-import { loadModel, createCompletion } from "gpt4all";
+import pkg from "gpt4all";
+const { loadModel, createCompletion } = pkg;
 import path from "path";
 
 class GPT4AllService {
