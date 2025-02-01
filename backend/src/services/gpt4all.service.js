@@ -9,7 +9,8 @@ class GPT4AllService {
   constructor() {
     this.model = null;
     this.isInitialized = false;
-    this.modelPath = path.join(__dirname, "../../models");
+    this.modelPath =
+      "/home/debian/tests-app/backend/models/gpt4all-lora-quantized.bin";
   }
 
   async initialize() {
