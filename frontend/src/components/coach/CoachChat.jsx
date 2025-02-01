@@ -61,28 +61,38 @@ const SUBJECTS = [
   { id: "writing", name: "Writing", icon: "✍️" },
 ];
 
-const Message = ({ message, isUser, isError }) => (
-  <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
-    <div
-      className={`w-8 h-8 rounded-full ${
-        isUser ? "bg-primary/10" : "bg-muted"
-      } flex items-center justify-center`}
-    >
-      {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+const Message = ({ message, isUser, isError }) => {
+  const { displayText, isTyping } = useTypingEffect(
+    isUser ? null : message,
+    30
+  );
+
+  return (
+    <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
+      <div
+        className={`w-8 h-8 rounded-full ${
+          isUser ? "bg-primary/10" : "bg-muted"
+        } flex items-center justify-center`}
+      >
+        {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+      </div>
+      <div
+        className={`flex-1 px-4 py-2 rounded-lg ${
+          isUser
+            ? "bg-primary text-primary-foreground"
+            : isError
+            ? "bg-destructive/10 text-destructive"
+            : "bg-muted"
+        }`}
+      >
+        {isUser ? message : displayText}
+        {!isUser && isTyping && (
+          <span className="inline-block ml-1 animate-pulse">▋</span>
+        )}
+      </div>
     </div>
-    <div
-      className={`flex-1 px-4 py-2 rounded-lg ${
-        isUser
-          ? "bg-primary text-primary-foreground"
-          : isError
-          ? "bg-destructive/10 text-destructive"
-          : "bg-muted"
-      }`}
-    >
-      {message}
-    </div>
-  </div>
-);
+  );
+};
 
 const Suggestions = ({ onSelect, subject }) => {
   const suggestions = {
