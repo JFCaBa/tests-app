@@ -5,6 +5,9 @@ class CoachService {
     this.model = null;
     this.isInitialized = false;
     this.initPromise = null;
+    // Base URL for the model - should match your static files location
+    this.modelPath = "/models/";
+    this.modelName = "ggml-gpt4all-j-v1.3-groovy.bin";
   }
 
   async initialize() {
@@ -15,11 +18,24 @@ class CoachService {
     this.initPromise = new Promise(async (resolve, reject) => {
       try {
         console.log("Initializing GPT4All...");
-        // Initialize GPT4All with the model you want to use
-        this.model = new GPT4All("ggml-gpt4all-j-v1.3-groovy");
-        await this.model.init();
+
+        // Create GPT4All instance with browser-compatible settings
+        this.model = new GPT4All(this.modelName, {
+          modelPath: this.modelPath,
+          verbose: true,
+          device: "cpu",
+          download: {
+            baseUrl: "https://gpt4all.io/models",
+            onProgress: (progress) => {
+              console.log("Download progress:", progress);
+            },
+          },
+        });
+
         console.log("Model initialization started...");
+        await this.model.init();
         await this.model.open();
+
         console.log("Model loaded successfully");
         this.isInitialized = true;
         resolve(true);
@@ -34,26 +50,19 @@ class CoachService {
   }
 
   async generateResponse(userInput, subject, context) {
-    try {
-      if (!this.isInitialized || !this.model) {
-        console.log("Model not initialized, attempting to initialize...");
-        const initialized = await this.initialize();
-        if (!initialized) {
-          console.log("Falling back to default responses...");
-          return this.getFallbackResponse(subject, userInput);
-        }
-      }
+    if (!this.isInitialized || !this.model) {
+      console.log("Using fallback responses as model is not initialized");
+      return this.getFallbackResponse(subject, userInput);
+    }
 
+    try {
       // Create a structured prompt for better responses
       const prompt = this.createPrompt(userInput, subject, context);
 
       console.log("Generating response with GPT4All...");
       const response = await this.model.prompt(prompt, {
-        temp: 0.7, // Control response creativity (0.0-1.0)
-        topK: 40,
-        topP: 0.9,
+        temp: 0.7,
         maxTokens: 200,
-        systemPrompt: this.getSystemPrompt(subject),
       });
 
       console.log("GPT4All response received");
@@ -64,28 +73,20 @@ class CoachService {
     }
   }
 
-  getSystemPrompt(subject) {
-    return `You are an expert Russian language tutor specializing in ${subject}. 
-        Provide clear, concise, and practical advice to help students prepare for their Russian language exams. 
-        Focus on specific examples and actionable tips. Be encouraging but professional.`;
-  }
-
   createPrompt(userInput, subject, context) {
     const contextInfo = context
       ? `
-            Current progress: ${context.progress}%
-            Recent scores: ${context.recentScores}
-            Total tests taken: ${context.totalTests}
+            Student Progress: ${context.progress}%
+            Recent Test Scores: ${context.recentScores}
+            Total Tests Taken: ${context.totalTests}
         `
       : "";
 
-    return `[INST]
-        As a Russian language exam coach specializing in ${subject}, please help with this question.
+    return `As a Russian language exam coach specializing in ${subject}, please help with this question.
         ${contextInfo}
         Student's question: ${userInput}
         
-        Provide a specific, practical response focused on exam preparation for ${subject}.
-        [/INST]`;
+        Provide a specific, practical response focused on exam preparation for ${subject}.`;
   }
 
   formatResponse(response) {
@@ -96,7 +97,6 @@ class CoachService {
   }
 
   getFallbackResponse(subject, userInput) {
-    // This is our fallback response system when GPT4All is not available
     const input = userInput.toLowerCase();
 
     const fallbacks = {
@@ -120,7 +120,27 @@ class CoachService {
           "Create a daily listening routine with varied content.",
         ],
       },
-      // Add other subjects similarly...
+      grammar: {
+        tips: [
+          "Learn one case at a time and practice extensively before moving to the next.",
+          "Focus on verb aspects and their usage.",
+          "Study motion verbs and their prefixes systematically.",
+          "Pay attention to gender agreement in different cases.",
+        ],
+        practice: [
+          "Create your own sentences using new grammar patterns daily.",
+          "Use grammar tables and charts for reference.",
+          "Practice with real-world examples.",
+          "Write short texts focusing on specific grammar points.",
+        ],
+        methodology: [
+          "Use spaced repetition to review grammar rules regularly.",
+          "Create mind maps for complex grammar concepts.",
+          "Practice with both written and spoken exercises.",
+          "Keep a grammar journal for common mistakes.",
+        ],
+      },
+      // Add other subjects as needed...
     };
 
     let category = "tips";
