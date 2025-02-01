@@ -21,7 +21,7 @@ router.get(
 // Generate response endpoint
 router.post(
   "/generate",
-  // auth.required,
+  auth.required,
   asyncHandler(async (req, res) => {
     const { input, subject, context } = req.body;
 
