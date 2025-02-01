@@ -27,24 +27,4 @@ export default defineConfig({
     https: false,
     allowedHosts: ["testmyrussian.com", "www.testmyrussian.com"],
   },
-  // Add static file serving configuration
-  publicDir: "public",
-  build: {
-    outDir: "dist",
-    assetsDir: "assets",
-    // Copy models directory to build output
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, "index.html"),
-      },
-      output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name.endsWith(".bin")) {
-            return "models/[name][extname]";
-          }
-          return "assets/[name]-[hash][extname]";
-        },
-      },
-    },
-  },
 });

@@ -1,99 +1,59 @@
-import { GPT4All } from "gpt4all";
+import axios from "axios";
 
 class CoachService {
   constructor() {
-    this.model = null;
     this.isInitialized = false;
-    this.initPromise = null;
-    // Base URL for the model - should match your static files location
-    this.modelPath = "/models/";
-    this.modelName = "ggml-gpt4all-j-v1.3-groovy.bin";
+    this.checkingStatus = false;
+
+    // Create axios instance
+    this.api = axios.create({
+      baseURL: "/api/coach",
+      timeout: 30000,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   async initialize() {
-    if (this.initPromise) {
-      return this.initPromise;
+    try {
+      const status = await this.api.get("/health");
+      this.isInitialized = status.data.aiInitialized;
+      return this.isInitialized;
+    } catch (error) {
+      console.error("Failed to initialize coach service:", error);
+      return false;
     }
-
-    this.initPromise = new Promise(async (resolve, reject) => {
-      try {
-        console.log("Initializing GPT4All...");
-
-        // Create GPT4All instance with browser-compatible settings
-        this.model = new GPT4All(this.modelName, {
-          modelPath: this.modelPath,
-          verbose: true,
-          device: "cpu",
-          download: {
-            baseUrl: "https://gpt4all.io/models",
-            onProgress: (progress) => {
-              console.log("Download progress:", progress);
-            },
-          },
-        });
-
-        console.log("Model initialization started...");
-        await this.model.init();
-        await this.model.open();
-
-        console.log("Model loaded successfully");
-        this.isInitialized = true;
-        resolve(true);
-      } catch (error) {
-        console.error("Failed to initialize GPT4All:", error);
-        this.isInitialized = false;
-        resolve(false); // Resolve with false instead of rejecting
-      }
-    });
-
-    return this.initPromise;
   }
 
   async generateResponse(userInput, subject, context) {
-    if (!this.isInitialized || !this.model) {
-      console.log("Using fallback responses as model is not initialized");
-      return this.getFallbackResponse(subject, userInput);
-    }
-
     try {
-      // Create a structured prompt for better responses
-      const prompt = this.createPrompt(userInput, subject, context);
-
-      console.log("Generating response with GPT4All...");
-      const response = await this.model.prompt(prompt, {
-        temp: 0.7,
-        maxTokens: 200,
+      const response = await this.api.post("/generate", {
+        input: userInput,
+        subject,
+        context,
       });
 
-      console.log("GPT4All response received");
-      return this.formatResponse(response);
+      return response.data.response;
     } catch (error) {
-      console.error("Error generating AI response:", error);
+      console.error("Error generating response:", error);
       return this.getFallbackResponse(subject, userInput);
     }
   }
 
-  createPrompt(userInput, subject, context) {
-    const contextInfo = context
-      ? `
-            Student Progress: ${context.progress}%
-            Recent Test Scores: ${context.recentScores}
-            Total Tests Taken: ${context.totalTests}
-        `
-      : "";
+  async getStatus() {
+    if (this.checkingStatus) return { isInitialized: this.isInitialized };
 
-    return `As a Russian language exam coach specializing in ${subject}, please help with this question.
-        ${contextInfo}
-        Student's question: ${userInput}
-        
-        Provide a specific, practical response focused on exam preparation for ${subject}.`;
-  }
-
-  formatResponse(response) {
-    return response
-      .trim()
-      .replace(/^Assistant:|^AI:|^Coach:/, "")
-      .trim();
+    this.checkingStatus = true;
+    try {
+      const response = await this.api.get("/status");
+      this.isInitialized = response.data.initialized;
+      this.checkingStatus = false;
+      return response.data;
+    } catch (error) {
+      this.checkingStatus = false;
+      return { isInitialized: this.isInitialized };
+    }
   }
 
   getFallbackResponse(subject, userInput) {
@@ -140,7 +100,7 @@ class CoachService {
           "Keep a grammar journal for common mistakes.",
         ],
       },
-      // Add other subjects as needed...
+      // Add other subjects...
     };
 
     let category = "tips";
@@ -156,14 +116,6 @@ class CoachService {
     }
 
     return responses[Math.floor(Math.random() * responses.length)];
-  }
-
-  async getStatus() {
-    return {
-      isInitialized: this.isInitialized,
-      modelLoaded: !!this.model,
-      timestamp: new Date(),
-    };
   }
 }
 

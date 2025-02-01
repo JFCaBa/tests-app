@@ -1,14 +1,20 @@
 import express from "express";
 import { auth, errors } from "../middleware/index.js";
-const { asyncHandler } = errors;
+import gpt4allService from "../services/gpt4all.service.js";
 
+const { asyncHandler } = errors;
 const router = express.Router();
 
 // Health check endpoint
 router.get(
   "/health",
   asyncHandler(async (req, res) => {
-    res.json({ status: "ok", timestamp: new Date() });
+    const status = {
+      status: "ok",
+      aiInitialized: gpt4allService.isInitialized,
+      timestamp: new Date(),
+    };
+    res.json(status);
   })
 );
 
@@ -20,53 +26,39 @@ router.post(
     const { input, subject, context } = req.body;
 
     try {
-      // Here you would integrate with your local AI service
-      // For now, we'll use a simple response system
-      const response = await generateResponse(input, subject, context);
+      const response = await gpt4allService.generateResponse(
+        input,
+        subject,
+        context
+      );
+
+      if (!response) {
+        return res.status(500).json({
+          message: "Failed to generate response",
+          fallback: true,
+        });
+      }
+
       res.json({ response });
     } catch (error) {
       console.error("Generation error:", error);
       res.status(500).json({
         message: "Failed to generate response",
-        fallback: true,
+        error: error.message,
       });
     }
   })
 );
 
-// Get subject statistics
+// Get model status
 router.get(
-  "/stats/:subject",
-  auth.required,
+  "/status",
   asyncHandler(async (req, res) => {
-    const { subject } = req.params;
-    const userId = req.user._id;
-
-    try {
-      // Get user's statistics for the subject
-      const stats = await getUserSubjectStats(userId, subject);
-      res.json(stats);
-    } catch (error) {
-      console.error("Stats error:", error);
-      res.status(500).json({ message: "Failed to get statistics" });
-    }
-  })
-);
-
-// Get suggestions for a subject
-router.get(
-  "/suggestions/:subject",
-  auth.required,
-  asyncHandler(async (req, res) => {
-    const { subject } = req.params;
-
-    try {
-      const suggestions = await getSubjectSuggestions(subject);
-      res.json(suggestions);
-    } catch (error) {
-      console.error("Suggestions error:", error);
-      res.status(500).json({ message: "Failed to get suggestions" });
-    }
+    res.json({
+      initialized: gpt4allService.isInitialized,
+      modelLoaded: !!gpt4allService.model,
+      timestamp: new Date(),
+    });
   })
 );
 
