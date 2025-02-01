@@ -14,36 +14,51 @@ class GPT4AllService {
   }
 
   async initialize() {
-    if (this.isInitialized) return true;
+    if (this.isInitialized) {
+      console.log("✅ GPT4All already initialized.");
+      return true;
+    }
 
     try {
-      console.log("Initializing GPT4All...");
-      this.model = new GPT4All("gpt4all-lora-quantized", this.modelPath);
+      console.log("🚀 Initializing GPT4All...");
+      console.log("🔍 Model Path:", this.modelPath);
+
+      this.model = new GPT4All("gpt4all-lora-quantized", {
+        modelPath: this.modelPath,
+      });
+
+      console.log("📥 Downloading/Loading model...");
       await this.model.init();
       await this.model.open();
+
       this.isInitialized = true;
-      console.log("GPT4All initialized successfully");
+      console.log("✅ GPT4All initialized successfully.");
       return true;
     } catch (error) {
-      console.error("Failed to initialize GPT4All:", error);
+      console.error("❌ GPT4All initialization failed:", error);
       return false;
     }
   }
 
   async generateResponse(input, subject, context = {}) {
     if (!this.isInitialized) {
-      await this.initialize();
+      const success = await this.initialize();
+      if (!success) throw new Error("❌ Failed to initialize GPT4All.");
     }
 
     try {
       const prompt = this.createPrompt(input, subject, context);
+      console.log("📝 Sending prompt:", prompt);
+
       const response = await this.model.prompt(prompt, {
         temp: 0.7,
         maxTokens: 200,
       });
+
+      console.log("✅ Response received.");
       return this.formatResponse(response);
     } catch (error) {
-      console.error("Generation error:", error);
+      console.error("❌ Generation error:", error);
       return null;
     }
   }
@@ -61,7 +76,7 @@ class GPT4AllService {
         ${contextInfo}
         Student's question: ${input}
         
-        Provide a specific, practical response focused on exam preparation for the working permission, temporaly residence premission and permanent residence permission.`;
+        Provide a specific, practical response focused on exam preparation for the working permission, temporary residence permission, and permanent residence permission.`;
   }
 
   formatResponse(response) {
