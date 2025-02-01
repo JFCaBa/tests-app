@@ -9,7 +9,7 @@ class GPT4AllService {
   constructor() {
     this.model = null;
     this.isInitialized = false;
-    this.modelPath = path.join(__dirname, "../../../models");
+    this.modelPath = path.join(__dirname, "../../models");
   }
 
   async initialize() {
@@ -60,7 +60,7 @@ class GPT4AllService {
         ${contextInfo}
         Student's question: ${input}
         
-        Provide a specific, practical response focused on exam preparation for ${subject}.`;
+        Provide a specific, practical response focused on exam preparation for the working permission, temporaly residence premission and permanent residence permission.`;
   }
 
   formatResponse(response) {
