@@ -21,11 +21,19 @@ class CoachService {
 
   async generateResponse(userInput, subject, context) {
     try {
-      const response = await this.api.post("/api/coach/generate", {
-        input: userInput,
-        subject,
-        context,
-      });
+      const response = await this.api.post(
+        "/api/coach/generate",
+        {
+          input: userInput,
+          subject,
+          context,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Use the token from your local storage or context
+          },
+        }
+      );
 
       return response.data.response;
     } catch (error) {
