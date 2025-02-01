@@ -168,6 +168,7 @@ const CoachChat = () => {
         const status = await coachService.initialize();
         setServiceStatus({ available: status, error: null });
       } catch (error) {
+        console.log("Error checking Coach Service status:", error);
         setServiceStatus({ available: false, error: error.message });
       }
     };
