@@ -107,9 +107,9 @@ const App = () => {
           <Route
             path="coach"
             element={
-              <ErrorBoundary>
+              <ProtectedRoute>
                 <CoachChat />
-              </ErrorBoundary>
+              </ProtectedRoute>
             }
           />
 
