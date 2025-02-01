@@ -26,6 +26,7 @@ import {
   VolumeX,
   ChevronLeft,
   ChevronRight,
+  Wand,
 } from "lucide-react";
 
 const subjects = [
@@ -113,6 +114,7 @@ const QuestionForm = ({
   onNavigate,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const [error, setError] = useState("");
   const [allQuestions, setAllQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
@@ -188,6 +190,30 @@ const QuestionForm = ({
         console.error("Navigation error:", error);
         setError("Failed to load question");
       }
+    }
+  };
+
+  const handleTranscribe = async () => {
+    if (!formData.existingAudioUrl) return;
+
+    setTranscribing(true);
+    try {
+      const audioPath = formData.existingAudioUrl.split("/").pop();
+      const response = await axios.post(
+        `/questions/${editingQuestion._id}/transcribe`
+      );
+
+      if (response.data?.transcription?.text) {
+        setFormData((prev) => ({
+          ...prev,
+          explanation: prev.explanation || response.data.transcription.text,
+        }));
+      }
+    } catch (error) {
+      console.error("Transcription error:", error);
+      setError(error.response?.data?.message || "Failed to transcribe audio");
+    } finally {
+      setTranscribing(false);
     }
   };
 
@@ -306,6 +332,42 @@ const QuestionForm = ({
       .split("/")
       .pop()}`;
   };
+
+  const renderAudioSection = () => (
+    <div>
+      <label className="block text-sm font-medium mb-1">Audio File</label>
+      {formData.existingAudioUrl && (
+        <>
+          <div className="mb-2 text-sm text-gray-500">
+            Current audio file: {formData.existingAudioUrl.split("/").pop()}
+          </div>
+          <div className="flex items-center space-x-2">
+            <AudioPlayer audioUrl={getAudioUrl(formData.existingAudioUrl)} />
+            {editingQuestion && !formData.explanation && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleTranscribe}
+                disabled={transcribing}
+                className="flex items-center space-x-2"
+              >
+                <Wand className="h-4 w-4" />
+                <span>{transcribing ? "Transcribing..." : "Transcribe"}</span>
+              </Button>
+            )}
+          </div>
+        </>
+      )}
+      <Input
+        type="file"
+        accept="audio/*"
+        onChange={(e) =>
+          setFormData({ ...formData, audioFile: e.target.files[0] })
+        }
+      />
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -459,31 +521,7 @@ const QuestionForm = ({
               </div>
             )}
 
-            {formData.type === "audio" && (
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Audio File
-                </label>
-                {formData.existingAudioUrl && (
-                  <>
-                    <div className="mb-2 text-sm text-gray-500">
-                      Current audio file:{" "}
-                      {formData.existingAudioUrl.split("/").pop()}
-                    </div>
-                    <AudioPlayer
-                      audioUrl={getAudioUrl(formData.existingAudioUrl)}
-                    />
-                  </>
-                )}
-                <Input
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) =>
-                    setFormData({ ...formData, audioFile: e.target.files[0] })
-                  }
-                />
-              </div>
-            )}
+            {formData.type === "audio" && renderAudioSection()}
 
             <div>
               <label className="block text-sm font-medium mb-1">
