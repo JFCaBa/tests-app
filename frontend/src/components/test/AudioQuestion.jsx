@@ -134,9 +134,6 @@ export const AudioQuestion = ({
           {question.explanation && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">
-                  Listen faster with text to speech:
-                </span>
                 <TextToSpeech
                   text={question.explanation}
                   language="ru-RU"
