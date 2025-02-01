@@ -407,6 +407,9 @@ router.post(
       const { texts } = await localTranscriptionService.transcribeAudio(
         audioFile
       );
+
+      console.log("Transcription result:", texts);
+
       res.json({
         message: "Audio transcribed successfully",
         // Extract all text from response based on the structure
