@@ -159,7 +159,7 @@ const CoachChat = () => {
   const scrollRef = useRef(null);
 
   const { displayText, isTyping } = useTypingEffect(suggestedText);
-  const currentInput = suggestedText ? displayText : actualInput;
+  const input = suggestedText ? displayText : actualInput;
 
   // Check service status
   useEffect(() => {
@@ -198,11 +198,11 @@ const CoachChat = () => {
   }, [user]);
 
   const handleSend = async () => {
-    if (!currentInput.trim() || !selectedSubject || loading) return;
+    if (!input.trim() || !selectedSubject || loading) return;
 
-    const userMessage = { text: currentInput, isUser: true };
+    const userMessage = { text: input, isUser: true };
     setMessages((prev) => [...prev, userMessage]);
-    setActualInput("");
+    setInput("");
     setSuggestedText("");
     setLoading(true);
 
@@ -222,7 +222,7 @@ const CoachChat = () => {
       };
 
       const response = await coachService.generateResponse(
-        currentInput,
+        input,
         selectedSubject,
         context
       );
@@ -243,12 +243,8 @@ const CoachChat = () => {
   };
 
   const handleSuggestionSelect = (suggestion) => {
-    setActualInput("");
-    setSuggestedText(suggestion);
-    // Wait for typing to complete before sending
-    setTimeout(() => {
-      handleSend();
-    }, suggestion.length * 50 + 100); // Adjust timing based on text length
+    setInput(suggestion);
+    handleSend();
   };
 
   return (
@@ -323,24 +319,18 @@ const CoachChat = () => {
               )}
               <div className="flex gap-2">
                 <Input
-                  value={currentInput}
-                  onChange={(e) => {
-                    setSuggestedText("");
-                    setActualInput(e.target.value);
-                  }}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask your study coach..."
                   onKeyPress={(e) =>
                     e.key === "Enter" && !e.shiftKey && handleSend()
                   }
-                  disabled={!selectedSubject || loading || isTyping}
+                  disabled={!selectedSubject || loading}
                 />
                 <Button
                   onClick={handleSend}
                   disabled={
-                    !currentInput.trim() ||
-                    !selectedSubject ||
-                    loading ||
-                    isTyping
+                    !input.trim() || !selectedSubject || loading || isTyping
                   }
                 >
                   {loading ? (
