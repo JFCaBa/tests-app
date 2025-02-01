@@ -53,7 +53,10 @@ class GPT4AllService {
       // End measuring time and log the result
       console.timeEnd("Response Time");
 
-      return this.formatResponse(response);
+      const formattedResponse = this.formatResponse(response);
+      console.log("Response:", formattedResponse);
+
+      return formattedResponse;
     } catch (error) {
       console.error("Generation error:", error);
       return null;
