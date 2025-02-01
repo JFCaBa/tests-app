@@ -17,13 +17,14 @@ class GPT4AllService {
       this.model = await loadModel("orca-mini-3b-gguf2-q4_0.gguf", {
         verbose: true,
         device: "cpu", // You can change to "gpu" if available
-        nCtx: 2048, // Set max context size
+        nCtx: 1024, // Set max context size
       });
 
       // Create a chat session
       this.chatSession = await this.model.createChatSession({
         temperature: 0.8,
-        systemPrompt: "### System:\nYou are a Russian language exam coach.\n\n", // Customize the system prompt as needed
+        systemPrompt:
+          "### System:\nYou are a Russian language exam coach. Use cyrilic when writing in Russian\n\n",
       });
 
       this.isInitialized = true;
@@ -43,8 +44,14 @@ class GPT4AllService {
     try {
       const prompt = this.createPrompt(input, subject, context);
 
+      // Start measuring time
+      console.time("Response Time");
+
       // Create a completion using the chat session
       const response = await createCompletion(this.chatSession, prompt);
+
+      // End measuring time and log the result
+      console.timeEnd("Response Time");
 
       return this.formatResponse(response);
     } catch (error) {
