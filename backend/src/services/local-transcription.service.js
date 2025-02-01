@@ -25,6 +25,7 @@ class LocalTranscriptionService {
           timeout: 300000, // 5 minute timeout for longer audio files
         }
       );
+      console.log("Transcription response:", response.data);
       return response.data;
     } catch (error) {
       console.error("Transcription error:", error);
