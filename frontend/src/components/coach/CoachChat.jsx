@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCoach } from "../../contexts/CoachContext"; // Add CoachContext
 import coachService from "../../services/coach.service";
 import {
   Card,
@@ -52,15 +53,6 @@ const useTypingEffect = (text, speed = 50) => {
   return { displayText, isTyping };
 };
 
-const SUBJECTS = [
-  { id: "listening", name: "Listening", icon: "🎧" },
-  { id: "grammar", name: "Grammar", icon: "📝" },
-  { id: "history", name: "History", icon: "📚" },
-  { id: "laws", name: "Laws", icon: "⚖️" },
-  { id: "reading", name: "Reading", icon: "📖" },
-  { id: "writing", name: "Writing", icon: "✍️" },
-];
-
 const Message = ({ message, isUser, isError }) => {
   const { displayText, isTyping } = useTypingEffect(
     isUser ? null : message,
@@ -93,6 +85,15 @@ const Message = ({ message, isUser, isError }) => {
     </div>
   );
 };
+
+const SUBJECTS = [
+  { id: "listening", name: "Listening", icon: "🎧" },
+  { id: "grammar", name: "Grammar", icon: "📝" },
+  { id: "history", name: "History", icon: "📚" },
+  { id: "laws", name: "Laws", icon: "⚖️" },
+  { id: "reading", name: "Reading", icon: "📖" },
+  { id: "writing", name: "Writing", icon: "✍️" },
+];
 
 const Suggestions = ({ onSelect, subject }) => {
   const suggestions = {
@@ -147,51 +148,50 @@ const Suggestions = ({ onSelect, subject }) => {
 
 const CoachChat = () => {
   const { user } = useAuth();
-  const [serviceStatus, setServiceStatus] = useState({
-    available: false,
-    error: null,
-  });
+  const { isInitialized, lastError, initializeCoach, getLearningContext } =
+    useCoach();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
 
-  // Check service status
+  // Initialize coach on component mount
   useEffect(() => {
-    const checkStatus = async () => {
-      try {
-        const status = await coachService.initialize();
-        setServiceStatus({ available: status, error: null });
-      } catch (error) {
-        console.log("Error checking Coach Service status:", error);
-        setServiceStatus({ available: false, error: error.message });
-      }
-    };
+    initializeCoach();
+  }, [initializeCoach]);
 
-    checkStatus();
-  }, []);
-
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Initial greeting
+  // Initial greeting with context
   useEffect(() => {
     if (messages.length === 0) {
+      const context = getLearningContext();
       let greeting = `Hello ${user?.username}! I'm your study coach. `;
 
-      if (user?.testHistory?.length > 0) {
-        greeting += `I see you've taken ${user.testHistory.length} tests. `;
+      if (context) {
+        if (context.totalTests > 0) {
+          greeting += `I see you've taken ${
+            context.totalTests
+          } tests with an average score of ${context.progress.toFixed(1)}%. `;
+        }
+        if (context.preferredSubjects?.length > 0) {
+          greeting += `I notice you've been focusing on ${context.preferredSubjects.join(
+            ", "
+          )}. `;
+        }
       }
 
       greeting += `Select a subject, and I'll help you prepare for your exam.`;
 
       setMessages([{ text: greeting, isUser: false }]);
     }
-  }, [user]);
+  }, [user, getLearningContext]);
 
   const handleSend = async () => {
     if (!input.trim() || !selectedSubject || loading) return;
@@ -199,24 +199,10 @@ const CoachChat = () => {
     const userMessage = { text: input, isUser: true };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setSuggestedText("");
     setLoading(true);
 
     try {
-      const context = {
-        progress:
-          user?.testHistory?.length > 0
-            ? user.testHistory.reduce((acc, test) => acc + test.score, 0) /
-              user.testHistory.length
-            : 0,
-        recentScores:
-          user?.testHistory
-            ?.slice(-3)
-            .map((test) => test.score)
-            .join(", ") || "No tests taken",
-        totalTests: user?.testHistory?.length || 0,
-      };
-
+      const context = getLearningContext();
       const response = await coachService.generateResponse(
         input,
         selectedSubject,
@@ -250,29 +236,26 @@ const CoachChat = () => {
           <CardTitle className="flex items-center gap-2">
             <Brain className="w-6 h-6" />
             Study Coach
-            <div
-              className={`flex items-center gap-2 text-sm ${
-                serviceStatus.available ? "text-green-500" : "text-yellow-500"
-              }`}
-            >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  serviceStatus.available
-                    ? "bg-green-500"
-                    : "bg-yellow-500 animate-pulse"
-                }`}
-              ></div>
-              {serviceStatus.available ? "Ready" : "Using Basic Assistance"}
-            </div>
+            {isInitialized ? (
+              <div className="flex items-center gap-2 text-sm text-green-500">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                AI Ready
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-yellow-500">
+                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                Loading AI Model
+              </div>
+            )}
           </CardTitle>
           <CardDescription>
             Select a subject and ask questions about exam preparation
           </CardDescription>
 
-          {serviceStatus.error && (
+          {lastError && (
             <Alert variant="destructive">
               <AlertDescription>
-                Using basic assistance mode. AI features are currently limited.
+                AI features might be limited. Falling back to basic assistance.
               </AlertDescription>
             </Alert>
           )}
@@ -303,6 +286,17 @@ const CoachChat = () => {
                 isError={message.isError}
               />
             ))}
+            {selectedSubject && messages.length === 1 && (
+              <div className="mt-4">
+                <p className="text-sm text-muted-foreground mb-2">
+                  Here are some suggestions to get started:
+                </p>
+                <Suggestions
+                  subject={selectedSubject}
+                  onSelect={handleSuggestionSelect}
+                />
+              </div>
+            )}
           </ScrollArea>
 
           <CardFooter className="p-4 border-t">
@@ -325,9 +319,7 @@ const CoachChat = () => {
                 />
                 <Button
                   onClick={handleSend}
-                  disabled={
-                    !input.trim() || !selectedSubject || loading || isTyping
-                  }
+                  disabled={!input.trim() || !selectedSubject || loading}
                 >
                   {loading ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
