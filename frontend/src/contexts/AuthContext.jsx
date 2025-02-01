@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { config } from "../config";
+import { FullScreenLoader } from "@/components/ui/loader";
 
 const AuthContext = createContext(null);
 
@@ -120,7 +121,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <FullScreenLoader text="Loading your profile..." />;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Clock, AlertCircle } from "lucide-react";
+import { Clock, AlertCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -41,15 +41,14 @@ export const PracticeSession = () => {
     streak: 0,
     answers: [],
   });
-  // Timer related state
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
   const [questionStartTime, setQuestionStartTime] = useState(null);
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [timerActive, setTimerActive] = useState(true);
-  const [questionTimers, setQuestionTimers] = useState({}); // Track time per question
+  const [questionTimers, setQuestionTimers] = useState({});
+  const [showExample, setShowExample] = useState(false);
 
   useEffect(() => {
-    // Initialize session time on first load
     if (!sessionStartTime) {
       setSessionStartTime(Date.now());
     }
@@ -60,6 +59,7 @@ export const PracticeSession = () => {
     setLoading(true);
     setError(null);
     setTimerActive(true);
+    setShowExample(false);
     try {
       const response = await axios.get("/questions/practice", {
         params: { subject, mode, difficulty },
@@ -71,9 +71,7 @@ export const PracticeSession = () => {
         setTimeLeft(response.data.timeLimit || 60);
       }
 
-      // Reset question timer
       const newQuestionStartTime = Date.now();
-
       setQuestionStartTime(newQuestionStartTime);
       setQuestionTimers((prev) => ({
         ...prev,
@@ -119,13 +117,7 @@ export const PracticeSession = () => {
     switch (currentQuestion.type) {
       case QuestionTypes.MULTIPLE_CHOICE:
       case QuestionTypes.AUDIO:
-        // First try to get the text using response.data.correctAnswer
         if (currentQuestion.options && Array.isArray(currentQuestion.options)) {
-          // Log for debugging
-          console.log("Current question:", currentQuestion);
-          console.log("Correct answer index:", currentQuestion.correctAnswer);
-          console.log("Options:", currentQuestion.options);
-
           const correctOption =
             currentQuestion.options[currentQuestion.correctAnswer];
           if (correctOption) {
@@ -139,7 +131,6 @@ export const PracticeSession = () => {
             }
           }
 
-          // Fallback: try to find the correct option by checking isCorrect property
           const correctOptionByFlag = currentQuestion.options.find(
             (opt) => typeof opt === "object" && opt.isCorrect
           );
@@ -159,9 +150,8 @@ export const PracticeSession = () => {
     }
   };
 
-  // Move handleAnswer outside of handleTimeUp
   const handleTimeUp = () => {
-    if (feedback) return;
+    if (feedback || currentQuestion.type === QuestionTypes.WRITING) return;
 
     setTimerActive(false);
     const timeSpentOnQuestion = calculateTimeSpent();
@@ -174,7 +164,6 @@ export const PracticeSession = () => {
       correct: false,
     };
 
-    // Update stats with the timed-out answer
     setStats((prev) => {
       const newTotal = prev.total + 1;
       const newStats = {
@@ -186,9 +175,7 @@ export const PracticeSession = () => {
 
       setProgress((newTotal * 100) / questionCount);
 
-      // If this was the last question, navigate to summary
       if (newTotal >= questionCount) {
-        // Small delay to ensure state is updated before navigating
         setTimeout(() => {
           const sessionTimeSpent = Math.floor(
             (Date.now() - sessionStartTime) / 1000
@@ -212,7 +199,6 @@ export const PracticeSession = () => {
       return newStats;
     });
 
-    // Only show feedback if not the last question
     if (stats.total < questionCount) {
       setFeedback({
         correct: false,
@@ -222,7 +208,7 @@ export const PracticeSession = () => {
   };
 
   const handleAnswer = async (answer) => {
-    if (feedback) return;
+    if (feedback || currentQuestion.type === QuestionTypes.WRITING) return;
 
     setTimerActive(false);
     const timeSpentOnQuestion = calculateTimeSpent();
@@ -235,11 +221,8 @@ export const PracticeSession = () => {
       });
 
       const isCorrect = response.data.correct;
-
-      // Update total time and answer history
       setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
 
-      // Store answer details
       const answerDetails = {
         questionId: currentQuestion._id,
         answer,
@@ -255,19 +238,13 @@ export const PracticeSession = () => {
           answers: [...prev.answers, answerDetails],
         };
 
-        // Calculate progress right after updating stats
         setProgress((newStats.total * 100) / questionCount);
-
         return newStats;
       });
 
-      let feedbackMessage = isCorrect
+      const feedbackMessage = isCorrect
         ? "Correct! " + (response.data.explanation || "")
         : `Incorrect. The correct answer was: ${getCorrectAnswerText()}`;
-
-      if (!isCorrect && response.data.explanation) {
-        feedbackMessage += ` ${response.data.explanation}`;
-      }
 
       setFeedback({
         correct: isCorrect,
@@ -282,15 +259,14 @@ export const PracticeSession = () => {
   const handleNext = async () => {
     setUserAnswer(null);
     setFeedback(null);
+    setShowExample(false);
 
     if (stats.total >= questionCount) {
       try {
-        // Calculate final session statistics
         const sessionTimeSpent = Math.floor(
           (Date.now() - sessionStartTime) / 1000
         );
 
-        // Prepare test data
         const testData = {
           stats: {
             ...stats,
@@ -303,10 +279,10 @@ export const PracticeSession = () => {
           difficulty,
         };
 
-        // Submit test results to backend
-        await testService.submitTest(testData);
+        if (currentQuestion.type !== QuestionTypes.WRITING) {
+          await testService.submitTest(testData);
+        }
 
-        // Navigate to summary
         navigate("/practice/summary", {
           state: testData,
         });
@@ -375,16 +351,18 @@ export const PracticeSession = () => {
               value={userAnswer || ""}
               onChange={(e) => setUserAnswer(e.target.value)}
               placeholder="Write your answer here..."
-              disabled={!!feedback}
             />
+
             <Button
               className="w-full"
-              onClick={() => handleAnswer(userAnswer)}
-              disabled={!userAnswer || !!feedback}
+              onClick={() => setShowExample(!showExample)}
+              variant={showExample ? "outline" : "default"}
             >
-              Submit Answer
+              <Eye className="mr-2 h-4 w-4" />
+              {showExample ? "Hide Example" : "Show Example"}
             </Button>
-            {feedback && currentQuestion.sampleResponse && (
+
+            {showExample && currentQuestion.sampleResponse && (
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-medium mb-2">Sample Response:</h4>
                 <TextFormatter
@@ -393,6 +371,10 @@ export const PracticeSession = () => {
                 />
               </div>
             )}
+
+            <Button className="w-full" onClick={handleNext} variant="default">
+              Next Question
+            </Button>
           </div>
         );
 
@@ -455,7 +437,7 @@ export const PracticeSession = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>{renderQuestion()}</CardContent>
-        {feedback && (
+        {feedback && currentQuestion?.type !== QuestionTypes.WRITING && (
           <CardFooter className="flex flex-col items-stretch space-y-4">
             <Alert
               variant={feedback.correct ? "default" : "destructive"}

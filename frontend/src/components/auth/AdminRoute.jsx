@@ -2,12 +2,17 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoaderLg } from "@/components/ui/loader";
 
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <LoaderLg text="Checking permissions..." />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

@@ -9,7 +9,6 @@ import { RegisterForm } from "./components/auth/RegisterForm";
 import { SubjectSelection } from "./components/test/SubjectSelection";
 import { PracticeMode } from "./components/test/PracticeMode";
 import { PracticeSession } from "./components/test/PracticeSession";
-import { TestContainer } from "./components/test/TestContainer";
 import { Profile } from "./components/profile/Profile";
 import { Settings } from "./components/settings/Settings";
 import { Statistics } from "./components/statistics/Statistics";
@@ -67,7 +66,6 @@ const App = () => {
           <Route path="practice/summary" element={<TestSummary />} />
           <Route path="practice/:subject" element={<PracticeMode />} />
           <Route path="practice/:subject/:mode" element={<PracticeSession />} />
-          <Route path="test" element={<TestContainer />} />
 
           {/* User Settings and Profile Routes */}
           <Route

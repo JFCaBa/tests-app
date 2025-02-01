@@ -87,7 +87,7 @@ export const MainLayout = () => {
               onClick={() => navigate("/")}
             >
               <Clock className="h-6 w-6 mr-2" />
-              <h1 className="text-xl font-bold">Test App</h1>
+              <h1 className="text-xl font-bold">Test My Russian</h1>
             </div>
 
             {/* Desktop Navigation */}
@@ -163,7 +163,7 @@ export const MainLayout = () => {
       <footer className="bg-white border-t mt-auto">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-gray-500">
-            © {new Date().getFullYear()} Test App. All rights reserved.
+            © {new Date().getFullYear()} Test My Russian. All rights reserved.
           </p>
         </div>
       </footer>
