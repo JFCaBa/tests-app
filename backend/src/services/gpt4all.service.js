@@ -1,5 +1,7 @@
 import { loadModel, createCompletion } from "gpt4all";
 
+const cache = new Map();
+
 class GPT4AllService {
   constructor() {
     this.model = null;
@@ -37,6 +39,11 @@ class GPT4AllService {
   }
 
   async generateResponse(input, subject, context = {}) {
+    const cacheKey = `${input}-${subject}-${JSON.stringify(context)}`;
+    if (cache.has(cacheKey)) {
+      return cache.get(cacheKey); // Return cached response
+    }
+
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -55,6 +62,7 @@ class GPT4AllService {
 
       const formattedResponse = this.formatResponse(response);
       console.log("Response:", formattedResponse);
+      cache.set(cacheKey, formattedResponse);
 
       return formattedResponse;
     } catch (error) {
