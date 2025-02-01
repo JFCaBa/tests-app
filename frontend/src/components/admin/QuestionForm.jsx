@@ -203,7 +203,9 @@ const QuestionForm = ({
         `/questions/${editingQuestion._id}/transcribe`
       );
 
-      if (response.data?.text) {
+      console.log("Transcription response:", response.data.text);
+
+      if (response.data.text) {
         setFormData((prev) => ({
           ...prev,
           explanation: response.data.text,
