@@ -22,6 +22,15 @@ import {
 } from "@/components/ui/select";
 import { Send, Bot, User, Book, Brain } from "lucide-react";
 
+const SUBJECTS = [
+  { id: "listening", name: "Listening", icon: "🎧" },
+  { id: "grammar", name: "Grammar", icon: "📝" },
+  { id: "history", name: "History", icon: "📚" },
+  { id: "laws", name: "Laws", icon: "⚖️" },
+  { id: "reading", name: "Reading", icon: "📖" },
+  { id: "writing", name: "Writing", icon: "✍️" },
+];
+
 const Message = ({ message, isUser, isError }) => (
   <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
     <div
@@ -44,6 +53,58 @@ const Message = ({ message, isUser, isError }) => (
     </div>
   </div>
 );
+
+// Suggestions component for quick questions
+const Suggestions = ({ onSelect, subject }) => {
+  const suggestions = {
+    listening: [
+      "How can I improve my listening comprehension?",
+      "What are common mistakes in listening tests?",
+      "Tips for understanding fast speech",
+    ],
+    grammar: [
+      "Help with case usage",
+      "Verb aspects explanation",
+      "Common grammar mistakes",
+    ],
+    history: [
+      "Key historical dates to remember",
+      "Important historical figures",
+      "Tips for history exam preparation",
+    ],
+    laws: [
+      "Essential legal concepts",
+      "Common law test questions",
+      "How to study legal terminology",
+    ],
+    reading: [
+      "Reading comprehension strategies",
+      "How to improve reading speed",
+      "Tips for understanding context",
+    ],
+    writing: [
+      "Writing structure tips",
+      "Common writing mistakes",
+      "How to improve essay writing",
+    ],
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-4">
+      {suggestions[subject]?.map((suggestion, index) => (
+        <Button
+          key={index}
+          variant="outline"
+          size="sm"
+          onClick={() => onSelect(suggestion)}
+          className="text-xs"
+        >
+          {suggestion}
+        </Button>
+      ))}
+    </div>
+  );
+};
 
 const CoachChat = () => {
   const { user } = useAuth();
