@@ -88,7 +88,15 @@ class GPT4AllService {
   }
 
   formatResponse(response) {
-    return response.choices[0].message.content.trim(); // Format the response content
+    const content = response.choices[0].message.content.trim();
+
+    // Split sentences based on punctuation (.!?:) and preserve the punctuation, then join with \r\n
+    const sentences = content
+      .split(/(?<=\.|\!|\?|\:)/)
+      .map((sentence) => sentence.trim());
+
+    // Add \r\n after each sentence
+    return sentences.join(":\r\n");
   }
 }
 
