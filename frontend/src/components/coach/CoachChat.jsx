@@ -152,14 +152,10 @@ const CoachChat = () => {
     error: null,
   });
   const [messages, setMessages] = useState([]);
-  const [actualInput, setActualInput] = useState("");
-  const [suggestedText, setSuggestedText] = useState("");
+  const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
-
-  const { displayText, isTyping } = useTypingEffect(suggestedText);
-  const input = suggestedText ? displayText : actualInput;
 
   // Check service status
   useEffect(() => {
