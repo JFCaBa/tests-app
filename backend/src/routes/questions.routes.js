@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import { Question, User } from "../models/index.js";
 import { auth, upload, validation, errors } from "../middleware/index.js";
 import { localTranscriptionService } from "../services/local-transcription.service.js";
