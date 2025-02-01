@@ -1,17 +1,14 @@
-import { GPT4All } from "gpt4all";
+import { loadModel, createCompletion } from "gpt4all";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 class GPT4AllService {
   constructor() {
     this.model = null;
+    this.chatSession = null;
     this.isInitialized = false;
     this.modelPath = path.resolve(
       "/home/debian/tests-app/backend/models/gpt4all-lora-quantized.bin"
-    ); // Use absolute path
+    ); // Absolute path
   }
 
   async initialize() {
@@ -19,14 +16,21 @@ class GPT4AllService {
 
     try {
       console.log("Initializing GPT4All...");
-      console.log(`🔍 Model Path: ${this.modelPath}`); // Log the model path to verify it's correct
+      console.log(`🔍 Model Path: ${this.modelPath}`);
 
-      // Explicitly set the model path as a file, not as a string for a URL
-      this.model = new GPT4All("gpt4all-lora-quantized", {
-        modelPath: this.modelPath,
+      // Load the model and set the device to 'cpu' (or 'gpu' if available)
+      this.model = await loadModel(this.modelPath, {
+        verbose: true,
+        device: "cpu", // Change to "gpu" if using GPU
+        nCtx: 2048, // Set max context size
       });
-      await this.model.init();
-      await this.model.open();
+
+      // Create a chat session
+      this.chatSession = await this.model.createChatSession({
+        temperature: 0.7,
+        systemPrompt: "### System:\nYou are a Russian language exam coach.\n\n", // Customize system prompt
+      });
+
       this.isInitialized = true;
       console.log("GPT4All initialized successfully");
       return true;
@@ -43,10 +47,10 @@ class GPT4AllService {
 
     try {
       const prompt = this.createPrompt(input, subject, context);
-      const response = await this.model.prompt(prompt, {
-        temp: 0.7,
-        maxTokens: 200,
-      });
+
+      // Create a completion using the chat session
+      const response = await createCompletion(this.chatSession, prompt);
+
       return this.formatResponse(response);
     } catch (error) {
       console.error("Generation error:", error);
@@ -71,10 +75,7 @@ class GPT4AllService {
   }
 
   formatResponse(response) {
-    return response
-      .trim()
-      .replace(/^Assistant:|^AI:|^Coach:/, "")
-      .trim();
+    return response.choices[0].message.content.trim(); // Format the response content
   }
 }
 
