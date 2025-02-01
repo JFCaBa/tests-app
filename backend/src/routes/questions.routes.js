@@ -389,9 +389,9 @@ router.post(
         audioFile
       );
 
-      res.json({
-        text,
-      });
+      console.log("Transcription result:", text);
+
+      res.json(text);
     } catch (error) {
       console.error("Transcription error:", error);
       res.status(500).json({
