@@ -286,7 +286,7 @@ const CoachChat = () => {
                 isError={message.isError}
               />
             ))}
-            {selectedSubject && messages.length === 1 && (
+            {selectedSubject && messages.length === 1 && !loading && (
               <div className="mt-4">
                 <p className="text-sm text-muted-foreground mb-2">
                   Here are some suggestions to get started:
@@ -301,12 +301,6 @@ const CoachChat = () => {
 
           <CardFooter className="p-4 border-t">
             <div className="flex flex-col w-full gap-4">
-              {selectedSubject && (
-                <Suggestions
-                  subject={selectedSubject}
-                  onSelect={handleSuggestionSelect}
-                />
-              )}
               <div className="flex gap-2">
                 <Input
                   value={input}
