@@ -368,6 +368,7 @@ router.post(
   [auth.required, auth.admin],
   asyncHandler(async (req, res) => {
     const question = await Question.findById(req.params.id);
+    console.log("Question:", question);
 
     if (!question) {
       return res.status(404).json({ message: "Question not found" });
