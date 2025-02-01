@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import TextFormatter from "../common/TextFormatter";
 import { AudioQuestion } from "./AudioQuestion";
 import { testService } from "../../services/test.service";
+import TextToSpeech from "@/components/common/TextToSpeech";
 
 const QuestionTypes = {
   MULTIPLE_CHOICE: "multiple-choice",
@@ -321,13 +322,20 @@ export const PracticeSession = () => {
 
         {feedback.explanation && (
           <div className="bg-gray-50 rounded-lg p-4 border">
-            <div className="flex items-center gap-2 mb-2 text-gray-700">
-              <Info className="h-4 w-4" />
-              <h4 className="font-medium">
-                {currentQuestion.type === QuestionTypes.AUDIO
-                  ? "Transcription"
-                  : "Explanation"}
-              </h4>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Info className="h-4 w-4" />
+                <h4 className="font-medium">
+                  {currentQuestion.type === QuestionTypes.AUDIO
+                    ? "Transcription"
+                    : "Explanation"}
+                </h4>
+              </div>
+              <TextToSpeech
+                text={feedback.explanation}
+                language="ru-RU"
+                size="sm"
+              />
             </div>
             <TextFormatter
               text={feedback.explanation}
