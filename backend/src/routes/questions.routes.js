@@ -385,9 +385,7 @@ router.post(
       // Get the audio file
       const audioFile = await fetch(fullPath).then((res) => res.blob());
 
-      const { text } = await localTranscriptionService.transcribeAudio(
-        audioFile
-      );
+      const text = await localTranscriptionService.transcribeAudio(audioFile);
 
       console.log("Transcription result:", text);
 
