@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Clock, AlertCircle, Eye } from "lucide-react";
+import { Clock, AlertCircle, Eye, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -242,13 +242,12 @@ export const PracticeSession = () => {
         return newStats;
       });
 
-      const feedbackMessage = isCorrect
-        ? "Correct! " + (response.data.explanation || "")
-        : `Incorrect. The correct answer was: ${getCorrectAnswerText()}`;
-
       setFeedback({
         correct: isCorrect,
-        message: feedbackMessage,
+        message: isCorrect
+          ? "Correct!"
+          : `Incorrect. The correct answer was: ${getCorrectAnswerText()}`,
+        explanation: response.data.explanation || "",
       });
     } catch (err) {
       console.error("Answer submission error:", err);
@@ -301,6 +300,47 @@ export const PracticeSession = () => {
       return option.text || "";
     }
     return "";
+  };
+
+  const renderFeedback = () => {
+    if (!feedback || currentQuestion?.type === QuestionTypes.WRITING)
+      return null;
+
+    return (
+      <CardFooter className="flex flex-col items-stretch space-y-4">
+        <Alert
+          variant={feedback.correct ? "default" : "destructive"}
+          className={feedback.correct ? "bg-green-100" : "bg-red-100"}
+        >
+          <AlertDescription
+            className={feedback.correct ? "text-green-800" : "text-red-800"}
+          >
+            {feedback.message}
+          </AlertDescription>
+        </Alert>
+
+        {feedback.explanation && (
+          <div className="bg-gray-50 rounded-lg p-4 border">
+            <div className="flex items-center gap-2 mb-2 text-gray-700">
+              <Info className="h-4 w-4" />
+              <h4 className="font-medium">
+                {currentQuestion.type === QuestionTypes.AUDIO
+                  ? "Transcription"
+                  : "Explanation"}
+              </h4>
+            </div>
+            <TextFormatter
+              text={feedback.explanation}
+              className="text-gray-600 text-sm"
+            />
+          </div>
+        )}
+
+        <Button onClick={handleNext}>
+          {stats.total >= questionCount ? "View Results" : "Next Question"}
+        </Button>
+      </CardFooter>
+    );
   };
 
   const renderQuestion = () => {
@@ -437,23 +477,7 @@ export const PracticeSession = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>{renderQuestion()}</CardContent>
-        {feedback && currentQuestion?.type !== QuestionTypes.WRITING && (
-          <CardFooter className="flex flex-col items-stretch space-y-4">
-            <Alert
-              variant={feedback.correct ? "default" : "destructive"}
-              className={feedback.correct ? "bg-green-100" : "bg-red-100"}
-            >
-              <AlertDescription
-                className={feedback.correct ? "text-green-800" : "text-red-800"}
-              >
-                {feedback.message}
-              </AlertDescription>
-            </Alert>
-            <Button onClick={handleNext}>
-              {stats.total >= questionCount ? "View Results" : "Next Question"}
-            </Button>
-          </CardFooter>
-        )}
+        {renderFeedback()}
       </Card>
     </div>
   );
