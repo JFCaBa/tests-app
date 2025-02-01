@@ -96,7 +96,6 @@ router.get(
             : {
                 // Exclude sensitive fields in test mode
                 correctAnswer: 0,
-                explanation: 0,
                 statistics: 0,
               },
       },
