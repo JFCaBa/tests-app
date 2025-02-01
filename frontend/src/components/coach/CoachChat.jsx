@@ -22,6 +22,36 @@ import {
 } from "@/components/ui/select";
 import { Send, Bot, User, Book, Brain } from "lucide-react";
 
+// Custom hook for typing effect
+const useTypingEffect = (text, speed = 50) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (!text) {
+      setDisplayText("");
+      setIsTyping(false);
+      return;
+    }
+
+    setIsTyping(true);
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      if (currentIndex <= text.length) {
+        setDisplayText(text.slice(0, currentIndex));
+        currentIndex++;
+      } else {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, speed);
+
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return { displayText, isTyping };
+};
+
 const SUBJECTS = [
   { id: "listening", name: "Listening", icon: "🎧" },
   { id: "grammar", name: "Grammar", icon: "📝" },
@@ -54,7 +84,6 @@ const Message = ({ message, isUser, isError }) => (
   </div>
 );
 
-// Suggestions component for quick questions
 const Suggestions = ({ onSelect, subject }) => {
   const suggestions = {
     listening: [
@@ -113,10 +142,14 @@ const CoachChat = () => {
     error: null,
   });
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [actualInput, setActualInput] = useState("");
+  const [suggestedText, setSuggestedText] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
+
+  const { displayText, isTyping } = useTypingEffect(suggestedText);
+  const currentInput = suggestedText ? displayText : actualInput;
 
   // Check service status
   useEffect(() => {
@@ -154,11 +187,12 @@ const CoachChat = () => {
   }, [user]);
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedSubject || loading) return;
+    if (!currentInput.trim() || !selectedSubject || loading) return;
 
-    const userMessage = { text: input, isUser: true };
+    const userMessage = { text: currentInput, isUser: true };
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setActualInput("");
+    setSuggestedText("");
     setLoading(true);
 
     try {
@@ -177,7 +211,7 @@ const CoachChat = () => {
       };
 
       const response = await coachService.generateResponse(
-        input,
+        currentInput,
         selectedSubject,
         context
       );
@@ -198,7 +232,12 @@ const CoachChat = () => {
   };
 
   const handleSuggestionSelect = (suggestion) => {
-    setInput(suggestion);
+    setActualInput("");
+    setSuggestedText(suggestion);
+    // Wait for typing to complete before sending
+    setTimeout(() => {
+      handleSend();
+    }, suggestion.length * 50 + 100); // Adjust timing based on text length
   };
 
   return (
@@ -273,17 +312,25 @@ const CoachChat = () => {
               )}
               <div className="flex gap-2">
                 <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  value={currentInput}
+                  onChange={(e) => {
+                    setSuggestedText("");
+                    setActualInput(e.target.value);
+                  }}
                   placeholder="Ask your study coach..."
                   onKeyPress={(e) =>
                     e.key === "Enter" && !e.shiftKey && handleSend()
                   }
-                  disabled={!selectedSubject || loading}
+                  disabled={!selectedSubject || loading || isTyping}
                 />
                 <Button
                   onClick={handleSend}
-                  disabled={!input.trim() || !selectedSubject || loading}
+                  disabled={
+                    !currentInput.trim() ||
+                    !selectedSubject ||
+                    loading ||
+                    isTyping
+                  }
                 >
                   {loading ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
