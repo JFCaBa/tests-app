@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCoach } from "../../contexts/CoachContext";
+import { processMessages } from "../../utils/formatText";
 import coachService from "../../services/coach.service";
-import chatService from "../../services/chat.service";
+import Message from "../chat/Message";
 import {
   Card,
   CardContent,
@@ -66,30 +67,6 @@ const SUGGESTIONS = {
   ],
 };
 
-// Message component
-const Message = React.memo(({ message, isUser, isError }) => (
-  <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
-    <div
-      className={`w-8 h-8 rounded-full ${
-        isUser ? "bg-primary/10" : "bg-muted"
-      } flex items-center justify-center`}
-    >
-      {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-    </div>
-    <div
-      className={`flex-1 px-4 py-2 rounded-lg ${
-        isUser
-          ? "bg-primary text-primary-foreground"
-          : isError
-          ? "bg-destructive/10 text-destructive"
-          : "bg-muted"
-      }`}
-    >
-      {message}
-    </div>
-  </div>
-));
-
 Message.displayName = "Message";
 
 // Suggestions component
@@ -126,8 +103,9 @@ const CoachChat = () => {
   const [loading, setLoading] = useState(false);
   const initialized = useRef(false);
   const scrollRef = useRef(null);
-
+  const processedMessages = processMessages(messages);
   // Initialize chat once
+
   useEffect(() => {
     const init = async () => {
       if (!initialized.current && user) {
@@ -282,7 +260,7 @@ const CoachChat = () => {
 
         <CardContent className="flex-1 overflow-hidden flex flex-col">
           <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
-            {messages.map((message) => (
+            {processedMessages.map((message) => (
               <Message
                 key={message.id}
                 message={message.text}
