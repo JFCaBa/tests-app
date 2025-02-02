@@ -8,33 +8,41 @@ const TextFormatter = ({ text, className = "" }) => {
   const textContent = String(text);
 
   const processText = (content) => {
-    // Split text into sections that might be lists vs regular text
-    const sections = content.split(/\r?\n(?=[-*•]|\d+\.\s)/);
+    // Split into paragraphs first
+    const paragraphs = content.split(/\n\n+/);
+    let currentNumber = 1;
 
-    return sections.map((section, sectionIndex) => {
-      // Check if this section is a list
-      if (section.trim().match(/^([-*•]|\d+\.)\s/)) {
-        const items = section.split(/\r?\n/).filter((item) => item.trim());
-        const isNumbered = items[0].match(/^\d+\.\s/);
+    return paragraphs.map((paragraph, paragraphIndex) => {
+      const lines = paragraph.split(/\r?\n/);
+
+      // Check if this paragraph contains a list
+      const isList = lines.some((line) =>
+        line.trim().match(/^([-*•]|\d+\.)\s/)
+      );
+
+      if (isList) {
+        // Check if it's a numbered list
+        const isNumbered = lines[0].trim().match(/^\d+\.\s/);
 
         if (isNumbered) {
+          // Process numbered list items
+          const items = lines.filter((line) => line.trim());
           return (
-            <ol
-              key={`section-${sectionIndex}`}
-              className="list-decimal pl-6 py-2"
-            >
+            <ol key={`p-${paragraphIndex}`} className="list-decimal pl-6 py-1">
               {items.map((item, index) => (
-                <li key={index} className="text-inherit">
+                <li key={index} className="text-inherit mb-1">
                   {item.replace(/^\d+\.\s/, "")}
                 </li>
               ))}
             </ol>
           );
         } else {
+          // Process bullet point list
+          const items = lines.filter((line) => line.trim());
           return (
-            <ul key={`section-${sectionIndex}`} className="list-disc pl-6 py-2">
+            <ul key={`p-${paragraphIndex}`} className="list-disc pl-6 py-1">
               {items.map((item, index) => (
-                <li key={index} className="text-inherit">
+                <li key={index} className="text-inherit mb-1">
                   {item.replace(/^[-*•]\s/, "")}
                 </li>
               ))}
@@ -43,13 +51,66 @@ const TextFormatter = ({ text, className = "" }) => {
         }
       }
 
-      // Regular text handling with line breaks
-      return section.split(/\r?\n/).map((line, lineIndex, array) => (
-        <React.Fragment key={`line-${sectionIndex}-${lineIndex}`}>
-          {line}
-          {lineIndex < array.length - 1 && <br />}
-        </React.Fragment>
-      ));
+      // Process regular text with potential inline lists
+      let inList = false;
+      let listItems = [];
+      const processedLines = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const isListItem = line.trim().match(/^(\d+\.|[-*•])\s/);
+
+        if (isListItem) {
+          if (!inList) {
+            inList = true;
+            listItems = [];
+          }
+          listItems.push(line.replace(/^(\d+\.|[-*•])\s/, ""));
+
+          // If this is the last line or next line is not a list item, render the list
+          if (
+            i === lines.length - 1 ||
+            !lines[i + 1].trim().match(/^(\d+\.|[-*•])\s/)
+          ) {
+            const isNumbered = line.trim().match(/^\d+\.\s/);
+            if (isNumbered) {
+              processedLines.push(
+                <ol key={`list-${i}`} className="list-decimal pl-6 py-1">
+                  {listItems.map((item, idx) => (
+                    <li key={idx} className="text-inherit mb-1">
+                      {item}
+                    </li>
+                  ))}
+                </ol>
+              );
+            } else {
+              processedLines.push(
+                <ul key={`list-${i}`} className="list-disc pl-6 py-1">
+                  {listItems.map((item, idx) => (
+                    <li key={idx} className="text-inherit mb-1">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+            inList = false;
+          }
+        } else {
+          processedLines.push(
+            <React.Fragment key={`line-${i}`}>
+              {line}
+              {i < lines.length - 1 && <br />}
+            </React.Fragment>
+          );
+        }
+      }
+
+      return (
+        <div key={`p-${paragraphIndex}`} className="mb-3">
+          {processedLines}
+        </div>
+      );
     });
   };
 
