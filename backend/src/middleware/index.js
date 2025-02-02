@@ -17,7 +17,7 @@ import {
   testValidationRules,
   queryValidationRules,
 } from "./validation.middleware.js";
-import { chatValidationRules } from "./chat.validation.js";
+import { chatValidationRules } from "./chat.middleware.js";
 import {
   notFound,
   errorHandler,
