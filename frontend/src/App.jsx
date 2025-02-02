@@ -16,6 +16,8 @@ import { Progress } from "./components/progress/Progress";
 import { TestSummary } from "./components/test/TestSummary";
 import { DemoTest } from "./components/demo/DemoTest";
 import CoachChat from "./components/coach/CoachChat";
+import SubscriptionNotice from "./components/subscription/SubscriptionNotice";
+import SubscriptionRoute from "./components/subscription/SubscriptionRoute";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
@@ -47,12 +49,39 @@ const App = () => {
         <Route
           path="/"
           element={
-            isAuthenticated ? <Navigate to="/subjects" /> : <LandingPage />
+            isAuthenticated ? (
+              <Navigate to="/subjects" />
+            ) : (
+              <ErrorBoundary>
+                <LandingPage />
+              </ErrorBoundary>
+            )
           }
         />
-        <Route path="/demo" element={<DemoTest />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
+        <Route
+          path="/demo"
+          element={
+            <ErrorBoundary>
+              <DemoTest />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <ErrorBoundary>
+              <LoginForm />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <ErrorBoundary>
+              <RegisterForm />
+            </ErrorBoundary>
+          }
+        />
 
         {/* Protected Routes */}
         <Route
@@ -63,10 +92,38 @@ const App = () => {
             </ProtectedRoute>
           }
         >
-          <Route path="subjects" element={<SubjectSelection />} />
-          <Route path="practice/summary" element={<TestSummary />} />
-          <Route path="practice/:subject" element={<PracticeMode />} />
-          <Route path="practice/:subject/:mode" element={<PracticeSession />} />
+          <Route
+            path="subjects"
+            element={
+              <ErrorBoundary>
+                <SubjectSelection />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="practice/summary"
+            element={
+              <ErrorBoundary>
+                <TestSummary />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="practice/:subject"
+            element={
+              <ErrorBoundary>
+                <PracticeMode />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="practice/:subject/:mode"
+            element={
+              <ErrorBoundary>
+                <PracticeSession />
+              </ErrorBoundary>
+            }
+          />
 
           {/* User Settings and Profile Routes */}
           <Route
@@ -103,19 +160,43 @@ const App = () => {
             }
           />
 
-          {/* Coach Chat Route */}
+          {/* Subscription and Coach Routes */}
+          <Route
+            path="subscription"
+            element={
+              <ErrorBoundary>
+                <SubscriptionNotice />
+              </ErrorBoundary>
+            }
+          />
           <Route
             path="coach"
             element={
-              <ProtectedRoute>
-                <CoachChat />
-              </ProtectedRoute>
+              <ErrorBoundary>
+                <SubscriptionRoute>
+                  <CoachChat />
+                </SubscriptionRoute>
+              </ErrorBoundary>
             }
           />
 
           {/* Admin Routes */}
-          <Route path="admin" element={<AdminDashboard />} />
-          <Route path="admin/users" element={<UserManager />} />
+          <Route
+            path="admin"
+            element={
+              <ErrorBoundary>
+                <AdminDashboard />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="admin/users"
+            element={
+              <ErrorBoundary>
+                <UserManager />
+              </ErrorBoundary>
+            }
+          />
           <Route
             path="admin/questions"
             element={
@@ -124,7 +205,14 @@ const App = () => {
               </ErrorBoundary>
             }
           />
-          <Route path="admin/tests" element={<TestStatistics />} />
+          <Route
+            path="admin/tests"
+            element={
+              <ErrorBoundary>
+                <TestStatistics />
+              </ErrorBoundary>
+            }
+          />
         </Route>
 
         {/* Catch all */}
