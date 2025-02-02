@@ -13,7 +13,7 @@ export const setupRoutes = (app) => {
   app.use("/api/tests", testRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/coach", coachRoutes);
-  app.use("/chat", chatRoutes);
+  app.use("/api/chat", chatRoutes);
 
   // Health check route
   app.get("/health", (req, res) => {

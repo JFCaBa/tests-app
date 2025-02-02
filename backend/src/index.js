@@ -43,8 +43,8 @@ app.use("/api/questions", questionRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/coach", coachRoutes);
-app.use("/subscription", subscriptionRoutes);
-app.use("/chat", chatRoutes);
+app.use("/api/subscription", subscriptionRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
