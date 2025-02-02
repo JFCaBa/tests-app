@@ -95,6 +95,12 @@ export const PracticeSession = () => {
     );
   };
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "";
+    const filename = imagePath.split("/").pop();
+    return `https://testmyrussian.com/uploads/images/${filename}`;
+  };
+
   useEffect(() => {
     let timer;
     if (mode === "timed" && timeLeft > 0 && timerActive && !feedback) {
@@ -354,10 +360,25 @@ export const PracticeSession = () => {
   const renderQuestion = () => {
     if (!currentQuestion) return null;
 
+    const imageUrl = currentQuestion.imageUrl
+      ? getImageUrl(currentQuestion.imageUrl)
+      : null;
+
     switch (currentQuestion.type) {
       case QuestionTypes.MULTIPLE_CHOICE:
         return (
           <div className="space-y-4">
+            {/* Render image if available */}
+            {imageUrl && (
+              <div className="mb-4">
+                <img
+                  src={imageUrl}
+                  alt="Question Visual"
+                  className="max-w-full h-auto rounded-lg shadow-md"
+                  style={{ maxWidth: "500px" }}
+                />
+              </div>
+            )}
             {(currentQuestion.options || []).map((option, index) => (
               <Button
                 key={index}

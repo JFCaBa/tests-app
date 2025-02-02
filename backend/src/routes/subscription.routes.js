@@ -1,5 +1,7 @@
 import express from "express";
+import { User } from "../models/index.js";
 import { auth } from "../middleware/index.js";
+
 const router = express.Router();
 
 // @route   GET /subscription/check
@@ -7,7 +9,7 @@ const router = express.Router();
 // @access  Private
 router.get("/check", auth.required, async (req, res) => {
   try {
-    const user = req.user;
+    const user = await User.findById(req.user._id).select("-password");
 
     // For now, only admins have access
     const hasAccess = user.role === "admin";
