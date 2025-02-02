@@ -86,6 +86,7 @@ router.delete(
 router.get(
   "/messages/stats",
   auth.required,
+  auth.admin,
   asyncHandler(async (req, res) => {
     const stats = await ChatMessage.aggregate([
       { $match: { userId: req.user._id } },
@@ -110,6 +111,7 @@ router.get(
 router.post(
   "/messages/cleanup",
   auth.required,
+  auth.admin,
   asyncHandler(async (req, res) => {
     const { daysToKeep = 30 } = req.body;
 
