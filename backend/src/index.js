@@ -13,7 +13,7 @@ import testRoutes from "./routes/tests.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import coachRoutes from "./routes/coach.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
-import chat from "./routes/chat.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,7 +44,7 @@ app.use("/api/tests", testRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/coach", coachRoutes);
 app.use("/subscription", subscriptionRoutes);
-app.use("/chat", chat);
+app.use("/chat", chatRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
