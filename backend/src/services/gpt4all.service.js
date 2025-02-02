@@ -96,7 +96,7 @@ class GPT4AllService {
       .map((sentence) => sentence.trim());
 
     // Add \r\n after each sentence
-    return sentences.join(":\r\n");
+    return sentences.join("\r\n");
   }
 }
 
