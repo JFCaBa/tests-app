@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { BulkQuestionUpload } from "./BulkQuestionUpload";
 import QuestionForm from "./QuestionForm";
+import ChatCleanup from "./ChatCleanup";
 import axios from "axios";
 
 export const AdminDashboard = () => {
@@ -21,7 +22,6 @@ export const AdminDashboard = () => {
     tests: { totalTests: 0, averageScore: 0 },
   });
   const [loading, setLoading] = useState(true);
-  const [showUpload, setShowUpload] = useState(false);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
 
   // Initialize question form data
@@ -55,8 +55,8 @@ export const AdminDashboard = () => {
 
   const handleQuestionSubmit = async (questionData) => {
     try {
-      await fetchStats(); // Refresh stats after successful submission
-      setShowQuestionForm(false); // Close the form
+      await fetchStats();
+      setShowQuestionForm(false);
     } catch (error) {
       console.error("Error handling question submission:", error);
     }
@@ -64,7 +64,6 @@ export const AdminDashboard = () => {
 
   const handleCloseForm = () => {
     setShowQuestionForm(false);
-    // Reset form data
     setFormData({
       subject: "",
       type: "",
@@ -186,6 +185,9 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Chat Cleanup Section */}
+      <ChatCleanup />
 
       {/* Question Form Modal */}
       {showQuestionForm && (
