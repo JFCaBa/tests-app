@@ -16,17 +16,7 @@ const SubscriptionNotice = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // If user is admin, redirect to coach chat
-  React.useEffect(() => {
-    if (isAdmin) {
-      navigate("/coach");
-    }
-  }, [isAdmin, navigate]);
-
-  if (isAdmin) {
-    return null; // Prevent flash while redirecting
-  }
-
+  // Remove auto-redirect for admins, let SubscriptionRoute handle that
   const features = [
     {
       icon: Brain,
