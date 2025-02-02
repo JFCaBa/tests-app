@@ -12,6 +12,7 @@ import questionRoutes from "./routes/questions.routes.js";
 import testRoutes from "./routes/tests.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import coachRoutes from "./routes/coach.routes.js";
+import subscriptionRoutes from "./routes/subscription.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +42,7 @@ app.use("/api/questions", questionRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/coach", coachRoutes);
+app.use("/subscription", subscriptionRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
