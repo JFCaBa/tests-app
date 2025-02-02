@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send, Bot, User, Book, Brain } from "lucide-react";
+import { Send, Bot, User } from "lucide-react";
 
 // Custom hook for typing effect
 const useTypingEffect = (text, speed = 50) => {
@@ -234,7 +234,7 @@ const CoachChat = () => {
       <Card className="min-h-[600px] flex flex-col">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Brain className="w-6 h-6" />
+            <Bot className="w-6 h-6" />
             Study Coach
             {isInitialized ? (
               <div className="flex items-center gap-2 text-sm text-green-500">

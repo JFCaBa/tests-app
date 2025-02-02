@@ -11,7 +11,7 @@ import {
   TrendingUp,
   LayoutDashboard,
   Menu,
-  Brain,
+  Bot,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,7 +55,7 @@ export const MainLayout = () => {
     { href: "/subjects", icon: Book, label: "Subjects" },
     { href: "/progress", icon: TrendingUp, label: "Progress" },
     { href: "/statistics", icon: BarChart, label: "Statistics" },
-    { href: "/coach", icon: Brain, label: "AI Coach" },
+    { href: "/coach", icon: Bot, label: "AI Coach" },
     ...(isAdmin
       ? [{ href: "/admin", icon: LayoutDashboard, label: "Admin" }]
       : []),
