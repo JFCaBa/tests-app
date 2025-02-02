@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useCoach } from "../../contexts/CoachContext"; // Add CoachContext
+import { useCoach } from "../../contexts/CoachContext";
 import coachService from "../../services/coach.service";
+import chatService from "../../services/chat.service";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,69 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Send, Bot, User } from "lucide-react";
 
-// Custom hook for typing effect
-const useTypingEffect = (text, speed = 50) => {
-  const [displayText, setDisplayText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
-  useEffect(() => {
-    if (!text) {
-      setDisplayText("");
-      setIsTyping(false);
-      return;
-    }
-
-    setIsTyping(true);
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex <= text.length) {
-        setDisplayText(text.slice(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, speed);
-
-    return () => clearInterval(interval);
-  }, [text, speed]);
-
-  return { displayText, isTyping };
-};
-
-const Message = ({ message, isUser, isError }) => {
-  const { displayText, isTyping } = useTypingEffect(
-    isUser ? null : message,
-    30
-  );
-
-  return (
-    <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
-      <div
-        className={`w-8 h-8 rounded-full ${
-          isUser ? "bg-primary/10" : "bg-muted"
-        } flex items-center justify-center`}
-      >
-        {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-      </div>
-      <div
-        className={`flex-1 px-4 py-2 rounded-lg ${
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : isError
-            ? "bg-destructive/10 text-destructive"
-            : "bg-muted"
-        }`}
-      >
-        {isUser ? message : displayText}
-        {!isUser && isTyping && (
-          <span className="inline-block ml-1 animate-pulse">▋</span>
-        )}
-      </div>
-    </div>
-  );
-};
-
+// Subject and Suggestions configurations
 const SUBJECTS = [
   { id: "listening", name: "Listening", icon: "🎧" },
   { id: "grammar", name: "Grammar", icon: "📝" },
@@ -95,43 +33,72 @@ const SUBJECTS = [
   { id: "writing", name: "Writing", icon: "✍️" },
 ];
 
-const Suggestions = ({ onSelect, subject }) => {
-  const suggestions = {
-    listening: [
-      "How can I improve my listening comprehension?",
-      "What are common mistakes in listening tests?",
-      "Tips for understanding fast speech",
-    ],
-    grammar: [
-      "Help with case usage",
-      "Verb aspects explanation",
-      "Common grammar mistakes",
-    ],
-    history: [
-      "Key historical dates to remember",
-      "Important historical figures",
-      "Tips for history exam preparation",
-    ],
-    laws: [
-      "Essential legal concepts",
-      "Common law test questions",
-      "How to study legal terminology",
-    ],
-    reading: [
-      "Reading comprehension strategies",
-      "How to improve reading speed",
-      "Tips for understanding context",
-    ],
-    writing: [
-      "Writing structure tips",
-      "Common writing mistakes",
-      "How to improve essay writing",
-    ],
-  };
+const SUGGESTIONS = {
+  listening: [
+    "How can I improve my listening comprehension?",
+    "What are common mistakes in listening tests?",
+    "Tips for understanding fast speech",
+  ],
+  grammar: [
+    "Help with case usage",
+    "Verb aspects explanation",
+    "Common grammar mistakes",
+  ],
+  history: [
+    "Key historical dates to remember",
+    "Important historical figures",
+    "Tips for history exam preparation",
+  ],
+  laws: [
+    "Essential legal concepts",
+    "Common law test questions",
+    "How to study legal terminology",
+  ],
+  reading: [
+    "Reading comprehension strategies",
+    "How to improve reading speed",
+    "Tips for understanding context",
+  ],
+  writing: [
+    "Writing structure tips",
+    "Common writing mistakes",
+    "How to improve essay writing",
+  ],
+};
+
+// Message component
+const Message = React.memo(({ message, isUser, isError }) => (
+  <div className={`flex gap-3 mb-4 ${isUser ? "flex-row-reverse" : ""}`}>
+    <div
+      className={`w-8 h-8 rounded-full ${
+        isUser ? "bg-primary/10" : "bg-muted"
+      } flex items-center justify-center`}
+    >
+      {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+    </div>
+    <div
+      className={`flex-1 px-4 py-2 rounded-lg ${
+        isUser
+          ? "bg-primary text-primary-foreground"
+          : isError
+          ? "bg-destructive/10 text-destructive"
+          : "bg-muted"
+      }`}
+    >
+      {message}
+    </div>
+  </div>
+));
+
+Message.displayName = "Message";
+
+// Suggestions component
+const Suggestions = React.memo(({ onSelect, subject }) => {
+  if (!subject || !SUGGESTIONS[subject]) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 mt-4">
-      {suggestions[subject]?.map((suggestion, index) => (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {SUGGESTIONS[subject].map((suggestion, index) => (
         <Button
           key={index}
           variant="outline"
@@ -144,8 +111,11 @@ const Suggestions = ({ onSelect, subject }) => {
       ))}
     </div>
   );
-};
+});
 
+Suggestions.displayName = "Suggestions";
+
+// Main component
 const CoachChat = () => {
   const { user } = useAuth();
   const { isInitialized, lastError, initializeCoach, getLearningContext } =
@@ -154,71 +124,105 @@ const CoachChat = () => {
   const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [loading, setLoading] = useState(false);
+  const initialized = useRef(false);
   const scrollRef = useRef(null);
 
-  // Initialize coach on component mount
+  // Initialize chat once
   useEffect(() => {
-    initializeCoach();
-  }, [initializeCoach]);
+    const init = async () => {
+      if (!initialized.current && user) {
+        await initializeCoach();
 
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+        const context = getLearningContext();
+        let greeting = `Hello ${user.username}! I'm your study coach. `;
 
-  // Initial greeting with context
-  useEffect(() => {
-    if (messages.length === 0) {
-      const context = getLearningContext();
-      let greeting = `Hello ${user?.username}! I'm your study coach. `;
-
-      if (context) {
-        if (context.totalTests > 0) {
+        if (context?.totalTests > 0) {
           greeting += `I see you've taken ${
             context.totalTests
-          } tests with an average score of ${context.progress.toFixed(1)}%. `;
+          } tests with an average score of ${context.averageScore.toFixed(
+            1
+          )}%. `;
         }
-        if (context.preferredSubjects?.length > 0) {
+
+        if (context?.preferredSubjects?.length > 0) {
           greeting += `I notice you've been focusing on ${context.preferredSubjects.join(
             ", "
           )}. `;
         }
+
+        greeting +=
+          "Select a subject, and I'll help you prepare for your exam.";
+
+        setMessages([
+          {
+            id: "greeting",
+            text: greeting,
+            isUser: false,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
+
+        initialized.current = true;
       }
+    };
 
-      greeting += `Select a subject, and I'll help you prepare for your exam.`;
+    init();
+  }, [user, initializeCoach, getLearningContext]);
 
-      setMessages([{ text: greeting, isUser: false }]);
+  // Auto-scroll on new messages
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
-  }, [user, getLearningContext]);
+  }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || !selectedSubject || loading) return;
+  const handleSubjectChange = useCallback((newSubject) => {
+    setSelectedSubject(newSubject);
+  }, []);
 
-    const userMessage = { text: input, isUser: true };
+  const handleSend = async (messageText = null) => {
+    const textToSend = messageText || input;
+    if (!textToSend.trim() || !selectedSubject || loading) return;
+
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      text: textToSend,
+      isUser: true,
+      timestamp: new Date().toISOString(),
+    };
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
 
     try {
-      const context = getLearningContext();
       const response = await coachService.generateResponse(
-        input,
+        textToSend,
         selectedSubject,
-        context
+        getLearningContext()
       );
-      setMessages((prev) => [...prev, { text: response, isUser: false }]);
+
+      const botMessage = {
+        id: `bot-${Date.now()}`,
+        text: response,
+        isUser: false,
+        timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error("Error generating response:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: "I'm having trouble responding right now. Please try again.",
-          isUser: false,
-          isError: true,
-        },
-      ]);
+      console.error("Error:", error);
+      const errorMessage = {
+        id: `error-${Date.now()}`,
+        text: "I'm having trouble responding right now. Please try again.",
+        isUser: false,
+        isError: true,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setLoading(false);
     }
@@ -226,7 +230,7 @@ const CoachChat = () => {
 
   const handleSuggestionSelect = (suggestion) => {
     setInput(suggestion);
-    handleSend();
+    handleSend(suggestion);
   };
 
   return (
@@ -260,7 +264,7 @@ const CoachChat = () => {
             </Alert>
           )}
 
-          <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+          <Select value={selectedSubject} onValueChange={handleSubjectChange}>
             <SelectTrigger>
               <SelectValue placeholder="Select subject" />
             </SelectTrigger>
@@ -278,52 +282,49 @@ const CoachChat = () => {
 
         <CardContent className="flex-1 overflow-hidden flex flex-col">
           <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <Message
-                key={index}
+                key={message.id}
                 message={message.text}
                 isUser={message.isUser}
                 isError={message.isError}
               />
             ))}
-            {selectedSubject && messages.length === 1 && !loading && (
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Here are some suggestions to get started:
-                </p>
-                <Suggestions
-                  subject={selectedSubject}
-                  onSelect={handleSuggestionSelect}
-                />
-              </div>
-            )}
           </ScrollArea>
 
-          <CardFooter className="p-4 border-t">
-            <div className="flex flex-col w-full gap-4">
-              <div className="flex gap-2">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask your study coach..."
-                  onKeyPress={(e) =>
-                    e.key === "Enter" && !e.shiftKey && handleSend()
-                  }
-                  disabled={!selectedSubject || loading}
-                />
-                <Button
-                  onClick={handleSend}
-                  disabled={!input.trim() || !selectedSubject || loading}
-                >
-                  {loading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+          <div className="mt-4 flex flex-col gap-4">
+            {selectedSubject && (
+              <Suggestions
+                subject={selectedSubject}
+                onSelect={handleSuggestionSelect}
+              />
+            )}
+            <div className="flex gap-2">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) =>
+                  e.key === "Enter" && !e.shiftKey && handleSend()
+                }
+                placeholder={
+                  selectedSubject
+                    ? "Ask your study coach..."
+                    : "Select a subject first"
+                }
+                disabled={!selectedSubject || loading}
+              />
+              <Button
+                onClick={() => handleSend()}
+                disabled={!input.trim() || !selectedSubject || loading}
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
             </div>
-          </CardFooter>
+          </div>
         </CardContent>
       </Card>
     </div>

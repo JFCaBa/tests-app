@@ -17,6 +17,7 @@ import {
   testValidationRules,
   queryValidationRules,
 } from "./validation.middleware.js";
+import { chatValidationRules } from "./chat.validation.js";
 import {
   notFound,
   errorHandler,
@@ -47,6 +48,7 @@ export const validation = {
     question: questionValidationRules,
     test: testValidationRules,
     query: queryValidationRules,
+    chat: chatValidationRules,
   },
 };
 

@@ -8,30 +8,55 @@ class GPT4AllService {
     this.isInitialized = false;
   }
 
+  // Updated initialize() method in GPT4AllService class
   async initialize() {
     if (this.isInitialized) return true;
 
     try {
       console.log("Initializing GPT4All...");
-      // Load the model (this will trigger a download if not already cached)
+      // Load model with increased context size
       this.model = await loadModel("orca-mini-3b-gguf2-q4_0.gguf", {
         verbose: true,
-        device: "cpu", // Change to "gpu" if available
-        nCtx: 1024, // Set max context size
+        device: "cpu",
+        nCtx: 2048, // Changed from 1024 to 2048
       });
 
-      // Create a chat session
+      // Updated system prompt with detailed instructions
       this.chatSession = await this.model.createChatSession({
-        temperature: 0.8,
-        systemPrompt:
-          "### System:\nYou are a Russian language exam coach. Use cyrilic when writing in Russian\n\n",
+        temperature: 0.7, // Slightly lower temperature for factual accuracy
+        systemPrompt: `
+### System:
+Вы экспертный помощник по миграционному праву России. Формат ответов:
+1. Используйте кириллицу и строго русский язык
+2. Структура ответа:
+   ### Грамматика (Русский язык)
+   ### Исторический контекст
+   ### Правовые аспекты
+   ### Частые ошибки
+3. Форматируйте через маркированные списки
+4. Примеры выделяйте курсивом через *
+5. Ссылайтесь на статьи законов (ФЗ-115 Статья 13.2)
+6. Упомяните изменения 2020-2023 гг.
+7. Сохраняйте официальный стиль
+8. Перечисляйте документы полностью
+
+Пример структуры:
+### Грамматика
+- Склонение термина "вид на жительство":
+  * Правильно: "заявление на получение видА на жительствО"
+  * Неправильно: "вид на жительстве"
+
+### Правовые аспекты
+- Согласно ФЗ-115 Статья 8.1 (2021):
+  Требуемый доход: 12 × прожиточный минимум региона
+  `.trim(),
       });
 
       this.isInitialized = true;
-      console.log("GPT4All initialized successfully");
+      console.log("GPT4All initialized with migration law settings");
       return true;
     } catch (error) {
-      console.error("GPT4All initialization failed:", error);
+      console.error("Initialization failed:", error);
       return false;
     }
   }
