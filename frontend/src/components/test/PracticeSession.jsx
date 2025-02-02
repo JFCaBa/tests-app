@@ -331,17 +331,17 @@ export const PracticeSession = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 text-gray-700">
                 <Info className="h-4 w-4" />
-                <h4 className="font-medium">
-                  {currentQuestion.type === QuestionTypes.AUDIO
-                    ? "Transcription"
-                    : "Explanation"}
-                </h4>
+                <h4 className="font-medium">Explanation</h4>
               </div>
-              <TextToSpeech
-                text={feedback.explanation}
-                language="ru-RU"
-                size="sm"
-              />
+
+              {/* Only show Text-to-Speech for audio-type questions */}
+              {currentQuestion.type === QuestionTypes.AUDIO && (
+                <TextToSpeech
+                  text={feedback.explanation}
+                  language="ru-RU"
+                  size="sm"
+                />
+              )}
             </div>
             <TextFormatter
               text={feedback.explanation}
