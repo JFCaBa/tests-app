@@ -115,11 +115,7 @@ const CoachChat = () => {
         let greeting = `Hello ${user.username}! I'm your study coach. `;
 
         if (context?.totalTests > 0) {
-          greeting += `I see you've taken ${
-            context.totalTests
-          } tests with an average score of ${context.averageScore.toFixed(
-            1
-          )}%. `;
+          greeting += `I see you've taken ${context.totalTests} tests. `;
         }
 
         if (context?.preferredSubjects?.length > 0) {
