@@ -39,7 +39,8 @@ class GPT4AllService {
   }
 
   async generateResponse(input, subject, context = {}) {
-    const cacheKey = `${input}-${subject}-${JSON.stringify(context)}`;
+    const prompt = subject + "\n" + input;
+    const cacheKey = prompt;
     if (cache.has(cacheKey)) {
       return cache.get(cacheKey); // Return cached response
     }
@@ -49,8 +50,6 @@ class GPT4AllService {
     }
 
     try {
-      const prompt = this.createPrompt(input, subject, context);
-
       // Start measuring time
       console.time("Response Time");
 
@@ -69,22 +68,6 @@ class GPT4AllService {
       console.error("Generation error:", error);
       return null;
     }
-  }
-
-  createPrompt(input, subject, context) {
-    const contextInfo = context.progress
-      ? `
-            Student Progress: ${context.progress}%
-            Recent Test Scores: ${context.recentScores || "N/A"}
-            Total Tests Taken: ${context.totalTests || 0}
-        `
-      : "";
-
-    return `As a Russian language exam coach specializing in ${subject}, help with this question.
-        ${contextInfo}
-        Student's question: ${input}
-        
-        Provide a specific, practical response focused on exam preparation for the working permission, temporary residence permission, and permanent residence permission.`;
   }
 
   formatResponse(response) {
