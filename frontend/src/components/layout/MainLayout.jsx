@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import TextTranslator from "../common/TextTranslator";
 
 const NavItem = ({ href, icon: Icon, children, isActive, onClick }) => (
   <Button
@@ -169,6 +170,7 @@ export const MainLayout = () => {
           </p>
         </div>
       </footer>
+      <TextTranslator />
     </div>
   );
 };
