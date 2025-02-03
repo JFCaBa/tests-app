@@ -7,8 +7,8 @@ export const formatCoachResponse = (text) => {
   if (!text) return "";
 
   // Ensure lists are properly formatted
-  text = text.replace(/(?:^|\n)[-*•]\s+/g, "\n• "); // Unordered lists
-  text = text.replace(/(?:^|\n)(\d+)\.\s+/g, "\n$1. "); // Ordered lists
+  // text = text.replace(/(?:^|\n)[-*•]\s+/g, "\n• "); // Unordered lists
+  // text = text.replace(/(?:^|\n)(\d+)\.\s+/g, "\n$1. "); // Ordered lists
 
   // Ensure proper spacing around lists
   text = text.replace(/(\n[•\d].*?)(\n[^•\d])/g, "$1\n\n$2");

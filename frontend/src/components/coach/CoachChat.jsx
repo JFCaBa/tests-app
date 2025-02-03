@@ -4,6 +4,9 @@ import { useCoach } from "../../contexts/CoachContext";
 import { processMessages } from "../../utils/formatText";
 import coachService from "../../services/coach.service";
 import Message from "../chat/Message";
+import Suggestions from "./Suggestions";
+import SubjectSelector from "./SubjectSelector";
+import { saveChatMessage } from "./api";
 import {
   Card,
   CardContent,
@@ -15,84 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Send, Bot, User } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 
-// Subject and Suggestions configurations
-const SUBJECTS = [
-  { id: "listening", name: "Listening", icon: "🎧" },
-  { id: "grammar", name: "Grammar", icon: "📝" },
-  { id: "history", name: "History", icon: "📚" },
-  { id: "laws", name: "Laws", icon: "⚖️" },
-  { id: "reading", name: "Reading", icon: "📖" },
-  { id: "writing", name: "Writing", icon: "✍️" },
-];
-
-const SUGGESTIONS = {
-  listening: [
-    "How can I improve my listening comprehension?",
-    "What are common mistakes in listening tests?",
-    "Tips for understanding fast speech",
-  ],
-  grammar: [
-    "Help with case usage",
-    "Verb aspects explanation",
-    "Common grammar mistakes",
-  ],
-  history: [
-    "Key historical dates to remember",
-    "Important historical figures",
-    "Tips for history exam preparation",
-  ],
-  laws: [
-    "Essential legal concepts",
-    "Common law test questions",
-    "How to study legal terminology",
-  ],
-  reading: [
-    "Reading comprehension strategies",
-    "How to improve reading speed",
-    "Tips for understanding context",
-  ],
-  writing: [
-    "Writing structure tips",
-    "Common writing mistakes",
-    "How to improve essay writing",
-  ],
-};
-
-Message.displayName = "Message";
-
-// Suggestions component
-const Suggestions = React.memo(({ onSelect, subject }) => {
-  if (!subject || !SUGGESTIONS[subject]) return null;
-
-  return (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {SUGGESTIONS[subject].map((suggestion, index) => (
-        <Button
-          key={index}
-          variant="outline"
-          size="sm"
-          onClick={() => onSelect(suggestion)}
-          className="text-xs"
-        >
-          {suggestion}
-        </Button>
-      ))}
-    </div>
-  );
-});
-
-Suggestions.displayName = "Suggestions";
-
-// Main component
 const CoachChat = () => {
   const { user } = useAuth();
   const { isInitialized, lastError, initializeCoach, getLearningContext } =
@@ -104,7 +31,6 @@ const CoachChat = () => {
   const initialized = useRef(false);
   const scrollRef = useRef(null);
   const processedMessages = processMessages(messages);
-  // Initialize chat once
 
   useEffect(() => {
     const init = async () => {
@@ -127,15 +53,15 @@ const CoachChat = () => {
         greeting +=
           "Select a subject, and I'll help you prepare for your exam.";
 
-        setMessages([
-          {
-            id: "greeting",
-            text: greeting,
-            isUser: false,
-            timestamp: new Date().toISOString(),
-          },
-        ]);
+        const initialMessage = {
+          text: greeting,
+          isUser: false,
+          subject: "general",
+          timestamp: new Date().toISOString(),
+        };
 
+        const savedMessage = await saveChatMessage(initialMessage);
+        setMessages([{ ...savedMessage, id: savedMessage._id }]);
         initialized.current = true;
       }
     };
@@ -143,7 +69,6 @@ const CoachChat = () => {
     init();
   }, [user, initializeCoach, getLearningContext]);
 
-  // Auto-scroll on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -162,17 +87,21 @@ const CoachChat = () => {
     if (!textToSend.trim() || !selectedSubject || loading) return;
 
     const userMessage = {
-      id: `user-${Date.now()}`,
       text: textToSend,
       isUser: true,
+      subject: selectedSubject,
       timestamp: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setLoading(true);
-
     try {
+      const savedUserMessage = await saveChatMessage(userMessage);
+      setMessages((prev) => [
+        ...prev,
+        { ...savedUserMessage, id: savedUserMessage._id },
+      ]);
+      setInput("");
+      setLoading(true);
+
       const response = await coachService.generateResponse(
         textToSend,
         selectedSubject,
@@ -180,23 +109,33 @@ const CoachChat = () => {
       );
 
       const botMessage = {
-        id: `bot-${Date.now()}`,
         text: response,
         isUser: false,
+        subject: selectedSubject,
         timestamp: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, botMessage]);
+      const savedBotMessage = await saveChatMessage(botMessage);
+      setMessages((prev) => [
+        ...prev,
+        { ...savedBotMessage, id: savedBotMessage._id },
+      ]);
     } catch (error) {
       console.error("Error:", error);
+
       const errorMessage = {
-        id: `error-${Date.now()}`,
         text: "I'm having trouble responding right now. Please try again.",
         isUser: false,
+        subject: selectedSubject,
         isError: true,
         timestamp: new Date().toISOString(),
       };
-      setMessages((prev) => [...prev, errorMessage]);
+
+      const savedErrorMessage = await saveChatMessage(errorMessage);
+      setMessages((prev) => [
+        ...prev,
+        { ...savedErrorMessage, id: savedErrorMessage._id },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -238,20 +177,10 @@ const CoachChat = () => {
             </Alert>
           )}
 
-          <Select value={selectedSubject} onValueChange={handleSubjectChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select subject" />
-            </SelectTrigger>
-            <SelectContent>
-              {SUBJECTS.map((subject) => (
-                <SelectItem key={subject.id} value={subject.id}>
-                  <span className="flex items-center gap-2">
-                    {subject.icon} {subject.name}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SubjectSelector
+            value={selectedSubject}
+            onChange={handleSubjectChange}
+          />
         </CardHeader>
 
         <CardContent className="flex-1 overflow-hidden flex flex-col">

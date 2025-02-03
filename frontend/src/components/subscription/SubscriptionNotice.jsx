@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Crown, Star, Zap, Brain, Check, ArrowRight } from "lucide-react";
+import { Crown, Star, Zap, Bot, Check, ArrowRight } from "lucide-react";
 
 const SubscriptionNotice = () => {
   const { user, isAdmin } = useAuth();
@@ -19,7 +19,7 @@ const SubscriptionNotice = () => {
   // Remove auto-redirect for admins, let SubscriptionRoute handle that
   const features = [
     {
-      icon: Brain,
+      icon: Bot,
       title: "AI Study Coach",
       description: "Get personalized help with your exam preparation",
     },

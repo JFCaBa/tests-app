@@ -1,0 +1,27 @@
+# https://testmyrussian.com robots.txt
+
+User-agent: *
+Allow: /
+Allow: /demo
+Allow: /subjects
+Allow: /practice/listening
+Allow: /practice/grammar
+Allow: /practice/history
+Allow: /practice/laws
+Allow: /practice/reading
+Allow: /practice/writing
+
+# Disallow admin and private routes
+Disallow: /admin/
+Disallow: /profile
+Disallow: /settings
+Disallow: /progress
+Disallow: /statistics
+Disallow: /practice/summary
+Disallow: /practice/*/mode
+
+# Sitemap
+Sitemap: https://testmyrussian.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10

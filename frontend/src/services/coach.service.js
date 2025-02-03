@@ -2,6 +2,7 @@
 import axiosInstance from "../config/axios";
 import { historicalService } from "./historical.service";
 import { lawService } from "./law.service";
+import { grammarService } from "./grammar.service";
 
 class CoachService {
   constructor() {
@@ -54,6 +55,16 @@ class CoachService {
       const legalEnhancement = lawService.enhanceResponse(userInput, subject);
       if (legalEnhancement) {
         finalResponse += "\n\nRelevant legal information:\n" + legalEnhancement;
+      }
+
+      // Enhance with grammar information if relevant
+      const grammarEnhancement = grammarService.findExample(userInput);
+      if (grammarEnhancement) {
+        finalResponse +=
+          "\n\nRelevant grammar tip:\n" +
+          grammarEnhancement.example +
+          " - " +
+          grammarEnhancement.explanation;
       }
 
       return finalResponse;
@@ -195,6 +206,17 @@ class CoachService {
       if (legalEnhancement) {
         response +=
           "\n\nHere is some specific legal information:\n" + legalEnhancement;
+      }
+    }
+
+    if (subject === "grammar") {
+      const grammarEnhancement = grammarService.findExample(userInput);
+      if (grammarEnhancement) {
+        response +=
+          "\n\nGrammar tip:\n" +
+          grammarEnhancement.example +
+          " - " +
+          grammarEnhancement.explanation;
       }
     }
 
