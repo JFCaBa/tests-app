@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { BulkQuestionUpload } from "./BulkQuestionUpload";
 import QuestionForm from "./QuestionForm";
+import CacheCleanup from "./CacheCleanup";
 import ChatCleanup from "./ChatCleanup";
 import axios from "axios";
 
@@ -22,6 +23,7 @@ export const AdminDashboard = () => {
     tests: { totalTests: 0, averageScore: 0 },
   });
   const [loading, setLoading] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
 
   // Initialize question form data
@@ -144,6 +146,7 @@ export const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Quick Actions Card */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
@@ -165,6 +168,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Questions by Subject Card */}
         <Card>
           <CardHeader>
             <CardTitle>Questions by Subject</CardTitle>
@@ -184,10 +188,16 @@ export const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Chat Cleanup Section */}
-      <ChatCleanup />
+        {/* System Maintenance Section */}
+        <div className="col-span-full">
+          <h2 className="text-2xl font-bold mb-4">System Maintenance</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CacheCleanup />
+            <ChatCleanup />
+          </div>
+        </div>
+      </div>
 
       {/* Question Form Modal */}
       {showQuestionForm && (

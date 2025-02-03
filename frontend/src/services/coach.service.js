@@ -1,10 +1,12 @@
+// src/services/coach.service.js
 import axiosInstance from "../config/axios";
+import { historicalService } from "./historical.service";
+import { lawService } from "./law.service";
 
 class CoachService {
   constructor() {
     this.isInitialized = false;
     this.checkingStatus = false;
-
     this.api = axiosInstance;
   }
 
@@ -36,7 +38,25 @@ class CoachService {
         }
       );
 
-      return response.data.response;
+      let finalResponse = response.data.response;
+
+      // Enhance with historical data if relevant
+      const historicalEnhancement = historicalService.enhanceResponse(
+        userInput,
+        subject
+      );
+      if (historicalEnhancement) {
+        finalResponse +=
+          "\n\nAdditional historical context:\n" + historicalEnhancement;
+      }
+
+      // Enhance with legal information if relevant
+      const legalEnhancement = lawService.enhanceResponse(userInput, subject);
+      if (legalEnhancement) {
+        finalResponse += "\n\nRelevant legal information:\n" + legalEnhancement;
+      }
+
+      return finalResponse;
     } catch (error) {
       console.error("Error generating response:", error);
       return this.getFallbackResponse(subject, userInput);
@@ -102,7 +122,46 @@ class CoachService {
           "Keep a grammar journal for common mistakes.",
         ],
       },
-      // Add other subjects...
+      history: {
+        tips: [
+          "Focus on key dates and their significance in Russian history.",
+          "Study important historical figures and their contributions.",
+          "Learn about major events chronologically.",
+          "Connect historical events to modern Russian society.",
+        ],
+        practice: [
+          "Create timelines of major historical events.",
+          "Practice explaining historical events in Russian.",
+          "Study historical documents and primary sources.",
+          "Connect different historical periods and their influence.",
+        ],
+        methodology: [
+          "Use memory techniques for remembering dates and events.",
+          "Create associations between historical figures and their achievements.",
+          "Practice explaining the cause and effect of historical events.",
+          "Review historical context regularly.",
+        ],
+      },
+      laws: {
+        tips: [
+          "Focus on understanding registration procedures and deadlines.",
+          "Learn about your rights and obligations as a foreign citizen.",
+          "Study common legal terms in Russian.",
+          "Understand the hierarchy of Russian laws and regulations.",
+        ],
+        practice: [
+          "Review real case scenarios and legal procedures.",
+          "Practice filling out common legal forms.",
+          "Study the consequences of various legal violations.",
+          "Learn about document requirements for different procedures.",
+        ],
+        methodology: [
+          "Create checklists for different legal procedures.",
+          "Keep track of important deadlines and requirements.",
+          "Practice explaining legal concepts in simple terms.",
+          "Review updates to laws and regulations regularly.",
+        ],
+      },
     };
 
     let category = "tips";
@@ -112,12 +171,34 @@ class CoachService {
       category = "methodology";
     }
 
-    const responses = fallbacks[subject]?.[category] || fallbacks.general;
-    if (!responses) {
-      return "I'm here to help you with your studies. Could you be more specific about what you'd like to know?";
+    // Get basic fallback response
+    const responses = fallbacks[subject]?.[category] || [
+      "I'm here to help you with your studies. Could you be more specific about what you'd like to know?",
+    ];
+    let response = responses[Math.floor(Math.random() * responses.length)];
+
+    // Enhance fallback response with historical or legal information if relevant
+    if (subject === "history") {
+      const historicalEnhancement = historicalService.enhanceResponse(
+        userInput,
+        subject
+      );
+      if (historicalEnhancement) {
+        response +=
+          "\n\nHere is some specific historical information:\n" +
+          historicalEnhancement;
+      }
     }
 
-    return responses[Math.floor(Math.random() * responses.length)];
+    if (subject === "laws") {
+      const legalEnhancement = lawService.enhanceResponse(userInput, subject);
+      if (legalEnhancement) {
+        response +=
+          "\n\nHere is some specific legal information:\n" + legalEnhancement;
+      }
+    }
+
+    return response;
   }
 }
 
