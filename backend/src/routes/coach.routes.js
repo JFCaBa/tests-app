@@ -64,9 +64,9 @@ router.get(
 
 // Delete model cache
 router.get(
+  "/clear-cache",
   auth.required,
   auth.admin,
-  "/clear-cache",
   asyncHandler(async (req, res) => {
     gpt4allService.clearCache();
     res.json({
