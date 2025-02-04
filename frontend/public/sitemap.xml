@@ -1,4 +1,4 @@
-?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Public Pages -->
   <url>
@@ -57,29 +57,5 @@
     <loc>https://testmyrussian.com/practice/writing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  
-  <!-- Profile and Settings -->
-  <url>
-    <loc>https://testmyrussian.com/profile</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://testmyrussian.com/settings</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <!-- Statistics and Progress -->
-  <url>
-    <loc>https://testmyrussian.com/progress</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://testmyrussian.com/statistics</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
   </url>
 </urlset>
