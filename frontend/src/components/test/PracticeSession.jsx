@@ -16,6 +16,7 @@ import TextFormatter from "../common/TextFormatter";
 import { AudioQuestion } from "./AudioQuestion";
 import { testService } from "../../services/test.service";
 import TextToSpeech from "@/components/common/TextToSpeech";
+import TranslationAnnouncement from "@/components/common/TranslationGuide";
 
 const QuestionTypes = {
   MULTIPLE_CHOICE: "multiple-choice",
@@ -508,6 +509,7 @@ export const PracticeSession = () => {
         <CardContent>{renderQuestion()}</CardContent>
         {renderFeedback()}
       </Card>
+      <TranslationAnnouncement />
     </div>
   );
 };
