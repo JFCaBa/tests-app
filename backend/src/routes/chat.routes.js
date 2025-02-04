@@ -111,14 +111,8 @@ router.get(
 router.post(
   "/messages/cleanup",
   auth.required,
-  auth.admin,
   asyncHandler(async (req, res) => {
-    const { daysToKeep = 30 } = req.body;
-
-    const result = await ChatMessage.cleanupOldMessages(
-      req.user._id,
-      daysToKeep
-    );
+    const result = await ChatMessage.cleanupMessages(req.user._id);
 
     res.json({
       message: "Cleanup completed",

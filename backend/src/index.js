@@ -48,6 +48,7 @@ app.use("/api/chat", chatRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  res.setHeader("Content-Type", "text/html; charset=UTF-8");
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });

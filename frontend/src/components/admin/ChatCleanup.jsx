@@ -47,7 +47,7 @@ const ChatCleanup = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.post("/chat/messages/cleanup", {
+      const response = await axios.post("/admin/messages/cleanup", {
         daysToKeep: parseInt(selectedDays),
       });
 

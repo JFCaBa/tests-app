@@ -344,4 +344,26 @@ router.get(
   })
 );
 
+// @route   POST /admin/messages/cleanup
+// @desc    Cleanup old messages
+// @access  Private
+router.post(
+  "/messages/cleanup",
+  auth.required,
+  auth.admin,
+  asyncHandler(async (req, res) => {
+    const { daysToKeep = 30 } = req.body;
+
+    const result = await ChatMessage.cleanupOldMessages(
+      req.user._id,
+      daysToKeep
+    );
+
+    res.json({
+      message: "Cleanup completed",
+      deletedCount: result.deletedCount,
+    });
+  })
+);
+
 export default router;

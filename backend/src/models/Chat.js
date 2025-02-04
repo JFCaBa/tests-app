@@ -82,6 +82,13 @@ ChatMessageSchema.statics.cleanupOldMessages = async function (
   });
 };
 
+// Method to cleanup  messages
+ChatMessageSchema.statics.cleanupMessages = async function (userId) {
+  return this.deleteMany({
+    userId,
+  });
+};
+
 const ChatMessage = mongoose.model("ChatMessage", ChatMessageSchema);
 
 export default ChatMessage;

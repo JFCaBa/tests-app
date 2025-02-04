@@ -18,7 +18,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Send, Bot } from "lucide-react";
+import { Send, Bot, Trash2 } from "lucide-react";
+import chatService from "../../services/chat.service";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const CoachChat = () => {
   const { user } = useAuth();
@@ -28,46 +39,38 @@ const CoachChat = () => {
   const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showCleanupDialog, setShowCleanupDialog] = useState(false);
+  const [cleanupLoading, setCleanupLoading] = useState(false);
   const initialized = useRef(false);
   const scrollRef = useRef(null);
-  const processedMessages = processMessages(messages);
+
+  const loadMessages = useCallback(async (subject = null) => {
+    try {
+      const fetchedMessages = await chatService.getMessages(subject);
+      if (fetchedMessages && fetchedMessages.length > 0) {
+        setMessages(fetchedMessages);
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
+    }
+  }, []);
 
   useEffect(() => {
-    const init = async () => {
-      if (!initialized.current && user) {
+    if (!initialized.current && user) {
+      const init = async () => {
         await initializeCoach();
-
-        const context = getLearningContext();
-        let greeting = `Hello ${user.username}! I'm your study coach. `;
-
-        if (context?.totalTests > 0) {
-          greeting += `I see you've taken ${context.totalTests} tests. `;
-        }
-
-        if (context?.preferredSubjects?.length > 0) {
-          greeting += `I notice you've been focusing on ${context.preferredSubjects.join(
-            ", "
-          )}. `;
-        }
-
-        greeting +=
-          "Select a subject, and I'll help you prepare for your exam.";
-
-        const initialMessage = {
-          text: greeting,
-          isUser: false,
-          subject: "general",
-          timestamp: new Date().toISOString(),
-        };
-
-        const savedMessage = await saveChatMessage(initialMessage);
-        setMessages([{ ...savedMessage, id: savedMessage._id }]);
+        await loadMessages();
         initialized.current = true;
-      }
-    };
+      };
+      init();
+    }
+  }, [user, initializeCoach, loadMessages]);
 
-    init();
-  }, [user, initializeCoach, getLearningContext]);
+  useEffect(() => {
+    if (selectedSubject) {
+      loadMessages(selectedSubject);
+    }
+  }, [selectedSubject, loadMessages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -82,6 +85,19 @@ const CoachChat = () => {
     setSelectedSubject(newSubject);
   }, []);
 
+  const handleCleanup = async () => {
+    try {
+      setCleanupLoading(true);
+      await chatService.cleanupMessages(selectedSubject);
+      await loadMessages(selectedSubject);
+      setShowCleanupDialog(false);
+    } catch (error) {
+      console.error("Cleanup error:", error);
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
   const handleSend = async (messageText = null) => {
     const textToSend = messageText || input;
     if (!textToSend.trim() || !selectedSubject || loading) return;
@@ -94,13 +110,10 @@ const CoachChat = () => {
     };
 
     try {
-      const savedUserMessage = await saveChatMessage(userMessage);
-      setMessages((prev) => [
-        ...prev,
-        { ...savedUserMessage, id: savedUserMessage._id },
-      ]);
-      setInput("");
       setLoading(true);
+      const savedUserMessage = await chatService.saveMessage(userMessage);
+      setMessages((prev) => [...prev, savedUserMessage]);
+      setInput("");
 
       const response = await coachService.generateResponse(
         textToSend,
@@ -115,14 +128,10 @@ const CoachChat = () => {
         timestamp: new Date().toISOString(),
       };
 
-      const savedBotMessage = await saveChatMessage(botMessage);
-      setMessages((prev) => [
-        ...prev,
-        { ...savedBotMessage, id: savedBotMessage._id },
-      ]);
+      const savedBotMessage = await chatService.saveMessage(botMessage);
+      setMessages((prev) => [...prev, savedBotMessage]);
     } catch (error) {
       console.error("Error:", error);
-
       const errorMessage = {
         text: "I'm having trouble responding right now. Please try again.",
         isUser: false,
@@ -130,52 +139,39 @@ const CoachChat = () => {
         isError: true,
         timestamp: new Date().toISOString(),
       };
-
-      const savedErrorMessage = await saveChatMessage(errorMessage);
-      setMessages((prev) => [
-        ...prev,
-        { ...savedErrorMessage, id: savedErrorMessage._id },
-      ]);
+      const savedErrorMessage = await chatService.saveMessage(errorMessage);
+      setMessages((prev) => [...prev, savedErrorMessage]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSuggestionSelect = (suggestion) => {
-    setInput(suggestion);
-    handleSend(suggestion);
-  };
+  const processedMessages = processMessages(messages);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Card className="min-h-[600px] flex flex-col">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bot className="w-6 h-6" />
-            Study Coach
-            {isInitialized ? (
-              <div className="flex items-center gap-2 text-sm text-green-500">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                AI Ready
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-sm text-yellow-500">
-                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                Loading AI Model
-              </div>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-2">
+              <Bot className="w-6 h-6" />
+              Study Coach
+            </CardTitle>
+            {messages.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCleanupDialog(true)}
+                disabled={cleanupLoading}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clean Messages
+              </Button>
             )}
-          </CardTitle>
+          </div>
           <CardDescription>
             Select a subject and ask questions about exam preparation
           </CardDescription>
-
-          {lastError && (
-            <Alert variant="destructive">
-              <AlertDescription>
-                AI features might be limited. Falling back to basic assistance.
-              </AlertDescription>
-            </Alert>
-          )}
 
           <SubjectSelector
             value={selectedSubject}
@@ -187,7 +183,7 @@ const CoachChat = () => {
           <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
             {processedMessages.map((message) => (
               <Message
-                key={message.id}
+                key={message.id || message._id}
                 message={message.text}
                 isUser={message.isUser}
                 isError={message.isError}
@@ -199,9 +195,13 @@ const CoachChat = () => {
             {selectedSubject && (
               <Suggestions
                 subject={selectedSubject}
-                onSelect={handleSuggestionSelect}
+                onSelect={(suggestion) => {
+                  setInput(suggestion);
+                  handleSend(suggestion);
+                }}
               />
             )}
+
             <div className="flex gap-2">
               <Input
                 value={input}
@@ -230,6 +230,28 @@ const CoachChat = () => {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clean Chat Messages</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove all chat messages{" "}
+              {selectedSubject ? `for ${selectedSubject}` : ""}. This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCleanup}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cleanupLoading ? "Cleaning..." : "Clean Messages"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
