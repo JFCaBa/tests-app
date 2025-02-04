@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { MainLayout } from "./components/layout/MainLayout";
@@ -46,186 +46,190 @@ const App = () => {
 
   return (
     <SettingsProvider>
-      <Routes>
-        {/* Public Routes */}
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/subjects" />
-            ) : (
-              <ErrorBoundary>
-                <LandingPage />
-              </ErrorBoundary>
-            )
-          }
-        />
-        <Route
-          path="/demo"
-          element={
-            <ErrorBoundary>
-              <DemoTest />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <ErrorBoundary>
-              <LoginForm />
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <ErrorBoundary>
-              <RegisterForm />
-            </ErrorBoundary>
-          }
-        />
-
-        {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
-          }
-        >
+      <BrowserRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <Routes>
+          {/* Public Routes */}
           <Route
-            path="subjects"
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/subjects" />
+              ) : (
+                <ErrorBoundary>
+                  <LandingPage />
+                </ErrorBoundary>
+              )
+            }
+          />
+          <Route
+            path="/demo"
             element={
               <ErrorBoundary>
-                <SubjectSelection />
+                <DemoTest />
               </ErrorBoundary>
             }
           />
           <Route
-            path="practice/summary"
+            path="/login"
             element={
               <ErrorBoundary>
-                <TestSummary />
+                <LoginForm />
               </ErrorBoundary>
             }
           />
           <Route
-            path="practice/:subject"
+            path="/register"
             element={
               <ErrorBoundary>
-                <PracticeMode />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="practice/:subject/:mode"
-            element={
-              <ErrorBoundary>
-                <PracticeSession />
+                <RegisterForm />
               </ErrorBoundary>
             }
           />
 
-          {/* User Settings and Profile Routes */}
+          {/* Protected Routes */}
           <Route
-            path="profile"
+            path="/"
             element={
-              <ErrorBoundary>
-                <Profile />
-              </ErrorBoundary>
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
             }
-          />
-          <Route
-            path="settings"
-            element={
-              <ErrorBoundary>
-                <React.Suspense fallback={<div>Loading...</div>}>
-                  <Settings />
-                </React.Suspense>
-              </ErrorBoundary>
-            }
-          />
-          {/* Progress and Statistic Routes */}
-          <Route
-            path="progress"
-            element={
-              <ErrorBoundary>
-                <React.Suspense fallback={<div>Loading...</div>}>
-                  <Progress />
-                </React.Suspense>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="statistics"
-            element={
-              <ErrorBoundary>
-                <React.Suspense fallback={<div>Loading...</div>}>
-                  <Statistics />
-                </React.Suspense>
-              </ErrorBoundary>
-            }
-          />
+          >
+            <Route
+              path="subjects"
+              element={
+                <ErrorBoundary>
+                  <SubjectSelection />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="practice/summary"
+              element={
+                <ErrorBoundary>
+                  <TestSummary />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="practice/:subject"
+              element={
+                <ErrorBoundary>
+                  <PracticeMode />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="practice/:subject/:mode"
+              element={
+                <ErrorBoundary>
+                  <PracticeSession />
+                </ErrorBoundary>
+              }
+            />
 
-          {/* Subscription and Coach Routes */}
-          <Route
-            path="subscription"
-            element={
-              <ErrorBoundary>
-                <SubscriptionNotice />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="coach"
-            element={
-              <ErrorBoundary>
-                <SubscriptionRoute>
-                  <CoachChat />
-                </SubscriptionRoute>
-              </ErrorBoundary>
-            }
-          />
+            {/* User Settings and Profile Routes */}
+            <Route
+              path="profile"
+              element={
+                <ErrorBoundary>
+                  <Profile />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="settings"
+              element={
+                <ErrorBoundary>
+                  <React.Suspense fallback={<div>Loading...</div>}>
+                    <Settings />
+                  </React.Suspense>
+                </ErrorBoundary>
+              }
+            />
+            {/* Progress and Statistic Routes */}
+            <Route
+              path="progress"
+              element={
+                <ErrorBoundary>
+                  <React.Suspense fallback={<div>Loading...</div>}>
+                    <Progress />
+                  </React.Suspense>
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="statistics"
+              element={
+                <ErrorBoundary>
+                  <React.Suspense fallback={<div>Loading...</div>}>
+                    <Statistics />
+                  </React.Suspense>
+                </ErrorBoundary>
+              }
+            />
 
-          {/* Admin Routes */}
-          <Route
-            path="admin"
-            element={
-              <ErrorBoundary>
-                <AdminDashboard />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="admin/users"
-            element={
-              <ErrorBoundary>
-                <UserManager />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="admin/questions"
-            element={
-              <ErrorBoundary>
-                <QuestionManager />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="admin/tests"
-            element={
-              <ErrorBoundary>
-                <TestStatistics />
-              </ErrorBoundary>
-            }
-          />
-        </Route>
+            {/* Subscription and Coach Routes */}
+            <Route
+              path="subscription"
+              element={
+                <ErrorBoundary>
+                  <SubscriptionNotice />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="coach"
+              element={
+                <ErrorBoundary>
+                  <SubscriptionRoute>
+                    <CoachChat />
+                  </SubscriptionRoute>
+                </ErrorBoundary>
+              }
+            />
 
-        {/* Catch all */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+            {/* Admin Routes */}
+            <Route
+              path="admin"
+              element={
+                <ErrorBoundary>
+                  <AdminDashboard />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="admin/users"
+              element={
+                <ErrorBoundary>
+                  <UserManager />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="admin/questions"
+              element={
+                <ErrorBoundary>
+                  <QuestionManager />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="admin/tests"
+              element={
+                <ErrorBoundary>
+                  <TestStatistics />
+                </ErrorBoundary>
+              }
+            />
+          </Route>
+
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
     </SettingsProvider>
   );
 };
