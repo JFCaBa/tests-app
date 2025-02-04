@@ -344,6 +344,30 @@ router.get(
   })
 );
 
+// @route   GET /admin/messages/stats
+// @desc    Get chat statistics
+// @access  Private
+router.get(
+  "/messages/stats",
+  auth.required,
+  auth.admin,
+  asyncHandler(async (req, res) => {
+    const stats = await ChatMessage.aggregate([
+      {
+        $group: {
+          _id: "$subject",
+          messageCount: { $sum: 1 },
+          userMessages: { $sum: { $cond: ["$isUser", 1, 0] } },
+          botMessages: { $sum: { $cond: ["$isUser", 0, 1] } },
+          errors: { $sum: { $cond: ["$isError", 1, 0] } },
+        },
+      },
+    ]);
+
+    res.json(stats);
+  })
+);
+
 // @route   POST /admin/messages/cleanup
 // @desc    Cleanup old messages
 // @access  Private

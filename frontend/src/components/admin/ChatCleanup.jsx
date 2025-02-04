@@ -29,7 +29,7 @@ const ChatCleanup = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get("/chat/messages/stats");
+      const response = await axios.get("/admin/messages/stats");
       setStats(response.data);
     } catch (err) {
       console.error("Failed to fetch chat stats:", err);
