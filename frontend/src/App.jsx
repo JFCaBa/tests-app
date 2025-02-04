@@ -141,7 +141,7 @@ const App = () => {
             element={
               <ErrorBoundary>
                 <React.Suspense fallback={<div>Loading...</div>}>
-                  <Progress />
+                  <Settings />
                 </React.Suspense>
               </ErrorBoundary>
             }
@@ -162,7 +162,7 @@ const App = () => {
             element={
               <ErrorBoundary>
                 <React.Suspense fallback={<div>Loading...</div>}>
-                  <Progress />
+                  <Statistics />
                 </React.Suspense>
               </ErrorBoundary>
             }
