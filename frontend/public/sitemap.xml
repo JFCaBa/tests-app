@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Public Pages -->
   <url>
     <loc>https://testmyrussian.com/</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/demo</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/login</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/register</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -25,36 +30,43 @@
   <!-- Subject Pages -->
   <url>
     <loc>https://testmyrussian.com/subjects</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/practice/listening</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/practice/grammar</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/practice/history</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/practice/laws</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/practice/reading</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://testmyrussian.com/practice/writing</loc>
+    <lastmod>2025-02-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
