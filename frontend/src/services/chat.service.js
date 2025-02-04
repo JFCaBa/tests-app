@@ -32,14 +32,14 @@ class ChatService {
     }
   }
 
-  async cleanupMessages(subject = null) {
+  async deleteMessages(subject = null) {
     try {
-      const response = await axios.post("/chat/messages/cleanup", {
+      const response = await axios.delete("/chat/messages", {
         subject,
       });
       return response.data;
     } catch (error) {
-      console.error("Failed to cleanup messages:", error);
+      console.error("Failed to delete messages:", error);
       throw error;
     }
   }

@@ -88,7 +88,7 @@ const CoachChat = () => {
   const handleCleanup = async () => {
     try {
       setCleanupLoading(true);
-      await chatService.cleanupMessages(selectedSubject);
+      await chatService.deleteMessages(selectedSubject);
       await loadMessages(selectedSubject);
       setShowCleanupDialog(false);
     } catch (error) {
