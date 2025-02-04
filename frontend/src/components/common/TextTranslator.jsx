@@ -28,10 +28,9 @@ const TextTranslator = () => {
           const range = selection.getRangeAt(0);
           const rect = range.getBoundingClientRect();
 
-          // Position the translation popup below the selected text
           const position = {
-            top: window.scrollY + rect.bottom + 10,
-            left: window.scrollX + rect.left,
+            top: rect.bottom + window.scrollY + 10,
+            left: rect.left + window.scrollX,
           };
 
           // Show loading state
@@ -107,6 +106,7 @@ const TextTranslator = () => {
         <div
           className="fixed z-50 translation-popup"
           style={{
+            position: "absolute", // Change from fixed
             top: translation.position.top,
             left: translation.position.left,
           }}
