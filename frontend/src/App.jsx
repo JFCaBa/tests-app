@@ -10,9 +10,11 @@ import { SubjectSelection } from "./components/test/SubjectSelection";
 import { PracticeMode } from "./components/test/PracticeMode";
 import { PracticeSession } from "./components/test/PracticeSession";
 import { Profile } from "./components/profile/Profile";
-import { Settings } from "./components/settings/Settings";
-import { Statistics } from "./components/statistics/Statistics";
-import { Progress } from "./components/progress/Progress";
+const Progress = React.lazy(() => import("@/components/progress/Progress"));
+const Settings = React.lazy(() => import("@/components/settings/Settings"));
+const Statistics = React.lazy(() =>
+  import("@/components/statistics/Statistics")
+);
 import { TestSummary } from "./components/test/TestSummary";
 import { DemoTest } from "./components/demo/DemoTest";
 import CoachChat from "./components/coach/CoachChat";
@@ -138,7 +140,9 @@ const App = () => {
             path="settings"
             element={
               <ErrorBoundary>
-                <Settings />
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <Progress />
+                </React.Suspense>
               </ErrorBoundary>
             }
           />
@@ -147,7 +151,9 @@ const App = () => {
             path="progress"
             element={
               <ErrorBoundary>
-                <Progress />
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <Progress />
+                </React.Suspense>
               </ErrorBoundary>
             }
           />
@@ -155,7 +161,9 @@ const App = () => {
             path="statistics"
             element={
               <ErrorBoundary>
-                <Statistics />
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <Progress />
+                </React.Suspense>
               </ErrorBoundary>
             }
           />

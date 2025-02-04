@@ -16,6 +16,7 @@ package-lock.json
 /backend/package.json.lock
 /frontend/.env
 /frontend/package.json.lock
+dist/
 
 # testing
 /coverage
