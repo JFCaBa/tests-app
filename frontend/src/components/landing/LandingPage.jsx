@@ -17,7 +17,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import YandexAdBanner from "../ads/YandexAdBanner";
-import TranslationAnnouncement from "../common/TranslationAnnouncement";
+import TranslationAnnouncement from "../common/TranslationGuide";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
