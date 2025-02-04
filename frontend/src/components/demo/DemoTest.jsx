@@ -13,6 +13,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import YandexAdBanner from "../ads/YandexAdBanner";
+import TranslationAnnouncement from "../common/TranslationGuide";
 
 // Demo questions covering different types
 const demoQuestions = [
@@ -263,6 +264,7 @@ export const DemoTest = () => {
             </Button>
           </CardFooter>
         </Card>
+        <TranslationAnnouncement />
       </div>
     </div>
   );
