@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const ConfirmDialog = ({
   open,
@@ -29,7 +30,10 @@ const ConfirmDialog = ({
     <AlertDialog open={open} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {/* If you want to hide the title for visual purposes, wrap it with VisuallyHidden */}
+          <VisuallyHidden>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+          </VisuallyHidden>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
