@@ -32,6 +32,7 @@ export default defineConfig({
         // Add rewrite if needed: rewrite: (path) => path.replace(/^\/api/, '')
       },
     },
+    allowedHosts: ["testmyrussian.com", "www.testmyrussian.com"], // Add the host here
     hmr: {
       clientPort: 443,
       protocol: "wss",
