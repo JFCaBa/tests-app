@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, Edit2, UserX, UserCheck, X } from "lucide-react";
+import { Search, Edit2, UserX, UserCheck, X, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import UserDetails from "./UserDetailsDialog";
 
 const UserManager = () => {
   const [users, setUsers] = useState([]);
@@ -30,6 +31,7 @@ const UserManager = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showUserDetails, setShowUserDetails] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -67,6 +69,11 @@ const UserManager = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update user status");
     }
+  };
+
+  const handleViewDetails = (user) => {
+    setSelectedUser(user);
+    setShowUserDetails(true);
   };
 
   const EditUserModal = () => {
@@ -154,7 +161,7 @@ const UserManager = () => {
           </div>
 
           {error && (
-            <Alert variant="destructive" className="mb-4">
+            <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -195,6 +202,13 @@ const UserManager = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewDetails(user)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -247,6 +261,12 @@ const UserManager = () => {
       </Card>
 
       <EditUserModal />
+      {showUserDetails && (
+        <UserDetails
+          user={selectedUser}
+          onClose={() => setShowUserDetails(false)}
+        />
+      )}
     </div>
   );
 };

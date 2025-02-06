@@ -11,6 +11,7 @@ router.use(auth.required, auth.admin);
 
 console.log("Admin routes loaded");
 
+// MARK: - /users
 // @route   GET /api/admin/users
 // @desc    Get all users
 // @access  Admin
@@ -44,6 +45,7 @@ router.get(
   })
 );
 
+// MARK: - /users/:id
 // @route   PUT /api/admin/users/:id
 // @desc    Update user role or status
 // @access  Admin
@@ -65,6 +67,7 @@ router.put(
   })
 );
 
+// MARK: - /questions GET
 // @route   GET /api/admin/stats
 // @desc    Get system statistics
 // @access  Admin
@@ -164,6 +167,7 @@ router.get(
   })
 );
 
+// MARK: - /questions POST
 // @route   POST /api/admin/question
 // @desc    Add a new question
 // @access  Admin
@@ -278,6 +282,7 @@ router.post(
   })
 );
 
+// MARK: - /bulk-questions
 // @route   POST /api/admin/bulk-questions
 // @desc    Bulk create/update questions
 // @access  Admin
@@ -304,6 +309,7 @@ router.post(
   })
 );
 
+// MARK: - /audit
 // @route   GET /api/admin/audit
 // @desc    Get system audit logs (last 100 actions)
 // @access  Admin
@@ -344,6 +350,7 @@ router.get(
   })
 );
 
+// MARK: - /messages/stats
 // @route   GET /admin/messages/stats
 // @desc    Get chat statistics
 // @access  Private
@@ -368,6 +375,7 @@ router.get(
   })
 );
 
+// MARK: - /messages/cleanup
 // @route   POST /admin/messages/cleanup
 // @desc    Cleanup old messages
 // @access  Private

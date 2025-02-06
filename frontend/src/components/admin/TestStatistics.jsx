@@ -70,7 +70,7 @@ const AdminStatsDashboard = () => {
       color: "bg-green-100 text-green-700",
     },
     {
-      title: "Total Tests",
+      title: "Total Questions",
       value: stats.tests?.totalTests || 0,
       icon: Calendar,
       color: "bg-purple-100 text-purple-700",
