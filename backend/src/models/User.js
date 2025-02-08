@@ -54,7 +54,7 @@ const TestHistorySchema = new mongoose.Schema({
   difficulty: {
     type: String,
     enum: ["easy", "medium", "hard"],
-    required: true,
+    default: "medium", // Add default value
   },
   questions: [TestResultSchema],
 });
