@@ -15,6 +15,15 @@ class AIServiceRotator {
         resetInterval: 60000,
         initialized: false,
       },
+      {
+        name: "gpt4all",
+        service: gpt4allService,
+        requestsLimit: 1,
+        requestsCount: 0,
+        resetTime: Date.now(),
+        resetInterval: 60000,
+        initialized: false,
+      },
     ];
 
     this.currentIndex = 0;
@@ -59,25 +68,33 @@ class AIServiceRotator {
 
     this.resetCounters();
 
+    let errors = [];
+
     for (let i = 0; i < this.services.length; i++) {
       const serviceIndex = (this.currentIndex + i) % this.services.length;
       const service = this.services[serviceIndex];
 
       if (!service.initialized) {
-        console.log(`Service ${service.name} not initialized, skipping`);
-        continue;
+        try {
+          const initialized = await service.service.initialize();
+          service.initialized = initialized;
+        } catch (error) {
+          errors.push(`${service.name}: ${error.message}`);
+          continue;
+        }
       }
 
-      if (service.requestsCount < service.requestsLimit) {
+      if (
+        service.initialized &&
+        service.requestsCount < service.requestsLimit
+      ) {
         this.currentIndex = serviceIndex;
         service.requestsCount++;
         return service.service;
       }
     }
 
-    throw new Error(
-      "All services have reached their rate limits or are unavailable"
-    );
+    throw new Error(`No available services. Errors: ${errors.join(", ")}`);
   }
 
   get currentService() {
