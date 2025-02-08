@@ -10,6 +10,11 @@ const TestResultSchema = new mongoose.Schema({
   userAnswer: mongoose.Schema.Types.Mixed,
   correct: Boolean,
   timeSpent: Number,
+  // Add these fields to store details directly
+  question: String,
+  correctAnswer: mongoose.Schema.Types.Mixed,
+  options: [mongoose.Schema.Types.Mixed],
+  explanation: String,
 });
 
 const TestHistorySchema = new mongoose.Schema({
@@ -44,6 +49,11 @@ const TestHistorySchema = new mongoose.Schema({
   },
   timeSpent: {
     type: Number,
+    required: true,
+  },
+  difficulty: {
+    type: String,
+    enum: ["easy", "medium", "hard"],
     required: true,
   },
   questions: [TestResultSchema],

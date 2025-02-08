@@ -75,6 +75,24 @@ router.post(
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Get full question details for each answer
+      const questionsDetails = await Promise.all(
+        answers.map(async (answer) => {
+          const question = await Question.findById(answer.questionId);
+          return {
+            questionId: answer.questionId,
+            userAnswer: answer.answer,
+            correct: answer.correct,
+            timeSpent: answer.timeSpent,
+            // Include full question details
+            question: question.question,
+            correctAnswer: question.correctAnswer,
+            options: question.options,
+            explanation: question.explanation,
+          };
+        })
+      );
+
       // Create test history entry
       const testResult = {
         testDate: new Date(),
@@ -85,12 +103,7 @@ router.post(
         timeSpent,
         mode,
         difficulty,
-        questions: answers.map((answer) => ({
-          questionId: answer.questionId,
-          userAnswer: answer.answer,
-          correct: answer.correct,
-          timeSpent: answer.timeSpent,
-        })),
+        questions: questionsDetails,
       };
 
       // Add to user's test history
@@ -135,7 +148,10 @@ router.get(
   asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
       .select("testHistory")
-      .populate("testHistory.questions.questionId", "question");
+      .populate({
+        path: "testHistory.questions.questionId",
+        select: "question options correctAnswer explanation type",
+      });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
