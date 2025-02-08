@@ -218,7 +218,7 @@ export const Statistics = () => {
                     height={60}
                   />
                   <YAxis domain={[0, 100]} />
-                  <Tooltip />
+                  <Tooltip formatter={(value) => value.toFixed(2)} />
                   <Bar dataKey="avgScore" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>

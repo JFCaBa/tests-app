@@ -1,8 +1,10 @@
 import OpenAI from "openai";
+import Cache from "../models/Cache.js";
 
 class OpenAIService {
   constructor() {
     this.client = null;
+    this.chatSession = null;
     this.isInitialized = false;
     this.maxRetries = 3;
     this.retryDelay = 2000;
@@ -42,6 +44,15 @@ class OpenAIService {
   }
 
   async generateResponse(input, subject, context = {}) {
+    const prompt = subject + "\n" + input;
+    const cacheKey = prompt;
+
+    const cachedResponse = await Cache.getCachedResponse(cacheKey);
+    if (cachedResponse) {
+      console.log("Cache hit:", cacheKey);
+      return cachedResponse;
+    }
+
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -81,7 +92,16 @@ class OpenAIService {
         (msg) => msg.role === "assistant"
       );
 
-      return assistantMessage?.content?.[0]?.text?.value || "Ответ не получен.";
+      const formattedResponse = assistantMessage?.content?.[0]?.text?.value;
+
+      if (!formattedResponse) {
+        return "Ответ не получен.";
+      }
+
+      // Cache the response
+      await Cache.cacheResponse(cacheKey, formattedResponse, subject);
+
+      return formattedResponse;
     } catch (error) {
       console.error("Error generating response:", error);
       throw error;
@@ -133,6 +153,48 @@ class OpenAIService {
     return `Subject: ${subject}
 Input: ${input}
 Context: ${formattedContext}`;
+  }
+
+  // Method to clear the cache
+  async clearCache(subject = null) {
+    try {
+      await Cache.clearCache(subject);
+      console.log(
+        subject
+          ? `Cache cleared for subject: ${subject}`
+          : "Complete cache cleared"
+      );
+      return true;
+    } catch (error) {
+      console.error("Error clearing cache:", error);
+      return false;
+    }
+  }
+
+  // Method to get cache statistics
+  async getCacheStats() {
+    try {
+      const totalEntries = await Cache.countDocuments();
+      const statsBySubject = await Cache.aggregate([
+        {
+          $group: {
+            _id: "$subject",
+            count: { $sum: 1 },
+            avgRequests: { $avg: "$metadata.timesRequested" },
+            totalRequests: { $sum: "$metadata.timesRequested" },
+          },
+        },
+      ]);
+
+      return {
+        totalEntries,
+        statsBySubject,
+        lastUpdated: new Date(),
+      };
+    } catch (error) {
+      console.error("Error getting cache stats:", error);
+      return null;
+    }
   }
 }
 
