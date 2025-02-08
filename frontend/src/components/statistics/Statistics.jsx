@@ -124,7 +124,7 @@ export const Statistics = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Total Tests</CardTitle>
+            <CardTitle className="text-lg">Total Questions</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{stats?.totalTests || 0}</p>
@@ -185,7 +185,7 @@ export const Statistics = () => {
                     dataKey="date"
                     angle={-45}
                     textAnchor="end"
-                    height={60}
+                    height={70}
                     interval={0}
                   />
                   <YAxis domain={[0, 100]} />
