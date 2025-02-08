@@ -21,11 +21,36 @@ import { Badge } from "@/components/ui/badge";
 const TestDetailsDialog = ({ test, onClose }) => {
   const getAnswerText = (question) => {
     if (!question) return "";
-    if (question.userAnswer?.text) return question.userAnswer.text;
-    if (Array.isArray(test.options)) {
-      return test.options[question.userAnswer]?.text || question.userAnswer;
+
+    // If it's already the answer text, return it
+    if (typeof question.userAnswer === "string") return question.userAnswer;
+
+    // If the answer is an index, get the text from options
+    if (
+      typeof question.userAnswer === "number" &&
+      Array.isArray(question.options)
+    ) {
+      return (
+        question.options[question.userAnswer]?.text ||
+        question.options[question.userAnswer]
+      );
     }
-    return question.userAnswer;
+
+    // If the answer is an object with text property
+    if (question.userAnswer?.text) return question.userAnswer.text;
+
+    // For multiple choice questions, try to get text from questionId options
+    if (
+      question.questionId?.options &&
+      typeof question.userAnswer === "number"
+    ) {
+      return (
+        question.questionId.options[question.userAnswer]?.text ||
+        question.questionId.options[question.userAnswer]
+      );
+    }
+
+    return String(question.userAnswer || "");
   };
 
   const getCorrectAnswerText = (question) => {
