@@ -4,6 +4,10 @@ class OpenAIService {
   constructor() {
     this.client = null;
     this.isInitialized = false;
+    this.maxRetries = 3;
+    this.retryDelay = 2000;
+    this.pollInterval = 2000;
+    this.maxPollAttempts = 30;
   }
 
   async initialize() {
@@ -12,11 +16,16 @@ class OpenAIService {
     try {
       this.client = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
+        maxRetries: this.maxRetries,
+        timeout: 30000,
       });
-      this.assistantId = "asst_X7KozbNoVi4sIWOUxtMVeS1z";
+      this.assistantId = process.env.OPENAI_ASSISTANT_ID;
+
+      if (!this.assistantId) {
+        throw new Error("OPENAI_ASSISTANT_ID not configured");
+      }
 
       this.isInitialized = true;
-      console.log("OpenAI service initialized");
       return true;
     } catch (error) {
       console.error("OpenAI initialization failed:", error);
@@ -25,44 +34,40 @@ class OpenAIService {
   }
 
   async generateResponse(input, subject, context = {}) {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+
+    let threadId;
+
     try {
-      if (!this.client) {
-        throw new Error("OpenAI client is not initialized.");
-      }
-
-      if (!this.client.beta || !this.client.beta.threads) {
-        throw new Error(
-          "Beta API not available. Ensure OpenAI Node.js SDK is up-to-date."
-        );
-      }
-
-      // ✅ Step 1: Create a new thread
-      const thread = await this.client.beta.threads.create();
-      const threadId = thread.id;
-
-      // ✅ Step 2: Send user input to the assistant
-      await this.client.beta.threads.messages.create(threadId, {
-        role: "user",
-        content: input,
+      // Create thread with retry mechanism
+      threadId = await this.withRetry(async () => {
+        const thread = await this.client.beta.threads.create();
+        return thread.id;
       });
 
-      // ✅ Step 3: Run the assistant
+      // Add message to thread
+      await this.client.beta.threads.messages.create(threadId, {
+        role: "user",
+        content: this.formatInput(input, subject, context),
+      });
+
+      // Run assistant
       const run = await this.client.beta.threads.runs.create(threadId, {
         assistant_id: this.assistantId,
       });
 
-      // ✅ Step 4: Poll for completion
-      let runStatus;
-      do {
-        runStatus = await this.client.beta.threads.runs.retrieve(
-          threadId,
-          run.id
-        );
-        if (runStatus.status === "completed") break;
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2s before checking again
-      } while (runStatus.status !== "completed");
+      // Poll for completion
+      const runStatus = await this.pollRunStatus(threadId, run.id);
 
-      // ✅ Step 5: Get assistant's response
+      if (runStatus.status === "failed") {
+        throw new Error(
+          `Run failed: ${runStatus.last_error?.message || "Unknown error"}`
+        );
+      }
+
+      // Get response
       const messages = await this.client.beta.threads.messages.list(threadId);
       const assistantMessage = messages.data.find(
         (msg) => msg.role === "assistant"
@@ -71,8 +76,59 @@ class OpenAIService {
       return assistantMessage?.content?.[0]?.text?.value || "Ответ не получен.";
     } catch (error) {
       console.error("Error generating response:", error);
-      return null;
+      throw error;
+    } finally {
+      // Cleanup thread
+      if (threadId) {
+        try {
+          await this.client.beta.threads.delete(threadId);
+        } catch (error) {
+          console.error("Error deleting thread:", error);
+        }
+      }
     }
+  }
+
+  async withRetry(operation, retries = this.maxRetries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        if (attempt === retries) throw error;
+        await new Promise((resolve) =>
+          setTimeout(resolve, this.retryDelay * attempt)
+        );
+      }
+    }
+  }
+
+  async pollRunStatus(threadId, runId) {
+    let attempts = 0;
+
+    while (attempts < this.maxPollAttempts) {
+      const status = await this.client.beta.threads.runs.retrieve(
+        threadId,
+        runId
+      );
+
+      if (
+        ["completed", "failed", "cancelled", "expired"].includes(status.status)
+      ) {
+        return status;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, this.pollInterval));
+      attempts++;
+    }
+
+    throw new Error("Run polling timed out");
+  }
+
+  formatInput(input, subject, context) {
+    const formattedContext = context ? JSON.stringify(context, null, 2) : "";
+    return `Subject: ${subject}
+Input: ${input}
+Context: ${formattedContext}`;
   }
 }
 

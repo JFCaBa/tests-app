@@ -1,3 +1,4 @@
+// services/ai.rotator.js
 import gpt4allService from "./gpt4all.service.js";
 import openaiService from "./openai.service.js";
 import deepseekService from "./deepseek.service.js";
@@ -11,27 +12,34 @@ class AIServiceRotator {
         requestsLimit: 5,
         requestsCount: 0,
         resetTime: Date.now(),
-        resetInterval: 60000, // 1 minute
+        resetInterval: 60000,
+        initialized: false,
       },
-      //   {
-      //     name: "gpt4all",
-      //     service: gpt4allService,
-      //     requestsLimit: 1,
-      //     requestsCount: 0,
-      //     resetTime: Date.now(),
-      //     resetInterval: 60000,
-      //   },
-      //   {
-      //     name: "deepseek",
-      //     service: deepseekService,
-      //     requestsLimit: 5,
-      //     requestsCount: 0,
-      //     resetTime: Date.now(),
-      //     resetInterval: 60000,
-      //   },
     ];
 
     this.currentIndex = 0;
+    this.initialized = false;
+  }
+
+  async initialize() {
+    if (this.initialized) return true;
+
+    try {
+      for (const service of this.services) {
+        const initialized = await service.service.initialize();
+        service.initialized = initialized;
+        console.log(
+          `Service ${service.name} initialization:`,
+          initialized ? "success" : "failed"
+        );
+      }
+
+      this.initialized = true;
+      return true;
+    } catch (error) {
+      console.error("Service rotator initialization failed:", error);
+      return false;
+    }
   }
 
   resetCounters() {
@@ -44,12 +52,21 @@ class AIServiceRotator {
     });
   }
 
-  getNextAvailableService() {
+  async getNextAvailableService() {
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
     this.resetCounters();
 
     for (let i = 0; i < this.services.length; i++) {
       const serviceIndex = (this.currentIndex + i) % this.services.length;
       const service = this.services[serviceIndex];
+
+      if (!service.initialized) {
+        console.log(`Service ${service.name} not initialized, skipping`);
+        continue;
+      }
 
       if (service.requestsCount < service.requestsLimit) {
         this.currentIndex = serviceIndex;
@@ -58,21 +75,35 @@ class AIServiceRotator {
       }
     }
 
-    throw new Error("All services have reached their rate limits");
+    throw new Error(
+      "All services have reached their rate limits or are unavailable"
+    );
   }
 
   get currentService() {
     return this.services[this.currentIndex].service;
   }
 
-  get isInitialized() {
-    return this.currentService.isInitialized;
-  }
-
   async generateResponse(input, subject, context) {
-    const service = this.getNextAvailableService();
-    service.initialize();
-    return service.generateResponse(input, subject, context);
+    try {
+      const service = await this.getNextAvailableService();
+
+      if (!service) {
+        throw new Error("No available AI service found");
+      }
+
+      console.log(`Using service: ${this.services[this.currentIndex].name}`);
+      const response = await service.generateResponse(input, subject, context);
+
+      if (!response) {
+        throw new Error("No response from AI service");
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error generating response:", error);
+      throw error;
+    }
   }
 }
 

@@ -9,10 +9,20 @@ const services = {
   deepseek: deepseekService,
 };
 
-export const getAIService = (type = process.env.AI_SERVICE || "deepseek") => {
+export const getAIService = async (
+  type = process.env.AI_SERVICE || "deepseek"
+) => {
   const service = services[type];
   if (!service) {
+    console.error(`AI service ${type} not found`);
     throw new Error(`AI service ${type} not found`);
   }
-  return service;
+
+  try {
+    await service.initialize();
+    return service;
+  } catch (error) {
+    console.error(`Failed to initialize ${type} service:`, error);
+    throw error;
+  }
 };
