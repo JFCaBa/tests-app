@@ -5,14 +5,14 @@ import deepseekService from "./deepseek.service.js";
 class AIServiceRotator {
   constructor() {
     this.services = [
-      {
-        name: "openai",
-        service: openaiService,
-        requestsLimit: 5,
-        requestsCount: 0,
-        resetTime: Date.now(),
-        resetInterval: 60000, // 1 minute
-      },
+      //   {
+      //     name: "openai",
+      //     service: openaiService,
+      //     requestsLimit: 5,
+      //     requestsCount: 0,
+      //     resetTime: Date.now(),
+      //     resetInterval: 60000, // 1 minute
+      //   },
       {
         name: "gpt4all",
         service: gpt4allService,
