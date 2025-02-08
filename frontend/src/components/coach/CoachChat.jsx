@@ -6,7 +6,6 @@ import coachService from "../../services/coach.service";
 import Message from "../chat/Message";
 import Suggestions from "./Suggestions";
 import SubjectSelector from "./SubjectSelector";
-import { saveChatMessage } from "./api";
 import {
   Card,
   CardContent,
@@ -48,7 +47,11 @@ const CoachChat = () => {
     try {
       const fetchedMessages = await chatService.getMessages(subject);
       if (fetchedMessages && fetchedMessages.length > 0) {
-        setMessages(fetchedMessages);
+        // Sort messages by timestamp in ascending order
+        const sortedMessages = fetchedMessages.sort(
+          (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+        );
+        setMessages(sortedMessages);
       }
     } catch (error) {
       console.error("Error loading messages:", error);
@@ -149,8 +152,8 @@ const CoachChat = () => {
   const processedMessages = processMessages(messages);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <Card className="min-h-[600px] flex flex-col">
+    <div className="fixed inset-0 flex items-center justify-center p-4 bg-gray-50/80">
+      <Card className="w-full max-w-4xl h-[80vh] flex flex-col">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2">
@@ -179,19 +182,21 @@ const CoachChat = () => {
           />
         </CardHeader>
 
-        <CardContent className="flex-1 overflow-hidden flex flex-col">
-          <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
-            {processedMessages.map((message) => (
-              <Message
-                key={message.id || message._id}
-                message={message.text}
-                isUser={message.isUser}
-                isError={message.isError}
-              />
-            ))}
+        <CardContent className="flex-1 overflow-hidden flex flex-col gap-4">
+          <ScrollArea className="flex-1" ref={scrollRef}>
+            <div className="pr-4">
+              {processedMessages.map((message) => (
+                <Message
+                  key={message.id || message._id}
+                  message={message.text}
+                  isUser={message.isUser}
+                  isError={message.isError}
+                />
+              ))}
+            </div>
           </ScrollArea>
 
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             {selectedSubject && (
               <Suggestions
                 subject={selectedSubject}
