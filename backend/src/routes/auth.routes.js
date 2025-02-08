@@ -85,6 +85,7 @@ router.post(
         email: user.email,
         role: user.role,
         preferences: user.preferences,
+        lastLogin: user.lastLogin,
       },
     });
   })
