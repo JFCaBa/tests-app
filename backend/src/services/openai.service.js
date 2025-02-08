@@ -33,6 +33,14 @@ class OpenAIService {
     }
   }
 
+  async deleteThread(threadId) {
+    try {
+      await this.client.beta.threads.del(threadId); // Change delete to del
+    } catch (error) {
+      console.error("Error deleting thread:", error);
+    }
+  }
+
   async generateResponse(input, subject, context = {}) {
     if (!this.isInitialized) {
       await this.initialize();
@@ -78,13 +86,9 @@ class OpenAIService {
       console.error("Error generating response:", error);
       throw error;
     } finally {
-      // Cleanup thread
+      // Updated cleanup
       if (threadId) {
-        try {
-          await this.client.beta.threads.delete(threadId);
-        } catch (error) {
-          console.error("Error deleting thread:", error);
-        }
+        await this.deleteThread(threadId);
       }
     }
   }
