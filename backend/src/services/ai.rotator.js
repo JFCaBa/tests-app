@@ -1,62 +1,78 @@
-import express from "express";
-import { auth, errors } from "../middleware/index.js";
-import aiRotator from "../services/ai.rotator.js";
+import gpt4allService from "./gpt4all.service.js";
+import openaiService from "./openai.service.js";
+import deepseekService from "./deepseek.service.js";
 
-const { asyncHandler } = errors;
-const router = express.Router();
+class AIServiceRotator {
+  constructor() {
+    this.services = [
+      {
+        name: "openai",
+        service: openaiService,
+        requestsLimit: 5,
+        requestsCount: 0,
+        resetTime: Date.now(),
+        resetInterval: 60000, // 1 minute
+      },
+      {
+        name: "gpt4all",
+        service: gpt4allService,
+        requestsLimit: 1,
+        requestsCount: 0,
+        resetTime: Date.now(),
+        resetInterval: 60000,
+      },
+      {
+        name: "deepseek",
+        service: deepseekService,
+        requestsLimit: 5,
+        requestsCount: 0,
+        resetTime: Date.now(),
+        resetInterval: 60000,
+      },
+    ];
 
-router.get(
-  "/health",
-  asyncHandler(async (req, res) => {
-    const status = {
-      status: "ok",
-      aiInitialized: aiRotator.isInitialized,
-      timestamp: new Date(),
-    };
-    res.json(status);
-  })
-);
+    this.currentIndex = 0;
+  }
 
-router.post(
-  "/generate",
-  auth.required,
-  asyncHandler(async (req, res) => {
-    const { input, subject, context } = req.body;
-
-    try {
-      const response = await aiRotator.generateResponse(
-        input,
-        subject,
-        context
-      );
-
-      if (!response) {
-        return res.status(500).json({
-          message: "Failed to generate response",
-          fallback: true,
-        });
+  resetCounters() {
+    const now = Date.now();
+    this.services.forEach((svc) => {
+      if (now - svc.resetTime >= svc.resetInterval) {
+        svc.requestsCount = 0;
+        svc.resetTime = now;
       }
-
-      res.json({ response });
-    } catch (error) {
-      console.error("Generation error:", error);
-      res.status(500).json({
-        message: "Failed to generate response",
-        error: error.message,
-      });
-    }
-  })
-);
-
-router.get(
-  "/status",
-  asyncHandler(async (req, res) => {
-    res.json({
-      initialized: aiRotator.isInitialized,
-      modelLoaded: true,
-      timestamp: new Date(),
     });
-  })
-);
+  }
 
-export default router;
+  getNextAvailableService() {
+    this.resetCounters();
+
+    for (let i = 0; i < this.services.length; i++) {
+      const serviceIndex = (this.currentIndex + i) % this.services.length;
+      const service = this.services[serviceIndex];
+
+      if (service.requestsCount < service.requestsLimit) {
+        this.currentIndex = serviceIndex;
+        service.requestsCount++;
+        return service.service;
+      }
+    }
+
+    throw new Error("All services have reached their rate limits");
+  }
+
+  get currentService() {
+    return this.services[this.currentIndex].service;
+  }
+
+  get isInitialized() {
+    return this.currentService.isInitialized;
+  }
+
+  async generateResponse(input, subject, context) {
+    const service = this.getNextAvailableService();
+    return service.generateResponse(input, subject, context);
+  }
+}
+
+export default new AIServiceRotator();
