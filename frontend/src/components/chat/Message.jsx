@@ -12,7 +12,7 @@ const Message = React.memo(({ message, isUser, isError }) => (
       {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
     </div>
     <div
-      className={`flex-1 px-4 py-2 rounded-lg ${
+      className={`flex-1 px-2 py-2 rounded-lg ${
         isUser
           ? "bg-primary text-primary-foreground"
           : isError

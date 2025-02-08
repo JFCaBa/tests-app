@@ -25,6 +25,7 @@ import UserManager from "./components/admin/UserManager";
 import QuestionManager from "./components/admin/QuestionManager";
 import TestStatistics from "./components/admin/TestStatistics";
 import ErrorBoundary from "./components/ErrorBoundary";
+import FlashcardGame from "./components/flashcard/FlashcardGame";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -187,6 +188,16 @@ const App = () => {
                   <SubscriptionRoute>
                     <CoachChat />
                   </SubscriptionRoute>
+                </ErrorBoundary>
+              }
+            />
+
+            {/* Flashcard Routes */}
+            <Route
+              path="flashcards"
+              element={
+                <ErrorBoundary>
+                  <FlashcardGame />
                 </ErrorBoundary>
               }
             />

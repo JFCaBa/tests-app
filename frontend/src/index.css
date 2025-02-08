@@ -64,9 +64,45 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
 }
 
 @layer base {
+  .markdown-content p,
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content h4,
+  .markdown-content h5,
+  .markdown-content h6,
+  .markdown-content ul,
+  .markdown-content ol,
+  .markdown-content li {
+    margin: 0 !important; /* Forcefully remove any margin */
+    padding: 0 !important; /* Forcefully remove any padding */
+  }
+
+  .markdown-content ul,
+  .markdown-content ol {
+    margin: 0;
+    padding-left: 1rem; /* Adjust this for list indentation */
+  }
+
   * {
     @apply border-border;
   }
