@@ -30,6 +30,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+const TYPING_SPEED = 25; // ms per character
+
 const CoachChat = () => {
   const { user } = useAuth();
   const { isInitialized, lastError, initializeCoach, getLearningContext } =
@@ -40,8 +42,43 @@ const CoachChat = () => {
   const [loading, setLoading] = useState(false);
   const [showCleanupDialog, setShowCleanupDialog] = useState(false);
   const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [displayText, setDisplayText] = useState("");
   const initialized = useRef(false);
   const scrollRef = useRef(null);
+  const responseText = useRef("");
+
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current) {
+      const scrollContainer = scrollRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
+      if (scrollContainer) {
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, []);
+
+  const simulateTyping = useCallback(
+    async (text) => {
+      setIsTyping(true);
+      let currentText = "";
+
+      for (let i = 0; i < text.length; i++) {
+        currentText += text[i];
+        setDisplayText(currentText);
+        await new Promise((resolve) => setTimeout(resolve, TYPING_SPEED));
+        scrollToBottom();
+      }
+
+      setIsTyping(false);
+      return text;
+    },
+    [scrollToBottom]
+  );
 
   const loadMessages = useCallback(async (subject = null) => {
     try {
@@ -80,13 +117,8 @@ const CoachChat = () => {
   }, [selectedSubject, loadMessages]);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const handleSubjectChange = useCallback((newSubject) => {
     setSelectedSubject(newSubject);
@@ -121,6 +153,7 @@ const CoachChat = () => {
       const savedUserMessage = await chatService.saveMessage(userMessage);
       setMessages((prev) => [...prev, savedUserMessage]);
       setInput("");
+      scrollToBottom();
 
       const response = await coachService.generateResponse(
         textToSend,
@@ -128,8 +161,11 @@ const CoachChat = () => {
         getLearningContext()
       );
 
+      // Start typing simulation
+      const typedResponse = await simulateTyping(response);
+
       const botMessage = {
-        text: response,
+        text: typedResponse,
         isUser: false,
         subject: selectedSubject,
         timestamp: new Date().toISOString(),
@@ -150,6 +186,7 @@ const CoachChat = () => {
       setMessages((prev) => [...prev, savedErrorMessage]);
     } finally {
       setLoading(false);
+      setDisplayText("");
     }
   };
 
@@ -197,6 +234,7 @@ const CoachChat = () => {
                   isError={message.isError}
                 />
               ))}
+              {isTyping && <Message message={displayText} isUser={false} />}
             </div>
           </ScrollArea>
 
