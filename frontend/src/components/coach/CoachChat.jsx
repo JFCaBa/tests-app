@@ -46,15 +46,17 @@ const CoachChat = () => {
   const loadMessages = useCallback(async (subject = null) => {
     try {
       const fetchedMessages = await chatService.getMessages(subject);
-      if (fetchedMessages && fetchedMessages.length > 0) {
-        // Sort messages by timestamp in ascending order
+      if (fetchedMessages && Array.isArray(fetchedMessages)) {
         const sortedMessages = fetchedMessages.sort(
           (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
         );
         setMessages(sortedMessages);
+      } else {
+        setMessages([]);
       }
     } catch (error) {
       console.error("Error loading messages:", error);
+      setMessages([]);
     }
   }, []);
 
@@ -72,6 +74,8 @@ const CoachChat = () => {
   useEffect(() => {
     if (selectedSubject) {
       loadMessages(selectedSubject);
+    } else {
+      setMessages([]);
     }
   }, [selectedSubject, loadMessages]);
 
@@ -92,7 +96,7 @@ const CoachChat = () => {
     try {
       setCleanupLoading(true);
       await chatService.deleteMessages(selectedSubject);
-      await loadMessages(selectedSubject);
+      setMessages([]);
       setShowCleanupDialog(false);
     } catch (error) {
       console.error("Cleanup error:", error);
