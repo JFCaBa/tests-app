@@ -15,15 +15,15 @@ class AIServiceRotator {
         resetInterval: 60000,
         initialized: false,
       },
-      {
-        name: "gpt4all",
-        service: gpt4allService,
-        requestsLimit: 1,
-        requestsCount: 0,
-        resetTime: Date.now(),
-        resetInterval: 60000,
-        initialized: false,
-      },
+      // {
+      //   name: "gpt4all",
+      //   service: gpt4allService,
+      //   requestsLimit: 1,
+      //   requestsCount: 0,
+      //   resetTime: Date.now(),
+      //   resetInterval: 60000,
+      //   initialized: false,
+      // },
     ];
 
     this.currentIndex = 0;
