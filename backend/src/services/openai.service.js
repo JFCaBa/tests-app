@@ -11,7 +11,9 @@ class OpenAIService {
 
     try {
       this.client = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
+        baseURL: "https://api.deepseek.com",
+        // apiKey: process.env.OPENAI_API_KEY,
+        apiKey: process.env.DEEPSEEK_API_KEY,
       });
 
       this.systemPrompt = `
