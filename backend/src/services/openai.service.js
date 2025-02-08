@@ -4,7 +4,6 @@ class OpenAIService {
   constructor() {
     this.client = null;
     this.isInitialized = false;
-    this.initialize();
   }
 
   async initialize() {

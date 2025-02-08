@@ -71,6 +71,7 @@ class AIServiceRotator {
 
   async generateResponse(input, subject, context) {
     const service = this.getNextAvailableService();
+    service.initialize();
     return service.generateResponse(input, subject, context);
   }
 }
