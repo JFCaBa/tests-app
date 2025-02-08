@@ -13,14 +13,14 @@ class AIServiceRotator {
       //     resetTime: Date.now(),
       //     resetInterval: 60000, // 1 minute
       //   },
-      {
-        name: "gpt4all",
-        service: gpt4allService,
-        requestsLimit: 1,
-        requestsCount: 0,
-        resetTime: Date.now(),
-        resetInterval: 60000,
-      },
+      //   {
+      //     name: "gpt4all",
+      //     service: gpt4allService,
+      //     requestsLimit: 1,
+      //     requestsCount: 0,
+      //     resetTime: Date.now(),
+      //     resetInterval: 60000,
+      //   },
       {
         name: "deepseek",
         service: deepseekService,
