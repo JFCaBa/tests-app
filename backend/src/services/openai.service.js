@@ -13,6 +13,7 @@ class OpenAIService {
       this.client = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
+      this.assistantId = "asst_X7KozbNoVi4sIWOUxtMVeS1z";
 
       this.systemPrompt = `
 ### System:
@@ -52,27 +53,41 @@ class OpenAIService {
 
   async generateResponse(input, subject, context = {}) {
     try {
-      if (!this.isInitialized) {
-        await this.initialize();
-      }
+      // Step 1: Create a thread (to track ongoing conversations)
+      const thread = await this.client.beta.threads.create();
+      const threadId = thread.id;
 
-      console.time("Response Time");
-
-      const response = await this.client.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          { role: "system", content: this.systemPrompt },
-          { role: "user", content: `${subject}\n${input}` },
-        ],
-        temperature: 0.7,
-        max_tokens: 2048,
+      // Step 2: Send a message to the assistant
+      await this.client.beta.threads.messages.create(threadId, {
+        role: "user",
+        content: input,
       });
 
-      console.timeEnd("Response Time");
+      // Step 3: Run the assistant
+      const run = await this.client.beta.threads.runs.create(threadId, {
+        assistant_id: this.assistantId,
+      });
 
-      return this.formatResponse(response);
+      // Step 4: Poll for the response (since Assistants API runs async)
+      let runStatus;
+      do {
+        runStatus = await this.client.beta.threads.runs.retrieve(
+          threadId,
+          run.id
+        );
+        if (runStatus.status === "completed") break;
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2s before polling again
+      } while (runStatus.status !== "completed");
+
+      // Step 5: Retrieve the assistant's response
+      const messages = await this.client.beta.threads.messages.list(threadId);
+      const assistantMessage = messages.data.find(
+        (msg) => msg.role === "assistant"
+      );
+
+      return assistantMessage?.content[0]?.text?.value || "Ответ не получен.";
     } catch (error) {
-      console.error("Generation error:", error);
+      console.error("Error generating response:", error);
       return null;
     }
   }
