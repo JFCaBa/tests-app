@@ -13,12 +13,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useSettings } from "../../contexts/SettingsContext";
-
-const subjects = [
-  { value: "laws", label: "Laws" },
-  { value: "history", label: "History" },
-  { value: "grammar", label: "Grammar" },
-];
+import { useTranslation } from "react-i18next";
 
 const FlashcardGame = () => {
   const { settings } = useSettings();
@@ -32,7 +27,13 @@ const FlashcardGame = () => {
     settings.defaultDifficulty
   );
   const [questionCount, setQuestionCount] = useState(settings.questionsPerTest);
-  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const subjects = [
+    { value: "laws", label: t("common.laws") },
+    { value: "history", label: t("common.history") },
+    { value: "grammar", label: t("common.grammar") },
+  ];
 
   const loadCards = async () => {
     if (!selectedSubject) {
@@ -57,7 +58,7 @@ const FlashcardGame = () => {
             ? typeof q.options[q.correctAnswer] === "object"
               ? q.options[q.correctAnswer].text
               : q.options[q.correctAnswer]
-            : "Answer not available",
+            : t("flashcards.anserNotAvailable"),
           subject: q.subject,
           explanation: q.explanation || "",
         }));
@@ -110,7 +111,7 @@ const FlashcardGame = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <Select value={selectedSubject} onValueChange={setSelectedSubject}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Subject" />
+            <SelectValue placeholder={t("common.subject")} />
           </SelectTrigger>
           <SelectContent>
             {subjects.map((subject) => (
@@ -126,7 +127,7 @@ const FlashcardGame = () => {
           onValueChange={setSelectedDifficulty}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select difficulty" />
+            <SelectValue placeholder={t("common.dificulty")} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="easy">Разрешение на работу</SelectItem>
@@ -142,7 +143,7 @@ const FlashcardGame = () => {
           onValueChange={(value) => setQuestionCount(Number(value))}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Number of questions" />
+            <SelectValue placeholder={t("flashcards.numberOfQuestions")} />
           </SelectTrigger>
           <SelectContent>
             {[5, 10, 15, 20].map((count) => (
@@ -154,7 +155,7 @@ const FlashcardGame = () => {
         </Select>
 
         <Button onClick={loadCards} disabled={!selectedSubject || loading}>
-          Load Cards
+          {t("flashcards.loadCards")}
         </Button>
       </div>
 
@@ -173,10 +174,10 @@ const FlashcardGame = () => {
                   </div>
                   <p className="text-gray-600 mt-2">
                     {score === cards.length
-                      ? "Perfect score! Amazing work!"
+                      ? t("flashcards.perfectScore")
                       : score >= cards.length * 0.7
-                      ? "Great job! Keep practicing!"
-                      : "Keep practicing to improve your score!"}
+                      ? t("flashcards.greatJob")
+                      : t("flashcards.keepPracticing")}
                   </p>
                 </div>
                 <div className="flex justify-center gap-4">
@@ -276,9 +277,7 @@ const FlashcardGame = () => {
       ) : (
         <div className="text-center p-6">
           <h2 className="text-xl font-semibold mb-2">No Flashcards Loaded</h2>
-          <p className="text-gray-600">
-            Select options above and click Load Cards to begin.
-          </p>
+          <p className="text-gray-600">{t("flashcards.selectSubject")}</p>
         </div>
       )}
     </div>

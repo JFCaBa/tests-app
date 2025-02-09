@@ -80,6 +80,19 @@
   .rotate-y-180 {
     transform: rotateY(180deg);
   }
+
+  /* Hide extra elements if present */
+  .goog-te-banner-frame {
+    display: none !important;
+  }
+
+  .goog-te-menu-frame {
+    display: none !important;
+  }
+
+  .goog-te-combo {
+    display: inline-block !important; /* Make sure the dropdown is visible */
+  }
 }
 
 @layer base {

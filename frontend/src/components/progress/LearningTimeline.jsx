@@ -72,8 +72,6 @@ export const LearningTimeline = () => {
           testService.getStats(),
         ]);
 
-        console.log("History:", history);
-
         // Transform test history into timeline format
         const testItems = history.map((test) => ({
           type: "test_completed",

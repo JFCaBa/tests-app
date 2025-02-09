@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, Volume2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -89,7 +90,7 @@ export const DemoTest = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [showFeedback, setShowFeedback] = useState(false);
-  const [writingInput, setWritingInput] = useState("");
+  const { t } = useTranslation();
 
   const currentQuestion = demoQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / demoQuestions.length) * 100;
@@ -104,21 +105,6 @@ export const DemoTest = () => {
     setUserAnswers((prev) => ({
       ...prev,
       [currentQuestion.id]: answer,
-    }));
-    setShowFeedback(true);
-  };
-
-  const handleWritingSubmit = () => {
-    if (showFeedback) return;
-
-    const words = writingInput.trim().split(/\s+/).length;
-    if (words < currentQuestion.minWords) {
-      return;
-    }
-
-    setUserAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: writingInput,
     }));
     setShowFeedback(true);
   };
@@ -145,15 +131,12 @@ export const DemoTest = () => {
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle className="text-2xl">Welcome to the Demo Test</CardTitle>
-            <CardDescription>
-              Experience our testing platform with this short demo featuring
-              different question types
-            </CardDescription>
+            <CardTitle className="text-2xl">t("demo.welcome.title")</CardTitle>
+            <CardDescription>t("demo.welcome.subtitle")</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-4">
-              <h3 className="font-semibold">What to expect:</h3>
+              <h3 className="font-semibold">t("demo.welcome.whatToExpect")</h3>
               <ul className="list-disc pl-5 space-y-2">
                 <li>3 questions showcasing different subjects</li>
                 <li>Grammar</li>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 import {
   LogOut,
   User,
@@ -12,6 +13,7 @@ import {
   LayoutDashboard,
   Menu,
   Bot,
+  Globe,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -24,57 +26,44 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import TextTranslator from "../common/TextTranslator";
-
-const NavItem = ({ href, icon: Icon, children, isActive, onClick }) => (
-  <Button
-    variant={isActive ? "default" : "ghost"}
-    className={cn(
-      "w-full justify-start",
-      isActive && "bg-primary text-primary-foreground"
-    )}
-    onClick={onClick}
-  >
-    <Icon className="mr-2 h-4 w-4" />
-    {children}
-  </Button>
-);
+import ConfirmDialog from "../common/ConfirmDialog";
+import { LoaderLg } from "@/components/ui/loader";
+import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 
 export const MainLayout = () => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/landing");
-  };
+  const { t } = useTranslation();
 
   const isPathActive = (path) => location.pathname === path;
 
   const navigationItems = [
-    { href: "/subjects", icon: Book, label: "Subjects" },
-    { href: "/progress", icon: TrendingUp, label: "Progress" },
-    { href: "/statistics", icon: BarChart, label: "Statistics" },
-    { href: "/flashcards", icon: Clock, label: "Flashcards" },
-    { href: "/coach", icon: Bot, label: "AI Coach" },
+    { href: "/subjects", icon: Book, label: t("nav.subjects") },
+    { href: "/progress", icon: TrendingUp, label: t("nav.progress") },
+    { href: "/statistics", icon: BarChart, label: t("nav.statistics") },
+    { href: "/flashcards", icon: Clock, label: t("nav.flashcards") },
+    { href: "/coach", icon: Bot, label: t("nav.aiCoach") },
     ...(isAdmin
-      ? [{ href: "/admin", icon: LayoutDashboard, label: "Admin" }]
+      ? [{ href: "/admin", icon: LayoutDashboard, label: t("nav.admin") }]
       : []),
   ];
 
   const renderNavigation = (isMobile = false) => (
     <div className={cn("flex", isMobile ? "flex-col space-y-2" : "space-x-4")}>
       {navigationItems.map((item) => (
-        <NavItem
+        <Button
           key={item.href}
-          href={item.href}
-          icon={item.icon}
-          isActive={isPathActive(item.href)}
+          variant={isPathActive(item.href) ? "default" : "ghost"}
+          className={cn(
+            "w-full justify-start",
+            isPathActive(item.href) && "bg-primary text-primary-foreground"
+          )}
           onClick={() => navigate(item.href)}
         >
+          <item.icon className="mr-2 h-4 w-4" />
           {item.label}
-        </NavItem>
+        </Button>
       ))}
     </div>
   );
@@ -101,6 +90,10 @@ export const MainLayout = () => {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
+              <div className="hidden md:block">
+                <LanguageSwitcher />
+              </div>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button>
@@ -128,14 +121,14 @@ export const MainLayout = () => {
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu */}
               <div className="md:hidden">
                 <Sheet>
                   <SheetTrigger asChild>
@@ -148,6 +141,9 @@ export const MainLayout = () => {
                       <div className="px-4 py-2">
                         <h2 className="text-lg font-semibold">Menu</h2>
                       </div>
+                      <div className="px-4 pb-4 border-b">
+                        <LanguageSwitcher />
+                      </div>
                       <div className="px-4 py-2">{renderNavigation(true)}</div>
                     </div>
                   </SheetContent>
@@ -157,21 +153,14 @@ export const MainLayout = () => {
           </div>
         </div>
       </nav>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Outlet />
       </main>
-
       {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-gray-500">
-            © {new Date().getFullYear()} Test My Russian. All rights reserved.
-          </p>
-        </div>
+      <footer className="bg-white border-t mt-auto text-center py-4 text-gray-500">
+        © {new Date().getFullYear()} Test My Russian. All rights reserved.
       </footer>
-      <TextTranslator />
     </div>
   );
 };

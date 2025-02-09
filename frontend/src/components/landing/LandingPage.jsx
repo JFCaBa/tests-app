@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,44 +17,73 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
-import YandexAdBanner from "../ads/YandexAdBanner";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const permitTypes = [
     {
-      title: "Working Permission",
-      description: "Required for legal employment in the country",
+      title: t("landing.permits.types.working.title"),
+      description: t("landing.permits.types.working.description"),
       icon: FileCheck,
       color: "bg-blue-100 text-blue-700",
-      features: [
-        "Basic language proficiency",
-        "Cultural knowledge",
-        "Work regulations",
-      ],
+      features: t("landing.permits.types.working.features", {
+        returnObjects: true,
+      }),
     },
     {
-      title: "Temporary Residence",
-      description: "For those planning to stay for an extended period",
+      title: t("landing.permits.types.temporary.title"),
+      description: t("landing.permits.types.temporary.description"),
       icon: Clock,
       color: "bg-green-100 text-green-700",
-      features: [
-        "Advanced language skills",
-        "Social system understanding",
-        "Legal rights and obligations",
-      ],
+      features: t("landing.permits.types.temporary.features", {
+        returnObjects: true,
+      }),
     },
     {
-      title: "Permanent Residence",
-      description: "For long-term settlement in the country",
+      title: t("landing.permits.types.permanent.title"),
+      description: t("landing.permits.types.permanent.description"),
       icon: Users,
       color: "bg-purple-100 text-purple-700",
-      features: [
-        "Complete language mastery",
-        "Deep cultural integration",
-        "Civic knowledge",
-      ],
+      features: t("landing.permits.types.permanent.features", {
+        returnObjects: true,
+      }),
+    },
+  ];
+
+  const stats = [
+    { stat: t("landing.stats.stats.95%"), label: t("landing.stats.passRate") },
+    {
+      stat: t("landing.stats.stats.10k+"),
+      label: t("landing.stats.practiceQuestions"),
+    },
+    {
+      stat: t("landing.stats.stats.24/7"),
+      label: t("landing.stats.studyAccess"),
+    },
+  ];
+
+  const features = [
+    {
+      icon: GraduationCap,
+      title: t("landing.features.list.content.title"),
+      description: t("landing.features.list.content.description"),
+    },
+    {
+      icon: Clock,
+      title: t("landing.features.list.practice.title"),
+      description: t("landing.features.list.practice.description"),
+    },
+    {
+      icon: Users,
+      title: t("landing.features.list.simulation.title"),
+      description: t("landing.features.list.simulation.description"),
+    },
+    {
+      icon: FileCheck,
+      title: t("landing.features.list.progress.title"),
+      description: t("landing.features.list.progress.description"),
     },
   ];
 
@@ -65,16 +95,16 @@ export const LandingPage = () => {
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:mx-0">
             <div className="mb-8 inline-flex items-center rounded-full bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-400 ring-1 ring-inset ring-blue-500/20">
-              New Platform Launch
+              {t("landing.hero.newPlatform")}
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              Master Your Permission Tests
-              <span className="block text-blue-400">Pass with Confidence</span>
+              {t("landing.hero.title")}
+              <span className="block text-blue-400">
+                {t("landing.hero.subtitle")}
+              </span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-300">
-              Your comprehensive preparation platform for working permission,
-              temporary residence, and permanent residence tests. Practice with
-              real exam-like questions and track your progress.
+              {t("landing.hero.description")}
             </p>
             <div className="mt-10 flex items-center gap-x-6">
               <Button
@@ -82,7 +112,7 @@ export const LandingPage = () => {
                 className="bg-blue-500 hover:bg-blue-600"
                 onClick={() => navigate("/register")}
               >
-                Get Started
+                {t("landing.hero.getStarted")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button
@@ -91,27 +121,18 @@ export const LandingPage = () => {
                 className="text-black hover:text-white border-white/20 hover:bg-white/10"
                 onClick={() => navigate("/demo")}
               >
-                Try Demo Test
+                {t("landing.hero.tryDemo")}
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Ad Banner Section */}
-      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        {/* <YandexAdBanner /> */}
-      </div>
-
       {/* Quick Stats */}
       <div className="relative -mt-10 lg:-mt-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto grid max-w-lg grid-cols-1 gap-6 sm:grid-cols-3 lg:mx-0 lg:max-w-none">
-            {[
-              { stat: "95%", label: "Pass Rate" },
-              { stat: "10k+", label: "Practice Questions" },
-              { stat: "24/7", label: "Study Access" },
-            ].map((item) => (
+            {stats.map((item) => (
               <Card
                 key={item.label}
                 className="bg-white/80 backdrop-blur-sm border-0 shadow-lg"
@@ -133,11 +154,10 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Choose Your Permission Path
+              {t("landing.permits.title")}
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Select the permission type you're preparing for and begin your
-              journey to success
+              {t("landing.permits.subtitle")}
             </p>
           </div>
 
@@ -181,40 +201,15 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Why Choose Our Platform
+              {t("landing.features.title")}
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Everything you need to succeed in your permission tests
+              {t("landing.features.subtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: GraduationCap,
-                title: "Comprehensive Content",
-                description:
-                  "Cover all required topics with our extensive question bank",
-              },
-              {
-                icon: Clock,
-                title: "Practice at Your Pace",
-                description:
-                  "Flexible learning with timed and untimed practice modes",
-              },
-              {
-                icon: Users,
-                title: "Real Exam Simulation",
-                description:
-                  "Experience tests in conditions similar to the actual exam",
-              },
-              {
-                icon: FileCheck,
-                title: "Track Progress",
-                description:
-                  "Monitor your improvement with detailed statistics",
-              },
-            ].map((feature, index) => {
+            {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card
@@ -244,11 +239,10 @@ export const LandingPage = () => {
         <div className="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Ready to Begin Your Journey?
+              {t("landing.cta.title")}
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
-              Start practicing now and take the first step towards achieving
-              your residency goals.
+              {t("landing.cta.subtitle")}
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button
@@ -256,7 +250,7 @@ export const LandingPage = () => {
                 className="bg-blue-500 hover:bg-blue-600"
                 onClick={() => navigate("/register")}
               >
-                Create Account
+                {t("landing.cta.createAccount")}
               </Button>
               <Button
                 variant="outline"
@@ -264,7 +258,7 @@ export const LandingPage = () => {
                 className="text-black hover:text-white border-white/20 hover:bg-white/10"
                 onClick={() => navigate("/login")}
               >
-                Sign In
+                {t("landing.cta.signIn")}
               </Button>
             </div>
           </div>
