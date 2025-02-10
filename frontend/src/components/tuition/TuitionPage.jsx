@@ -1,26 +1,36 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock } from "lucide-react";
 import axios from "axios";
-import TutorCard from "./TutorCard";
 
-export const TuitionPage = () => {
+const TuitionPage = () => {
+  const { t } = useTranslation();
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTutors = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await axios.get("/tutors");
-        if (response.data.length === 0) {
-          setError(true);
-        } else {
-          setTutors(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching tutors:", error);
-        setError(true);
+        setTutors(response.data.tutors ? response.data.tutors : []);
+      } catch (err) {
+        console.error("Failed to fetch tutors:", err);
+        setError(err.message || "Failed to load tutors");
+        setTutors([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -30,31 +40,76 @@ export const TuitionPage = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-center text-lg font-semibold">Loading...</div>;
-  }
-
-  if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-80">
-        <h2 className="text-2xl font-bold text-gray-700">Coming Soon</h2>
-        <p className="text-gray-500 mt-2">
-          New tutors will be available soon. Stay tuned!
-        </p>
-        <Button className="mt-4" onClick={() => window.location.reload()}>
-          Refresh
-        </Button>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
+  if (error) {
+    return <div className="p-4 text-red-500 text-center">{error}</div>;
+  }
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Book a Tuition Session</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tutors.map((tutor) => (
-          <TutorCard key={tutor._id} tutor={tutor} />
-        ))}
-      </div>
+    <div className="p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("tuition.availableTutors")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("tuition.name")}</TableHead>
+                <TableHead>{t("nav.subjects")}</TableHead>
+                <TableHead>{t("tuition.rate")}</TableHead>
+                <TableHead>{t("tuition.availability")}</TableHead>
+                <TableHead>{t("tuition.actions")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tutors.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-4">
+                    {t("tuition.noTutorsAvailable")}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                tutors.map((tutor) => (
+                  <TableRow key={tutor._id}>
+                    <TableCell className="font-medium">{tutor.name}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {(tutor.subjects || []).map((subject) => (
+                          <Badge key={subject} variant="secondary">
+                            {subject}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>${tutor.hourlyRate}/hr</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {tutor.availability || t("tuition.flexible")}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Button size="sm">
+                        <Clock className="h-4 w-4 mr-2" />
+                        {t("tuition.bookSession")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };

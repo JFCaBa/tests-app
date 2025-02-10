@@ -1,8 +1,8 @@
 import express from "express";
 import { Question, User } from "../models/index.js";
 import { auth, validation, errors } from "../middleware/index.js";
-const { asyncHandler } = errors;
 
+const { asyncHandler } = errors;
 const router = express.Router();
 
 // @route   POST /api/tests/start

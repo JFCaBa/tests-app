@@ -10,7 +10,7 @@ import { SubjectSelection } from "./components/test/SubjectSelection";
 import { PracticeMode } from "./components/test/PracticeMode";
 import { PracticeSession } from "./components/test/PracticeSession";
 import { Profile } from "./components/profile/Profile";
-import { TuitionPage } from "./components/tuition/TuitionPage";
+import TuitionPage from "./components/tuition/TuitionPage";
 import BookingPage from "./components/tuition/BookingPage";
 import TutorManager from "./components/admin/TutorManager";
 import AddTutor from "./components/admin/AddTutor";

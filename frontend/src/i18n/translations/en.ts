@@ -269,4 +269,14 @@ export default {
     noFlashcardsLoaded: "No Flashcards Loaded",
     selectSubject: "Select a subject above and click Load Cards to begin.",
   },
+  tuition: {
+    availableTutors: "Available Tutors",
+    name: "Name",
+    rate: "Rate",
+    availability: "Availability",
+    actions: "Actions",
+    noTutorsAvailable: "No Tutors Available",
+    flexible: "Flexible",
+    bookSession: "Book Session",
+  },
 };

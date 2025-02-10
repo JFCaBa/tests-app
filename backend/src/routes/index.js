@@ -34,5 +34,6 @@ export default {
   questions: questionRoutes,
   tests: testRoutes,
   admin: adminRoutes,
-  chatRoutes: chatRoutes,
+  chat: chatRoutes,
+  tutor: tutorRoutes,
 };
