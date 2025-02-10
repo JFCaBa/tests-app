@@ -498,6 +498,48 @@ router.get(
   })
 );
 
+// @route   PUT /api/admin/tutors/:id
+// @desc    Update tutor
+// @access  Admin
+router.put(
+  "/tutors/:id",
+  [auth.required, auth.admin],
+  asyncHandler(async (req, res) => {
+    const {
+      name,
+      gender,
+      bio,
+      hourlyRate,
+      subjects,
+      phonePayments,
+      paypalPayments,
+      phoneNumber,
+      paypalEmail,
+      active,
+    } = req.body;
+
+    const tutor = await Tutor.findById(req.params.id);
+
+    if (!tutor) {
+      return res.status(404).json({ message: "Tutor not found" });
+    }
+
+    tutor.name = name;
+    tutor.gender = gender;
+    tutor.bio = bio;
+    tutor.hourlyRate = Number(hourlyRate);
+    tutor.subjects = subjects;
+    tutor.phonePayments = phonePayments;
+    tutor.paypalPayments = paypalPayments;
+    tutor.phoneNumber = phonePayments ? phoneNumber : undefined;
+    tutor.paypalEmail = paypalPayments ? paypalEmail : undefined;
+    tutor.active = active;
+
+    const updatedTutor = await tutor.save();
+    res.json(updatedTutor);
+  })
+);
+
 // @route   DELETE /api/admin/tutors/:id
 // @desc    Delete a tutor
 // @access  Admin
