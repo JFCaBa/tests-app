@@ -1,22 +1,26 @@
-// components/tuition/TuitionPage.jsx
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 import TutorCard from "./TutorCard";
 
 export const TuitionPage = () => {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchTutors = async () => {
       try {
-        const response = await axios.get("/api/tutors");
-        setTutors(response.data);
+        const response = await axios.get("/tutors");
+        if (response.data.length === 0) {
+          setError(true);
+        } else {
+          setTutors(response.data);
+        }
       } catch (error) {
         console.error("Error fetching tutors:", error);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -26,7 +30,21 @@ export const TuitionPage = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center text-lg font-semibold">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-80">
+        <h2 className="text-2xl font-bold text-gray-700">Coming Soon</h2>
+        <p className="text-gray-500 mt-2">
+          New tutors will be available soon. Stay tuned!
+        </p>
+        <Button className="mt-4" onClick={() => window.location.reload()}>
+          Refresh
+        </Button>
+      </div>
+    );
   }
 
   return (
