@@ -77,9 +77,9 @@ export const MainLayout = () => {
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo/Home */}
+            {/* Logo/Home - Only visible on mobile */}
             <div
-              className="flex-shrink-0 cursor-pointer flex items-center"
+              className="md:hidden flex-shrink-0 cursor-pointer flex items-center"
               onClick={() => navigate("/")}
             >
               <Clock className="h-6 w-6 mr-2" />
