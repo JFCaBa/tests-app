@@ -14,6 +14,7 @@ import {
   Menu,
   Bot,
   Globe,
+  GraduationCap,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,6 +45,7 @@ export const MainLayout = () => {
     { href: "/statistics", icon: BarChart, label: t("nav.statistics") },
     { href: "/flashcards", icon: Clock, label: t("nav.flashcards") },
     { href: "/coach", icon: Bot, label: t("nav.aiCoach") },
+    { href: "/tuition", icon: GraduationCap, label: "Tuition" },
     ...(isAdmin
       ? [{ href: "/admin", icon: LayoutDashboard, label: t("nav.admin") }]
       : []),

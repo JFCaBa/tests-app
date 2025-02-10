@@ -1,24 +1,22 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc"; // Switched to SWC for faster builds
-import viteCompression from "vite-plugin-compression"; // Corrected import
+import react from "@vitejs/plugin-react-swc";
+import viteCompression from "vite-plugin-compression";
 import path from "path";
 
 export default defineConfig({
   base: "/",
   plugins: [
     react({
-      jsxImportSource: "@emotion/react", // If using CSS-in-JS
-      devTools: process.env.NODE_ENV !== "production",
+      jsxImportSource: undefined, // Remove emotion
     }),
     viteCompression({
-      algorithm: "brotliCompress", // Enable Brotli compression
+      algorithm: "brotliCompress",
       ext: ".br",
     }),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Add more aliases if needed
     },
   },
   server: {
@@ -29,26 +27,24 @@ export default defineConfig({
         target: "https://testmyrussian.com",
         changeOrigin: true,
         secure: false,
-        // Add rewrite if needed: rewrite: (path) => path.replace(/^\/api/, '')
       },
     },
-    allowedHosts: ["testmyrussian.com", "www.testmyrussian.com"], // Add the host here
+    allowedHosts: ["testmyrussian.com", "www.testmyrussian.com"],
     hmr: {
       clientPort: 443,
       protocol: "wss",
-      // Consider adding host if behind reverse proxy
     },
-    open: true, // Automatically open browser
+    open: true,
   },
   build: {
-    sourcemap: process.env.NODE_ENV !== "production", // Enable sourcemaps for dev
-    minify: "terser", // Explicitly enable minification
+    sourcemap: process.env.NODE_ENV !== "production",
+    minify: "terser",
     terserOptions: {
       compress: {
-        drop_console: process.env.NODE_ENV === "production", // Remove console logs in prod
+        drop_console: process.env.NODE_ENV === "production",
       },
     },
-    target: "esnext", // Modern browser targeting
+    target: "esnext",
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -56,7 +52,7 @@ export default defineConfig({
             if (id.includes("@radix-ui")) return "vendor-radix";
             if (id.includes("react")) return "vendor-react";
             if (id.includes("recharts")) return "vendor-charts";
-            return "vendor-others"; // Catch-all for other dependencies
+            return "vendor-others";
           }
         },
         chunkFileNames: "assets/[name]-[hash].js",
@@ -66,12 +62,11 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
-      // Add packages that should be pre-bundled
       "react",
       "react-dom",
       "react-router-dom",
       "axios",
+      "@radix-ui/react-toast",
     ],
-    exclude: ["@radix-ui/react-alert-dialog"], // Exclude if needed
   },
 });

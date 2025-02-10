@@ -10,6 +10,8 @@ import { SubjectSelection } from "./components/test/SubjectSelection";
 import { PracticeMode } from "./components/test/PracticeMode";
 import { PracticeSession } from "./components/test/PracticeSession";
 import { Profile } from "./components/profile/Profile";
+import { TuitionPage } from "./components/tuition/TuitionPage";
+import BookingPage from "./components/tuition/BookingPage";
 const Progress = React.lazy(() => import("@/components/progress/Progress"));
 const Settings = React.lazy(() => import("@/components/settings/Settings"));
 const Statistics = React.lazy(() =>
@@ -130,6 +132,22 @@ const App = () => {
                 </ErrorBoundary>
               }
             />
+            <Route
+              path="tuition"
+              element={
+                <ErrorBoundary>
+                  <TuitionPage />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="tuition/book/:tutorId"
+              element={
+                <ErrorBoundary>
+                  <BookingPage />
+                </ErrorBoundary>
+              }
+            />
 
             {/* User Settings and Profile Routes */}
             <Route
@@ -171,7 +189,6 @@ const App = () => {
                 </ErrorBoundary>
               }
             />
-
             {/* Subscription and Coach Routes */}
             <Route
               path="subscription"
@@ -191,7 +208,6 @@ const App = () => {
                 </ErrorBoundary>
               }
             />
-
             {/* Flashcard Routes */}
             <Route
               path="flashcards"
@@ -201,7 +217,6 @@ const App = () => {
                 </ErrorBoundary>
               }
             />
-
             {/* Admin Routes */}
             <Route
               path="admin"

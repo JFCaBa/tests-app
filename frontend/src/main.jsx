@@ -5,6 +5,7 @@ import App from "./App";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { CoachProvider } from "./contexts/CoachContext";
+import { Toaster } from "./components/ui/toaster";
 import "./i18n";
 import "./index.css";
 
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <SettingsProvider>
           <CoachProvider>
             <App />
+            <Toaster />
           </CoachProvider>
         </SettingsProvider>
       </AuthProvider>
