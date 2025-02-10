@@ -77,7 +77,6 @@ router.get(
 router.post(
   "/sessions",
   auth.required,
-  validation.rules.body.session,
   validation.validate,
   asyncHandler(async (req, res) => {
     const { tutorId, startTime, endTime, subject, paymentMethod, amount } =
