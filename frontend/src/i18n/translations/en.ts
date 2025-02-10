@@ -174,6 +174,8 @@ export default {
     targeted: "Targeted Practice",
     continuous: "Continuous Practice",
     review: "Review Previous",
+    thisWeek: "This Week",
+    highestScore: "Highest Score",
   },
   admin: {
     dashboard: "Admin Dashboard",
@@ -197,6 +199,7 @@ export default {
     bestSubject: "Best Subject",
     recentTests: "Recent Tests",
     successRate: "Success Rate",
+    selectSubject: "Select Subject",
   },
   common: {
     loading: "Loading...",
@@ -234,6 +237,7 @@ export default {
     laws: "Laws",
     history: "History",
     grammar: "Grammar",
+    noDataAvailable: "No data available",
   },
   coach: {
     askQuestion: "Ask your study coach...",

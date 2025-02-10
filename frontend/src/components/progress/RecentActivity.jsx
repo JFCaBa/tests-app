@@ -18,8 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 export const RecentActivity = () => {
+  const { t } = useTranslation();
   const [activityData, setActivityData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState("all");
@@ -31,13 +33,13 @@ export const RecentActivity = () => {
   });
 
   const subjects = [
-    { value: "all", label: "All Subjects" },
-    { value: "listening", label: "Listening" },
-    { value: "grammar", label: "Grammar" },
-    { value: "history", label: "History" },
-    { value: "laws", label: "Laws" },
-    { value: "reading", label: "Reading" },
-    { value: "writing", label: "Writing" },
+    { value: "all", label: t("subjects.all") },
+    { value: "listening", label: t("subjects.listening") },
+    { value: "grammar", label: t("subjects.grammar") },
+    { value: "history", label: t("subjects.history") },
+    { value: "laws", label: t("subjects.laws") },
+    { value: "reading", label: t("subjects.reading") },
+    { value: "writing", label: t("subjects.writing") },
   ];
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export const RecentActivity = () => {
         <CardTitle>Recent Activity</CardTitle>
         <Select value={selectedSubject} onValueChange={setSelectedSubject}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="Select subject" />
+            <SelectValue placeholder={t("stats.selectSubject")} />
           </SelectTrigger>
           <SelectContent>
             {subjects.map((subject) => (
@@ -126,19 +128,19 @@ export const RecentActivity = () => {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center">
-            <p className="text-sm text-gray-500">Total Tests</p>
+            <p className="text-sm text-gray-500">{t("stats.totalTests")}</p>
             <p className="text-2xl font-bold">{stats.totalTests}</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">Average Score</p>
+            <p className="text-sm text-gray-500">{t("stats.averageScore")}</p>
             <p className="text-2xl font-bold">{stats.averageScore}%</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">Highest Score</p>
+            <p className="text-sm text-gray-500">{t("test.highestScore")}</p>
             <p className="text-2xl font-bold">{stats.highestScore}%</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">This Week</p>
+            <p className="text-sm text-gray-500">{t("tests.thisWeek")}</p>
             <p className="text-2xl font-bold">{stats.testsThisWeek}</p>
           </div>
         </div>
@@ -159,7 +161,7 @@ export const RecentActivity = () => {
                   tickFormatter={(value) => `${value}%`}
                 />
                 <Tooltip
-                  formatter={(value) => [`${value}%`, "Score"]}
+                  formatter={(value) => [`${value}%`, t("test.score")]}
                   labelFormatter={(label) => `Date: ${label}`}
                 />
                 <Line
@@ -174,16 +176,16 @@ export const RecentActivity = () => {
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">
-                No data available for the selected subject
-              </p>
+              <p className="text-gray-500">{t("common.noDataAvailable")}</p>
             </div>
           )}
         </div>
 
         {filteredData.length > 0 && (
           <div className="mt-4">
-            <p className="text-sm text-gray-500 mb-2">Recent Tests:</p>
+            <p className="text-sm text-gray-500 mb-2">
+              {t("stats.recentTests")}:
+            </p>
             <div className="flex flex-wrap gap-2">
               {filteredData.slice(0, 5).map((test, index) => (
                 <Badge key={index} variant="secondary">
