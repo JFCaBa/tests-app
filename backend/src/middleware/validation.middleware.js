@@ -138,3 +138,26 @@ export const queryValidationRules = {
       .withMessage("Invalid question type"),
   ],
 };
+
+// In validation.middleware.js
+export const tutorValidationRules = {
+  create: [
+    body("name").trim().notEmpty().withMessage("Name is required"),
+    body("gender").isIn(["male", "female"]).withMessage("Invalid gender"),
+    body("hourlyRate").isNumeric().withMessage("Invalid hourly rate"),
+    body("subjects").isArray().withMessage("Subjects must be an array"),
+    body("subjects.*").isIn([
+      "listening",
+      "grammar",
+      "history",
+      "laws",
+      "reading",
+      "writing",
+      "exam",
+    ]),
+    body("phonePayments").isBoolean(),
+    body("paypalPayments").isBoolean(),
+    body("phoneNumber").if(body("phonePayments").equals(true)).notEmpty(),
+    body("paypalEmail").if(body("paypalPayments").equals(true)).isEmail(),
+  ],
+};

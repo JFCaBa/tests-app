@@ -398,4 +398,43 @@ router.post(
   })
 );
 
+// MARK: - Tutor
+// @route   POST /api/admin/tutors
+// @desc    Create a new tutor
+// @access  Admin
+router.post(
+  "/tutor",
+  [auth.required, auth.admin],
+  asyncHandler(async (req, res) => {
+    const {
+      name,
+      gender,
+      bio,
+      hourlyRate,
+      subjects,
+      phonePayments,
+      paypalPayments,
+      phoneNumber,
+      paypalEmail,
+    } = req.body;
+
+    const tutor = new Tutor({
+      userId: req.user._id,
+      name,
+      gender,
+      bio,
+      hourlyRate: Number(hourlyRate),
+      subjects,
+      phonePayments,
+      paypalPayments,
+      phoneNumber: phonePayments ? phoneNumber : undefined,
+      paypalEmail: paypalPayments ? paypalEmail : undefined,
+      active: true,
+    });
+
+    await tutor.save();
+    res.status(201).json(tutor);
+  })
+);
+
 export default router;

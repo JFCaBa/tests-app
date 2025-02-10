@@ -15,13 +15,21 @@ router.get(
   validation.rules.query.search,
   validation.validate,
   asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, search = "" } = req.query;
-    const query = search ? { subjects: { $regex: search, $options: "i" } } : {};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    const query = {
+      active: true,
+      ...(search ? { subjects: { $regex: search, $options: "i" } } : {}),
+    };
     const tutors = await Tutor.find(query)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
+
     const count = await Tutor.countDocuments(query);
+
     res.json({
       tutors,
       totalPages: Math.ceil(count / limit),

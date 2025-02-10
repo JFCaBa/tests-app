@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, BarChart2, Settings, Book } from "lucide-react";
+import {
+  Users,
+  FileText,
+  BarChart2,
+  Settings,
+  Book,
+  GraduationCap,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,6 +28,7 @@ export const AdminDashboard = () => {
     users: { total: 0, active: 0, admins: 0 },
     questions: { total: 0, active: 0, bySubject: [] },
     tests: { totalTests: 0, averageScore: 0 },
+    tutors: { total: 0, active: 0 },
   });
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
@@ -100,6 +108,12 @@ export const AdminDashboard = () => {
       color: "bg-purple-100 text-purple-700",
     },
     {
+      title: "Active Tutors",
+      value: stats.tutors?.active || 0,
+      icon: GraduationCap,
+      color: "bg-indigo-100 text-indigo-700",
+    },
+    {
       title: "Average Score",
       value: `${stats.tests.averageScore.toFixed(1)}%`,
       icon: Settings,
@@ -153,6 +167,12 @@ export const AdminDashboard = () => {
             <CardDescription>Manage your test application</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <Button
+              className="w-full"
+              onClick={() => navigate("/admin/tutors")}
+            >
+              Manage Tutors
+            </Button>
             <Button className="w-full" onClick={() => navigate("/admin/users")}>
               Manage Users
             </Button>

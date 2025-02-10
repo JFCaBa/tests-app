@@ -14,6 +14,15 @@ const TutorSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+      required: true,
+    },
     bio: String,
     hourlyRate: {
       type: Number,
@@ -22,7 +31,15 @@ const TutorSchema = new mongoose.Schema(
     subjects: [
       {
         type: String,
-        enum: ["listening", "grammar", "history", "laws", "reading", "writing"],
+        enum: [
+          "listening",
+          "grammar",
+          "history",
+          "laws",
+          "reading",
+          "writing",
+          "exam",
+        ],
       },
     ],
     availability: [availabilitySchema],

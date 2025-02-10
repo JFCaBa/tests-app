@@ -29,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 
 const TYPING_SPEED = 25; // ms per character
 
@@ -47,6 +48,7 @@ const CoachChat = () => {
   const initialized = useRef(false);
   const scrollRef = useRef(null);
   const responseText = useRef("");
+  const { t } = useTranslation();
 
   const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
@@ -176,7 +178,7 @@ const CoachChat = () => {
     } catch (error) {
       console.error("Error:", error);
       const errorMessage = {
-        text: "I'm having trouble responding right now. Please try again.",
+        text: t("coach.troubleResponding"),
         isUser: false,
         subject: selectedSubject,
         isError: true,
@@ -209,13 +211,11 @@ const CoachChat = () => {
                 disabled={cleanupLoading}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Clean Messages
+                {t("coach.clealMessages")}
               </Button>
             )}
           </div>
-          <CardDescription>
-            Select a subject and ask questions about exam preparation
-          </CardDescription>
+          <CardDescription>{t("coach.selectSubjectToStart")}</CardDescription>
 
           <SubjectSelector
             value={selectedSubject}
@@ -258,8 +258,8 @@ const CoachChat = () => {
                 }
                 placeholder={
                   selectedSubject
-                    ? "Ask your study coach..."
-                    : "Select a subject first"
+                    ? t("coack.askQuestion")
+                    : t("coach.selectSubject")
                 }
                 disabled={!selectedSubject || loading}
               />
@@ -281,20 +281,18 @@ const CoachChat = () => {
       <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clean Chat Messages</AlertDialogTitle>
+            <AlertDialogTitle>{t("coach.cleanMessages")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove all chat messages{" "}
-              {selectedSubject ? `for ${selectedSubject}` : ""}. This action
-              cannot be undone.
+              {t("coach.confirmClean")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCleanup}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {cleanupLoading ? "Cleaning..." : "Clean Messages"}
+              {cleanupLoading ? t("coach.cleaning") : t("coach.cleanMessages")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

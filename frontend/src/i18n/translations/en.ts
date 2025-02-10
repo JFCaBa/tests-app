@@ -242,11 +242,16 @@ export default {
   coach: {
     askQuestion: "Ask your study coach...",
     selectSubject: "Select a subject first",
+    selectSubjectToStart:
+      "Select a subject and ask questions about exam preparation",
     typing: "Coach is typing...",
     suggestions: "Suggestions",
     cleanMessages: "Clean Messages",
     confirmClean:
       "This will remove all chat messages. This action cannot be undone.",
+    troubleResponding:
+      "I'm having trouble responding right now. Please try again.",
+    cleaning: "Cleaning ...",
   },
   flashcards: {
     flip: "Flip",
