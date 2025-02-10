@@ -437,4 +437,37 @@ router.post(
   })
 );
 
+// @route   GET /admin/tutors
+// @desc    Get available tutors
+// @access  Private
+router.get(
+  "/tutors",
+  auth.required,
+  auth.admin,
+  validation.rules.query.pagination,
+  validation.rules.query.search,
+  validation.validate,
+  asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    const query = {
+      ...(search ? { subjects: { $regex: search, $options: "i" } } : {}),
+    };
+    const tutors = await Tutor.find(query)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
+    const count = await Tutor.countDocuments(query);
+
+    res.json({
+      tutors,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
+  })
+);
+
 export default router;
