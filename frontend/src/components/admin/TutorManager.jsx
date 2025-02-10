@@ -106,7 +106,7 @@ const TutorManager = () => {
                 ) : (
                   tutors.map((tutor) => (
                     <TableRow key={tutor._id}>
-                      <TableCell>{tutor.user.username}</TableCell>
+                      <TableCell>{tutor.name}</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {tutor.subjects.map((subject) => (

@@ -12,6 +12,7 @@ import questionRoutes from "./routes/questions.routes.js";
 import testRoutes from "./routes/tests.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import coachRoutes from "./routes/coach.routes.js";
+import tutorRoutes from "./routes/tutors.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 
@@ -45,6 +46,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/coach", coachRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/tutors", tutorRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
