@@ -1,4 +1,3 @@
-// components/admin/TutorManager.jsx
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,8 +12,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Edit2, UserX, UserCheck, Plus } from "lucide-react";
+import { Search, Edit2, UserX, UserCheck, Plus, Trash2 } from "lucide-react";
 import axios from "axios";
+import ConfirmDialog from "../common/ConfirmDialog";
 
 const TutorManager = () => {
   const [tutors, setTutors] = useState([]);
@@ -22,6 +22,7 @@ const TutorManager = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [tutorToDelete, setTutorToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +52,18 @@ const TutorManager = () => {
       fetchTutors();
     } catch (error) {
       console.error("Failed to update tutor status:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!tutorToDelete) return;
+
+    try {
+      await axios.delete(`/admin/tutors/${tutorToDelete._id}`);
+      setTutorToDelete(null);
+      fetchTutors();
+    } catch (error) {
+      console.error("Failed to delete tutor:", error);
     }
   };
 
@@ -146,6 +159,13 @@ const TutorManager = () => {
                               <UserCheck className="h-4 w-4 text-green-500" />
                             )}
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setTutorToDelete(tutor)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -178,6 +198,17 @@ const TutorManager = () => {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={!!tutorToDelete}
+        onClose={() => setTutorToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Tutor"
+        description={`Are you sure you want to delete ${tutorToDelete?.name}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </div>
   );
 };

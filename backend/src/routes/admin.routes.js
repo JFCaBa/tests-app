@@ -481,4 +481,40 @@ router.get(
   })
 );
 
+// @route   GET /api/admin/tutors/:id
+// @desc    Get tutor by ID
+// @access  Admin
+router.get(
+  "/tutors/:id",
+  [auth.required, auth.admin],
+  asyncHandler(async (req, res) => {
+    const tutor = await Tutor.findById(req.params.id);
+
+    if (!tutor) {
+      return res.status(404).json({ message: "Tutor not found" });
+    }
+
+    res.json(tutor);
+  })
+);
+
+// @route   DELETE /api/admin/tutors/:id
+// @desc    Delete a tutor
+// @access  Admin
+router.delete(
+  "/tutors/:id",
+  auth.required,
+  auth.admin,
+  asyncHandler(async (req, res) => {
+    const tutor = await Tutor.findById(req.params.id);
+
+    if (!tutor) {
+      return res.status(404).json({ message: "Tutor not found" });
+    }
+
+    await tutor.deleteOne();
+    res.json({ message: "Tutor removed successfully" });
+  })
+);
+
 export default router;

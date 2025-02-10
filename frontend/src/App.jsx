@@ -13,7 +13,7 @@ import { Profile } from "./components/profile/Profile";
 import TuitionPage from "./components/tuition/TuitionPage";
 import BookingPage from "./components/tuition/BookingPage";
 import TutorManager from "./components/admin/TutorManager";
-import AddTutor from "./components/admin/AddTutor";
+import TutorForm from "./components/admin/TutorForm";
 const Progress = React.lazy(() => import("@/components/progress/Progress"));
 const Settings = React.lazy(() => import("@/components/settings/Settings"));
 const Statistics = React.lazy(() =>
@@ -161,10 +161,18 @@ const App = () => {
             />
 
             <Route
-              path="admin/tutors/new"
+              path="/admin/tutors/new"
               element={
                 <ErrorBoundary>
-                  <AddTutor />
+                  <TutorForm />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/admin/tutors/:id/edit"
+              element={
+                <ErrorBoundary>
+                  <TutorForm />
                 </ErrorBoundary>
               }
             />
