@@ -403,7 +403,7 @@ router.post(
 // @desc    Create a new tutor
 // @access  Admin
 router.post(
-  "/tutor",
+  "/tutors",
   [auth.required, auth.admin],
   asyncHandler(async (req, res) => {
     const {

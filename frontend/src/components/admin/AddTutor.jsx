@@ -53,6 +53,7 @@ const AddTutor = () => {
       await axios.post("/admin/tutors", formData);
       navigate("/admin/tutors");
     } catch (err) {
+      console.log(err);
       setError(err.response?.data?.message || "Failed to create tutor");
     } finally {
       setLoading(false);
