@@ -1,18 +1,11 @@
+// components/tuition/TuitionPage.jsx
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import axios from "axios";
+import TutorCard from "./TutorCard";
 
 const TuitionPage = () => {
   const { t } = useTranslation();
@@ -30,7 +23,7 @@ const TuitionPage = () => {
       } catch (err) {
         console.error("Failed to fetch tutors:", err);
         setError(err.message || "Failed to load tutors");
-        setTutors([]); // Set empty array on error
+        setTutors([]);
       } finally {
         setLoading(false);
       }
@@ -48,7 +41,12 @@ const TuitionPage = () => {
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 text-center">{error}</div>;
+    return (
+      <Alert variant="destructive" className="m-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   return (
@@ -58,56 +56,17 @@ const TuitionPage = () => {
           <CardTitle>{t("tuition.availableTutors")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("tuition.name")}</TableHead>
-                <TableHead>{t("nav.subjects")}</TableHead>
-                <TableHead>{t("tuition.rate")}</TableHead>
-                <TableHead>{t("tuition.availability")}</TableHead>
-                <TableHead>{t("tuition.actions")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tutors.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    {t("tuition.noTutorsAvailable")}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                tutors.map((tutor) => (
-                  <TableRow key={tutor._id}>
-                    <TableCell className="font-medium">{tutor.name}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {(tutor.subjects || []).map((subject) => (
-                          <Badge key={subject} variant="secondary">
-                            {subject}
-                          </Badge>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>${tutor.hourlyRate}/hr</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {tutor.availability || t("tuition.flexible")}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button size="sm">
-                        <Clock className="h-4 w-4 mr-2" />
-                        {t("tuition.bookSession")}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          {tutors.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              {t("tuition.noTutorsAvailable")}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {tutors.map((tutor) => (
+                <TutorCard key={tutor._id} tutor={tutor} />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

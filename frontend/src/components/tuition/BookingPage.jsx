@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { dateFnsLocalizer } from "react-big-calendar";
+import { Calendar as BigCalendar } from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,12 +47,12 @@ const BookingPage = () => {
   useEffect(() => {
     const fetchTutorDetails = async () => {
       try {
-        const response = await axios.get(`/api/tutors/${tutorId}`);
+        const response = await axios.get(`/tutors/${tutorId}`);
         setTutor(response.data);
 
         // Fetch available slots for the current week
         const slotsResponse = await axios.get(
-          `/api/tutors/${tutorId}/availability`
+          `/tutors/${tutorId}/availability`
         );
         setAvailableSlots(slotsResponse.data);
       } catch (error) {
@@ -113,7 +115,7 @@ const BookingPage = () => {
     }
 
     try {
-      const response = await axios.post("/api/tutors/sessions", {
+      const response = await axios.post("/tutors/sessions", {
         tutorId,
         startTime: selectedSlot.start,
         endTime: selectedSlot.end,
@@ -145,13 +147,13 @@ const BookingPage = () => {
     <div className="container mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle>Book a Session with {tutor.user.username}</CardTitle>
+          <CardTitle>Book a Session with {tutor.name}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-medium mb-4">Select Date & Time</h3>
-              <Calendar
+              <BigCalendar
                 localizer={localizer}
                 events={availableSlots.map((slot) => ({
                   start: new Date(slot.startTime),
@@ -162,7 +164,7 @@ const BookingPage = () => {
                 endAccessor="end"
                 selectable
                 onSelectSlot={handleSlotSelect}
-                style={{ height: 500 }}
+                className="min-h-[500px]"
               />
             </div>
 
@@ -220,16 +222,13 @@ const BookingPage = () => {
                       onApprove={async (data, actions) => {
                         await actions.order.capture();
                         // Handle successful payment
-                        const response = await axios.post(
-                          "/api/tutors/sessions",
-                          {
-                            tutorId,
-                            startTime: selectedSlot.start,
-                            endTime: selectedSlot.end,
-                            paymentMethod: "paypal",
-                            paypalOrderId: data.orderID,
-                          }
-                        );
+                        const response = await axios.post("/tutors/sessions", {
+                          tutorId,
+                          startTime: selectedSlot.start,
+                          endTime: selectedSlot.end,
+                          paymentMethod: "paypal",
+                          paypalOrderId: data.orderID,
+                        });
 
                         toast({
                           title: "Booking Successful",

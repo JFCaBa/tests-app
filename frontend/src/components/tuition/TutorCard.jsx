@@ -28,7 +28,7 @@ const TutorCard = ({ tutor }) => {
           <div className="relative">
             <img
               src={tutor.avatarUrl || getDefaultAvatar(tutor.gender)}
-              alt={tutor.user.username}
+              alt={tutor.name}
               className="w-24 h-24 rounded-full object-cover border-2 border-primary"
             />
             {tutor.isOnline && (
@@ -38,7 +38,7 @@ const TutorCard = ({ tutor }) => {
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-xl">{tutor.user.username}</CardTitle>
+                <CardTitle className="text-xl">{tutor.name}</CardTitle>
                 <CardDescription className="flex items-center mt-1">
                   <MapPin className="w-4 h-4 mr-1" />
                   {tutor.location || "Location not specified"}

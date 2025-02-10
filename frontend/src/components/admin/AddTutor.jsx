@@ -37,6 +37,7 @@ const AddTutor = () => {
     gender: "",
     bio: "",
     hourlyRate: "",
+    location: "",
     subjects: [],
     phonePayments: false,
     paypalPayments: false,
@@ -118,6 +119,17 @@ const AddTutor = () => {
                   }
                   required
                 />
+
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  type="string"
+                  value={formData.location}
+                  onChange={(e) =>
+                    setFormData({ ...formData, location: e.target.value })
+                  }
+                  required
+                />
               </div>
 
               <div className="space-y-2">
@@ -196,7 +208,10 @@ const AddTutor = () => {
                     placeholder="Phone Number"
                     value={formData.phoneNumber}
                     onChange={(e) =>
-                      setFormData({ ...formData, phoneNumber: e.target.value })
+                      setFormData({
+                        ...formData,
+                        phoneNumber: e.target.value,
+                      })
                     }
                   />
                 )}
@@ -219,7 +234,10 @@ const AddTutor = () => {
                     placeholder="PayPal Email"
                     value={formData.paypalEmail}
                     onChange={(e) =>
-                      setFormData({ ...formData, paypalEmail: e.target.value })
+                      setFormData({
+                        ...formData,
+                        paypalEmail: e.target.value,
+                      })
                     }
                   />
                 )}
