@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { LoaderLg } from "@/components/ui/loader";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
+import TextTranslator from "../common/TextTranslator";
 
 export const MainLayout = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -163,6 +164,7 @@ export const MainLayout = () => {
       <footer className="bg-white border-t mt-auto text-center py-4 text-gray-500">
         © {new Date().getFullYear()} Test My Russian. All rights reserved.
       </footer>
+      <TextTranslator />
     </div>
   );
 };
