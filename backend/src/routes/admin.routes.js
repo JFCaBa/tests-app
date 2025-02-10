@@ -80,6 +80,12 @@ router.get(
         totalUsers,
         activeUsers,
         adminUsers,
+
+        // Tutor statistics
+        totalTutors,
+        activeTutors,
+
+        // Question statistics
         totalQuestions,
         activeQuestions,
         questionsBySubject,
@@ -88,6 +94,10 @@ router.get(
         User.countDocuments(),
         User.countDocuments({ isActive: true }),
         User.countDocuments({ role: "admin" }),
+
+        // Tutor statistics
+        Tutor.countDocuments(), // Total tutors
+        Tutor.countDocuments({ active: true }), // Active tutors
 
         // Question statistics
         Question.countDocuments(),
@@ -106,9 +116,7 @@ router.get(
 
       // Calculate test statistics
       const testStats = await User.aggregate([
-        // Unwind the testHistory array to work with individual tests
         { $unwind: "$testHistory" },
-        // Group all tests together
         {
           $group: {
             _id: null,
@@ -118,7 +126,6 @@ router.get(
             totalQuestions: { $sum: "$testHistory.totalQuestions" },
           },
         },
-        // Calculate averages
         {
           $project: {
             _id: 0,
@@ -146,6 +153,10 @@ router.get(
           total: totalUsers,
           active: activeUsers,
           admins: adminUsers,
+        },
+        tutors: {
+          total: totalTutors,
+          active: activeTutors,
         },
         questions: {
           total: totalQuestions,
