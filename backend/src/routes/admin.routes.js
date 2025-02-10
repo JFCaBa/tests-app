@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import express from "express";
-import { User, Question, ChatMessage } from "../models/index.js";
+import { User, Question, ChatMessage, Tutor } from "../models/index.js";
 import { auth, validation, errors, upload } from "../middleware/index.js";
 
 const { asyncHandler } = errors;
