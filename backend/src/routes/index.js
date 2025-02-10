@@ -4,6 +4,7 @@ import testRoutes from "./tests.routes.js";
 import adminRoutes from "./admin.routes.js";
 import chatRoutes from "./chat.routes.js";
 import coachRoutes from "./coach.routes.js";
+import tutorRoutes from "./tutors.routes.js";
 import { errors } from "../middleware/index.js";
 
 export const setupRoutes = (app) => {
@@ -14,6 +15,7 @@ export const setupRoutes = (app) => {
   app.use("/api/admin", adminRoutes);
   app.use("/api/coach", coachRoutes);
   app.use("/api/chat", chatRoutes);
+  app.use("/api/tutors", tutorRoutes);
 
   // Health check route
   app.get("/health", (req, res) => {
