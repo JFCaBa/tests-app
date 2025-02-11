@@ -7,6 +7,7 @@
 /scripts/node_modules
 /.pnp
 .pnp.js
+.env
 /public/models
 .vscode
 package-lock.json
