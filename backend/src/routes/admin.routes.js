@@ -576,12 +576,12 @@ router.get(
   auth.admin,
   async (req, res) => {
     const now = new Date();
-    const upcoming = await Session.find({
+    const upcoming = await TutorSession.find({
       tutorId: req.params.id,
       startTime: { $gt: now },
     }).sort({ startTime: 1 });
 
-    const past = await Session.find({
+    const past = await TutorSession.find({
       tutorId: req.params.id,
       startTime: { $lt: now },
     }).sort({ startTime: -1 });
