@@ -1,11 +1,9 @@
-// components/tuition/BookingPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { dateFnsLocalizer } from "react-big-calendar";
-import { Calendar as BigCalendar } from "react-big-calendar";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { format, parse, startOfWeek, getDay } from "date-fns";
-import { enUS } from "date-fns/locale";
+import moment from "moment";
+import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,17 +18,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 import PhoneInput from "react-phone-number-input";
 import axios from "axios";
 
-const locales = {
-  "en-US": enUS,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
+const localizer = momentLocalizer(moment);
 
 const BookingPage = () => {
   const { tutorId } = useParams();
@@ -43,6 +31,7 @@ const BookingPage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(true);
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const fetchTutorDetails = async () => {
@@ -50,11 +39,20 @@ const BookingPage = () => {
         const response = await axios.get(`/tutors/${tutorId}`);
         setTutor(response.data);
 
-        // Fetch available slots for the current week
         const slotsResponse = await axios.get(
           `/tutors/${tutorId}/availability`
         );
-        setAvailableSlots(slotsResponse.data);
+        const slots = slotsResponse.data;
+        setAvailableSlots(slots);
+
+        const calendarEvents = slots.map((slot) => ({
+          start: moment(slot.date + "T" + slot.startTime).toDate(),
+          end: moment(slot.date + "T" + slot.endTime).toDate(),
+          title: "Available",
+          resource: slot,
+        }));
+
+        setEvents(calendarEvents);
       } catch (error) {
         console.error("Error fetching tutor details:", error);
         toast({
@@ -68,27 +66,32 @@ const BookingPage = () => {
     };
 
     fetchTutorDetails();
-  }, [tutorId]);
+  }, [tutorId, toast]);
 
-  const handleSlotSelect = ({ start, end }) => {
-    // Check if slot is available
-    const isAvailable = availableSlots.some(
-      (slot) =>
-        slot.startTime === format(start, "HH:mm") &&
-        slot.endTime === format(end, "HH:mm") &&
-        slot.dayOfWeek === getDay(start)
+  const handleSelectSlot = ({ start }) => {
+    // Create a one hour slot from the clicked time
+    const endTime = moment(start).add(1, "hour").toDate();
+
+    // Find if this slot is available
+    const selectedEvent = events.find((event) =>
+      moment(event.start).isSame(moment(start), "hour")
     );
 
-    if (!isAvailable) {
+    if (!selectedEvent) {
       toast({
         variant: "destructive",
         title: "Unavailable Slot",
-        description: "This time slot is not available for booking",
+        description: "Please select an available time slot",
       });
       return;
     }
 
-    setSelectedSlot({ start, end });
+    setSelectedDate(start);
+    setSelectedSlot({
+      start,
+      end: endTime,
+      resource: selectedEvent.resource,
+    });
   };
 
   const handlePaypalPayment = async (data, actions) => {
@@ -139,32 +142,56 @@ const BookingPage = () => {
     }
   };
 
+  const calendarStyle = {
+    height: 500,
+  };
+
+  const eventStyleGetter = (event) => ({
+    style: {
+      backgroundColor:
+        selectedSlot?.start === event.start ? "#2563eb" : "#93c5fd",
+      color: selectedSlot?.start === event.start ? "white" : "black",
+      maxWidth: "100%",
+      overflow: "hidden",
+    },
+  });
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle>Book a Session with {tutor.name}</CardTitle>
+          <CardTitle>Book a Session with {tutor?.name}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+            <div className="calendar-container">
               <h3 className="text-lg font-medium mb-4">Select Date & Time</h3>
-              <BigCalendar
+              <Calendar
                 localizer={localizer}
-                events={availableSlots.map((slot) => ({
-                  start: new Date(slot.startTime),
-                  end: new Date(slot.endTime),
-                  title: "Available",
-                }))}
+                events={events}
                 startAccessor="start"
                 endAccessor="end"
                 selectable
-                onSelectSlot={handleSlotSelect}
-                className="min-h-[500px]"
+                selected={selectedDate}
+                onSelectSlot={handleSelectSlot}
+                eventPropGetter={eventStyleGetter}
+                {...calendarStyle}
+                views={["week", "day"]}
+                defaultView="week"
+                min={moment().startOf("day").add(9, "hours").toDate()}
+                max={moment().startOf("day").add(19, "hours").toDate()}
+                step={60}
+                timeslots={1}
+                defaultDate={new Date()}
+                onView={() => {}}
               />
             </div>
 
@@ -221,7 +248,6 @@ const BookingPage = () => {
                       createOrder={handlePaypalPayment}
                       onApprove={async (data, actions) => {
                         await actions.order.capture();
-                        // Handle successful payment
                         const response = await axios.post("/tutors/sessions", {
                           tutorId,
                           startTime: selectedSlot.start,

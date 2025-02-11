@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, PhoneCall, MapPin, MessageCircle } from "lucide-react";
+import { Star, Clock, MessageCircle, MapPin } from "lucide-react";
 
 const TutorCard = ({ tutor }) => {
   const navigate = useNavigate();
@@ -76,8 +76,9 @@ const TutorCard = ({ tutor }) => {
 
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-sm text-gray-500">Hourly Rate</p>
-            <p className="font-bold text-2xl">${tutor.hourlyRate}</p>
+            <p className="text-sm text-gray-500">Session Rate</p>
+            <p className="font-bold text-2xl">${tutor.hourlyRate}/hour</p>
+            <p className="text-xs text-gray-500">Secure payment via platform</p>
           </div>
           <div className="space-x-2">
             <Button variant="outline" size="sm">
@@ -92,18 +93,12 @@ const TutorCard = ({ tutor }) => {
 
         <div className="flex justify-between items-center pt-4 border-t">
           <div className="text-sm text-gray-500">
-            <span className="font-medium">Payment methods:</span>
+            <span className="font-medium">Available Payment Methods:</span>
             <div className="flex gap-2 mt-1">
-              {tutor.phonePayments && <Badge variant="outline">Phone</Badge>}
-              {tutor.paypalPayments && <Badge variant="outline">PayPal</Badge>}
+              <Badge variant="outline">Credit Card</Badge>
+              <Badge variant="outline">PayPal</Badge>
             </div>
           </div>
-          {tutor.phoneNumber && (
-            <Button variant="ghost" size="sm">
-              <PhoneCall className="w-4 h-4 mr-2" />
-              Contact
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>

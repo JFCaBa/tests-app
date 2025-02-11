@@ -93,6 +93,42 @@
   .goog-te-combo {
     display: inline-block !important; /* Make sure the dropdown is visible */
   }
+
+  .calendar-container {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .calendar-container .rbc-calendar {
+    width: 100%;
+  }
+
+  .rbc-time-view {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .rbc-time-content {
+    width: 100%;
+  }
+
+  .rbc-time-column {
+    min-width: auto;
+  }
+
+  .rbc-day-slot .rbc-events-container {
+    margin-right: 0;
+  }
+
+  .rbc-header {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rbc-time-header-content {
+    min-width: auto;
+  }
 }
 
 @layer base {
