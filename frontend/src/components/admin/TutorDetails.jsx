@@ -54,10 +54,12 @@ const TutorDetails = () => {
     (total, session) => total + session.duration * tutor.hourlyRate,
     0
   );
-  const upcomingPayments = sessions.upcoming.reduce(
-    (total, session) => total + session.duration * tutor.hourlyRate,
-    0
-  );
+  const upcomingPayments = sessions.upcoming.reduce((total, session) => {
+    const durationInHours =
+      (new Date(session.endTime) - new Date(session.startTime)) /
+      (1000 * 60 * 60);
+    return total + durationInHours * tutor.hourlyRate;
+  }, 0);
 
   return (
     <div className="p-6 space-y-6">
@@ -95,10 +97,12 @@ const TutorDetails = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {sessions.past.reduce(
-                (total, session) => total + session.duration,
-                0
-              )}
+              {sessions.past.reduce((total, session) => {
+                const durationInHours =
+                  (new Date(session.endTime) - new Date(session.startTime)) /
+                  (1000 * 60 * 60);
+                return total + durationInHours;
+              }, 0)}
               h
             </div>
           </CardContent>
@@ -137,18 +141,29 @@ const TutorDetails = () => {
                     <div key={session._id} className="p-4 border rounded-lg">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <p className="font-medium">{session.student.name}</p>
                           <p className="text-sm text-gray-500">
                             {formatDate(session.startTime)}
                           </p>
                         </div>
-                        <Badge>{session.duration}h</Badge>
+                        <Badge>
+                          {(
+                            (new Date(session.endTime) -
+                              new Date(session.startTime)) /
+                            (1000 * 60 * 60)
+                          ).toFixed(2)}{" "}
+                          h
+                        </Badge>
                       </div>
                       <div className="text-sm text-gray-600">
                         <p>Subject: {session.subject}</p>
                         <p>
                           Fee:{" "}
-                          {formatCurrency(session.duration * tutor.hourlyRate)}
+                          {formatCurrency(
+                            ((new Date(session.endTime) -
+                              new Date(session.startTime)) /
+                              (1000 * 60 * 60)) *
+                              tutor.hourlyRate
+                          )}
                         </p>
                       </div>
                     </div>

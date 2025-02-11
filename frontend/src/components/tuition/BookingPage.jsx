@@ -165,7 +165,7 @@ const BookingPage = () => {
   const handlePaymentApproval = async (data, actions) => {
     try {
       // Capture the payment after approval
-      // const paymentDetails = await actions.order.capture();
+      const paymentDetails = await actions.order.capture();
 
       // Send the payment details to the backend to confirm and complete the booking
       const response = await axios.post("/tutors/sessions", {
@@ -315,8 +315,8 @@ const BookingPage = () => {
                     ) : (
                       <PayPalButtons
                         style={{ layout: "vertical" }}
-                        createOrder={handlePaymentApproval}
-                        // createOrder={handlePaypalPayment}
+                        // createOrder={handlePaymentApproval}
+                        createOrder={handlePaypalPayment}
                         onApprove={handlePaymentApproval}
                       />
                     ))}
