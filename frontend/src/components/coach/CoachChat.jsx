@@ -211,7 +211,7 @@ const CoachChat = () => {
                 disabled={cleanupLoading}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                {t("coach.clealMessages")}
+                {t("coach.cleanMessages")}
               </Button>
             )}
           </div>

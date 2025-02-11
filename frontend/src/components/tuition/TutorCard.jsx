@@ -1,6 +1,6 @@
-// components/tuition/TutorCard.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Clock, MessageCircle, MapPin } from "lucide-react";
 
 const TutorCard = ({ tutor }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const getDefaultAvatar = (gender) => {
@@ -66,19 +67,24 @@ const TutorCard = ({ tutor }) => {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex items-center text-sm text-gray-500">
             <Clock className="w-4 h-4 mr-2" />
-            {tutor.totalHours}+ hours taught
+            {tutor.totalHours} {t("tuition.hoursTought")}
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <MessageCircle className="w-4 h-4 mr-2" />
-            {tutor.responseTime || "Quick"} response
+            {tutor.responseTime || t("tuition.quick")} {t("tuition.response")}
           </div>
         </div>
 
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-sm text-gray-500">Session Rate</p>
-            <p className="font-bold text-2xl">${tutor.hourlyRate}/hour</p>
-            <p className="text-xs text-gray-500">Secure payment via platform</p>
+            <p className="text-sm text-gray-500">{t("tuition.sessionRate")}</p>
+            <p className="font-bold text-2xl">
+              ${tutor.hourlyRate}
+              {t("tuition.hour")}
+            </p>
+            <p className="text-xs text-gray-500">
+              {t("tuition.securePayment")}
+            </p>
           </div>
           <div className="space-x-2">
             <Button variant="outline" size="sm">
@@ -93,10 +99,13 @@ const TutorCard = ({ tutor }) => {
 
         <div className="flex justify-between items-center pt-4 border-t">
           <div className="text-sm text-gray-500">
-            <span className="font-medium">Available Payment Methods:</span>
+            <span className="font-medium">
+              {t("tuition.availablePaymentMethods")}
+            </span>
             <div className="flex gap-2 mt-1">
-              <Badge variant="outline">Credit Card</Badge>
-              <Badge variant="outline">PayPal</Badge>
+              <Badge variant="outline">{t("tuition.creditCard")}</Badge>
+              <Badge variant="outline">{t("tuition.paypal")}</Badge>
+              <Badge variant="outline">{t("tuition.phone")}</Badge>
             </div>
           </div>
         </div>

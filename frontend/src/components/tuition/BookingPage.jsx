@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
@@ -32,6 +33,7 @@ const BookingPage = () => {
   const [loading, setLoading] = useState(true);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [events, setEvents] = useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchTutorDetails = async () => {
@@ -168,12 +170,16 @@ const BookingPage = () => {
     <div className="container mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle>Book a Session with {tutor?.name}</CardTitle>
+          <CardTitle>
+            {t("tuition.bookASessionWith")} {tutor?.name}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="calendar-container">
-              <h3 className="text-lg font-medium mb-4">Select Date & Time</h3>
+              <h3 className="text-lg font-medium mb-4">
+                {t("tuition.selectDateAndTime")}
+              </h3>
               <Calendar
                 localizer={localizer}
                 events={events}
@@ -199,7 +205,9 @@ const BookingPage = () => {
               {selectedSlot && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Selected Time</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      {t("tuition.selectTime")}
+                    </h3>
                     <p>
                       {format(selectedSlot.start, "MMMM d, yyyy h:mm a")} -{" "}
                       {format(selectedSlot.end, "h:mm a")}
@@ -210,17 +218,25 @@ const BookingPage = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Payment Method</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      {t("tuition.paymentMethod")}
+                    </h3>
                     <Select onValueChange={setPaymentMethod}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select payment method" />
+                        <SelectValue
+                          placeholder={t("tuition.selectPaymentMethod")}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {tutor.phonePayments && (
-                          <SelectItem value="phone">Phone Payment</SelectItem>
+                          <SelectItem value="phone">
+                            {t("tuition.phonePayment")}
+                          </SelectItem>
                         )}
                         {tutor.paypalPayments && (
-                          <SelectItem value="paypal">PayPal</SelectItem>
+                          <SelectItem value="paypal">
+                            {t("tuition.paypal")}
+                          </SelectItem>
                         )}
                       </SelectContent>
                     </Select>
