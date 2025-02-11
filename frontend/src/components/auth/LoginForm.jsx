@@ -29,7 +29,7 @@ export const LoginForm = () => {
 
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/subjects");
     } catch (err) {
       setError(err.message);
     } finally {

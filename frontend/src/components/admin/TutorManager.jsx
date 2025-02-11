@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Edit2, UserX, UserCheck, Plus, Trash2 } from "lucide-react";
+import { Search, Edit2, UserX, Eye, Plus, Trash2 } from "lucide-react";
 import axios from "axios";
 import ConfirmDialog from "../common/ConfirmDialog";
 
@@ -146,7 +146,7 @@ const TutorManager = () => {
                               navigate(`/admin/tutors/${tutor._id}`)
                             }
                           >
-                            <UserCheck className="h-4 w-4" />
+                            <Eye className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
