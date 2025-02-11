@@ -29,8 +29,6 @@ export const LoginForm = () => {
 
     try {
       await login(email, password);
-      const response = await login(email, password);
-      localStorage.setItem("token", response.token);
       navigate("/subjects");
     } catch (err) {
       setError(err.message);

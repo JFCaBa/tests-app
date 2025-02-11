@@ -73,7 +73,9 @@ router.post(
     await user.save();
 
     // Generate token
-    const token = jwt.sign({ userId: user._id }, config.jwtSecret);
+    const token = jwt.sign({ userId: user._id }, config.jwtSecret, {
+      expiresIn: "120d",
+    });
 
     res.json({
       token,
