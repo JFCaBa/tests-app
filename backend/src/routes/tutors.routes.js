@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import express from "express";
 import { Tutor, TutorSession } from "../models/index.js";
 import { auth, validation, errors } from "../middleware/index.js";
@@ -35,6 +36,26 @@ router.get(
       totalPages: Math.ceil(count / limit),
       currentPage: page,
     });
+  })
+);
+
+// @route   GET /api/tutors/sessions
+// @desc    Get available sessions
+// @access  Private
+router.get(
+  "/sessions",
+  auth.required,
+  asyncHandler(async (req, res) => {
+    const userId = mongoose.Types.ObjectId(req.user.id);
+
+    const sessions = await TutorSession.find({
+      $or: [{ studentId: userId }, { tutorId: userId }],
+    })
+      .populate("tutorId", "name email subjects hourlyRate")
+      .populate("studentId", "username email")
+      .sort({ startTime: -1 });
+
+    res.json(sessions);
   })
 );
 
@@ -101,6 +122,56 @@ router.post(
 
     await session.save();
     res.status(201).json(session);
+  })
+);
+
+// @route   GET /api/tutors/sessions/:id
+// @desc    Get session details
+// @access  Private
+router.get(
+  "/sessions/:id",
+  auth.required,
+  asyncHandler(async (req, res) => {
+    // Validate ID format first
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid session ID format" });
+    }
+
+    const session = await TutorSession.findById(req.params.id)
+      .populate("tutorId", "name email subjects hourlyRate")
+      .populate("studentId", "username email");
+
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (
+      session.studentId._id.toString() !== req.user.id &&
+      session.tutorId._id.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    res.json(session);
+  })
+);
+
+// @route   GET /api/tutors/sessions
+// @desc    Get user's sessions
+// @access  Private
+router.get(
+  "/sessions",
+  auth.required,
+  asyncHandler(async (req, res) => {
+    const sessions = await TutorSession.find({
+      $or: [{ studentId: req.user.id }, { tutorId: req.user.id }],
+    })
+      .populate("tutorId", "name email subjects hourlyRate")
+      .populate("studentId", "username email")
+      .sort({ startTime: -1 });
+
+    res.json(sessions);
   })
 );
 
