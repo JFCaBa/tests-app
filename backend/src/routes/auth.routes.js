@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
@@ -32,7 +33,7 @@ router.post(
 
     // Generate token
     const token = jwt.sign({ userId: user._id }, config.jwtSecret, {
-      expiresIn: "7d",
+      expiresIn: "120d",
     });
 
     res.status(201).json({

@@ -121,6 +121,7 @@ const UserSchema = new mongoose.Schema(
     },
     lastLogin: {
       type: Date,
+      default: Date.now,
     },
     statistics: {
       type: StatisticsSchema,

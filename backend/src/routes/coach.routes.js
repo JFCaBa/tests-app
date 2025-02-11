@@ -52,7 +52,7 @@ router.get(
   "/status",
   asyncHandler(async (req, res) => {
     res.json({
-      initialized: aiRotator.isInitialized,
+      initialized: aiRotator.initialized,
       modelLoaded: true,
       timestamp: new Date(),
     });
