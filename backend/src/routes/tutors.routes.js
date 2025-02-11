@@ -46,7 +46,7 @@ router.get(
   "/sessions",
   auth.required,
   asyncHandler(async (req, res) => {
-    const userId = mongoose.Types.ObjectId(req.user.id);
+    const userId = new mongoose.Types.ObjectId(req.user.id);
 
     const sessions = await TutorSession.find({
       $or: [{ studentId: userId }, { tutorId: userId }],
