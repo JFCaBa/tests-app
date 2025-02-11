@@ -96,6 +96,15 @@ const BookingPage = () => {
     });
   };
 
+  const handleSelectEvent = (event) => {
+    // Handle event selection logic here
+    setSelectedSlot({
+      start: event.start,
+      end: event.end,
+      resource: event.resource,
+    });
+  };
+
   const handlePaypalPayment = async (data, actions) => {
     return actions.order.create({
       purchase_units: [
@@ -188,6 +197,7 @@ const BookingPage = () => {
                 selectable
                 selected={selectedDate}
                 onSelectSlot={handleSelectSlot}
+                onSelectEvent={handleSelectEvent}
                 eventPropGetter={eventStyleGetter}
                 {...calendarStyle}
                 views={["week", "day"]}
