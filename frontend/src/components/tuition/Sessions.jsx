@@ -12,9 +12,15 @@ import { Calendar, Clock, AlertCircle, Video } from "lucide-react";
 import axios from "axios";
 
 const SessionCard = ({ session, onJoin }) => {
+  if (!session) return null;
+
   const isUpcoming = new Date(session.startTime) > new Date();
   const startTime = format(new Date(session.startTime), "MMM d, yyyy h:mm a");
   const endTime = format(new Date(session.endTime), "h:mm a");
+  const { t } = useTranslation();
+
+  // Safely access tutor name with fallback
+  const tutorName = session.tutor?.name || t("tuition.unknownTutor");
 
   return (
     <Card className="mb-4">
@@ -22,7 +28,7 @@ const SessionCard = ({ session, onJoin }) => {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium mb-2">
-              Session with {session.tutor.name}
+              {t("tuition.sessionWith")} {tutorName}
             </h3>
             <div className="flex items-center text-gray-600 mb-2">
               <Calendar className="w-4 h-4 mr-2" />
@@ -32,11 +38,11 @@ const SessionCard = ({ session, onJoin }) => {
             </div>
             <div className="flex items-center text-gray-600">
               <Clock className="w-4 h-4 mr-2" />
-              <span>60 minutes</span>
+              <span>60 {t("tuition.minutes")}</span>
             </div>
           </div>
           <Badge variant={isUpcoming ? "default" : "secondary"}>
-            {isUpcoming ? "Upcoming" : "Completed"}
+            {isUpcoming ? t("tuition.upcoming") : t("tuition.completed")}
           </Badge>
         </div>
         {isUpcoming && session.meetingUrl && (
@@ -45,14 +51,13 @@ const SessionCard = ({ session, onJoin }) => {
             onClick={() => onJoin(session.meetingUrl)}
           >
             <Video className="w-4 h-4 mr-2" />
-            Join Session
+            {t("tuition.joinSession")}
           </Button>
         )}
       </CardContent>
     </Card>
   );
 };
-
 const Sessions = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +69,7 @@ const Sessions = () => {
     const fetchSessions = async () => {
       try {
         const response = await axios.get("/tutors/sessions");
+        console.log("Sessions: ", response.data);
         setSessions(response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to load sessions");
@@ -100,7 +106,7 @@ const Sessions = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t("tuition.mySessions")}</CardTitle>
-          <Button onClick={() => navigate("/tutors")}>
+          <Button onClick={() => navigate("/tuition")}>
             {t("tuition.bookNewSession")}
           </Button>
         </CardHeader>
@@ -112,19 +118,21 @@ const Sessions = () => {
             </Alert>
           ) : sessions.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No sessions found</p>
-              <Button onClick={() => navigate("/tutors")}>
-                Book Your First Session
+              <p className="text-gray-500 mb-4">
+                {t("tuition.noSessionsFound")}
+              </p>
+              <Button onClick={() => navigate("/tuition")}>
+                {t("tuition.bookYourFirstSession")}
               </Button>
             </div>
           ) : (
             <Tabs defaultValue="upcoming">
               <TabsList>
                 <TabsTrigger value="upcoming">
-                  Upcoming ({upcomingSessions.length})
+                  {t("tuition.upcomming")} ({upcomingSessions.length})
                 </TabsTrigger>
                 <TabsTrigger value="past">
-                  Past ({pastSessions.length})
+                  {t("tuition.past")} ({pastSessions.length})
                 </TabsTrigger>
               </TabsList>
 

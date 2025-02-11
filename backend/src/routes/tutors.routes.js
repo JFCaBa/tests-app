@@ -167,8 +167,8 @@ router.get(
     const sessions = await TutorSession.find({
       $or: [{ studentId: req.user.id }, { tutorId: req.user.id }],
     })
-      .populate("tutorId", "name email subjects hourlyRate")
-      .populate("studentId", "username email")
+      .populate("tutor", "name email subjects hourlyRate")
+      .populate("user", "username email")
       .sort({ startTime: -1 });
 
     res.json(sessions);

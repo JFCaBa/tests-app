@@ -13,7 +13,6 @@ import {
   LayoutDashboard,
   Menu,
   Bot,
-  Globe,
   GraduationCap,
 } from "lucide-react";
 import {
@@ -117,22 +116,22 @@ export const MainLayout = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
-                    Profile
+                    {t("menu.profile")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/tuition/sessions")}
                   >
-                    <User className="mr-2 h-4 w-4" />
-                    Sessions
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                    {t("menu.sessions")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/settings")}>
                     <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                    {t("menu.settings")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    {t("menu.logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -148,7 +147,9 @@ export const MainLayout = () => {
                   <SheetContent side="right">
                     <div className="py-4">
                       <div className="px-4 py-2">
-                        <h2 className="text-lg font-semibold">Menu</h2>
+                        <h2 className="text-lg font-semibold">
+                          {t("menu.menu")}
+                        </h2>
                       </div>
                       <div className="px-4 pb-4 border-b">
                         <LanguageSwitcher />

@@ -142,7 +142,8 @@ const BookingPage = () => {
         startTime: selectedSlot.start,
         endTime: selectedSlot.end,
         paymentMethod: "phone",
-        phoneNumber,
+        amount: "10.0",
+        status: "paid",
       });
 
       toast({
@@ -164,16 +165,19 @@ const BookingPage = () => {
   const handlePaymentApproval = async (data, actions) => {
     try {
       // Capture the payment after approval
-      const paymentDetails = await actions.order.capture();
+      // const paymentDetails = await actions.order.capture();
 
       // Send the payment details to the backend to confirm and complete the booking
       const response = await axios.post("/tutors/sessions", {
         tutorId,
         startTime: selectedSlot.start,
         endTime: selectedSlot.end,
+        subject: "exam",
         paymentMethod: "paypal",
-        paypalOrderId: data.orderID,
-        paymentDetails,
+        amount: "10.0",
+        status: "paid",
+        // paypalOrderId: data.orderID,
+        // paymentDetails,
       });
 
       toast({
@@ -181,7 +185,6 @@ const BookingPage = () => {
         description: "Your session has been booked successfully.",
       });
 
-      // Navigate to the sessions page or another page
       navigate("/tuition/sessions");
     } catch (error) {
       console.error("Error capturing PayPal payment:", error);
@@ -312,7 +315,8 @@ const BookingPage = () => {
                     ) : (
                       <PayPalButtons
                         style={{ layout: "vertical" }}
-                        createOrder={handlePaypalPayment}
+                        createOrder={handlePaymentApproval}
+                        // createOrder={handlePaypalPayment}
                         onApprove={handlePaymentApproval}
                       />
                     ))}
