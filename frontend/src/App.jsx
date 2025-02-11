@@ -30,6 +30,7 @@ import QuestionManager from "./components/admin/QuestionManager";
 import TestStatistics from "./components/admin/TestStatistics";
 import ErrorBoundary from "./components/ErrorBoundary";
 import FlashcardGame from "./components/flashcard/FlashcardGame";
+import Sessions from "./components/tuition/Sessions";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 // Protected Route Component
@@ -111,6 +112,10 @@ const App = () => {
                 element={withErrorBoundary(PracticeSession)}
               />
               <Route path="tuition" element={withErrorBoundary(TuitionPage)} />
+              <Route
+                path="tuition/sessions"
+                element={withErrorBoundary(Sessions)}
+              />
               <Route
                 path="tuition/book/:tutorId"
                 element={withErrorBoundary(BookingPage)}
