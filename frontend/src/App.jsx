@@ -14,6 +14,7 @@ import TuitionPage from "./components/tuition/TuitionPage";
 import BookingPage from "./components/tuition/BookingPage";
 import TutorManager from "./components/admin/TutorManager";
 import TutorForm from "./components/admin/TutorForm";
+import TutorDetails from "./components/admin/TutorDetails";
 const Progress = React.lazy(() => import("@/components/progress/Progress"));
 const Settings = React.lazy(() => import("@/components/settings/Settings"));
 const Statistics = React.lazy(() =>
@@ -131,6 +132,10 @@ const App = () => {
               <Route
                 path="/admin/tutors/:id/edit"
                 element={withErrorBoundary(TutorForm)}
+              />
+              <Route
+                path="/admin/tutors/:id"
+                element={withErrorBoundary(TutorDetails)}
               />
 
               {/* User Settings and Profile Routes */}

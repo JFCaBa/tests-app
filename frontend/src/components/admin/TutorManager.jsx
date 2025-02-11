@@ -140,6 +140,15 @@ const TutorManager = () => {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Button
+                            variant="gosht"
+                            size="sm"
+                            onClick={() =>
+                              navigate(`/admin/tutors/${tutor._id}`)
+                            }
+                          >
+                            <UserCheck className="h-4 w-4" />
+                          </Button>
+                          <Button
                             variant="ghost"
                             size="sm"
                             onClick={() =>

@@ -567,6 +567,29 @@ router.put(
   })
 );
 
+// @route   GET /api/admin/tutors/:id/sessions
+// @desc    Tutors sessions
+// @access  Admin
+router.get(
+  "/tutors/:id/sessions",
+  auth.required,
+  auth.admin,
+  async (req, res) => {
+    const now = new Date();
+    const upcoming = await Session.find({
+      tutorId: req.params.id,
+      startTime: { $gt: now },
+    }).sort({ startTime: 1 });
+
+    const past = await Session.find({
+      tutorId: req.params.id,
+      startTime: { $lt: now },
+    }).sort({ startTime: -1 });
+
+    res.json({ upcoming, past });
+  }
+);
+
 // @route   DELETE /api/admin/tutors/:id
 // @desc    Delete a tutor
 // @access  Admin
