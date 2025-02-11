@@ -25,6 +25,7 @@ const TutorSchema = new mongoose.Schema(
     },
     bio: String,
     location: String,
+    email: String,
     hourlyRate: {
       type: Number,
       required: true,

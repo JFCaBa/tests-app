@@ -419,6 +419,8 @@ router.post(
   asyncHandler(async (req, res) => {
     const {
       name,
+      location,
+      email,
       gender,
       bio,
       hourlyRate,
@@ -432,6 +434,8 @@ router.post(
     const tutor = new Tutor({
       userId: req.user._id,
       name,
+      location,
+      email,
       gender,
       bio,
       hourlyRate: Number(hourlyRate),
@@ -507,6 +511,8 @@ router.put(
   asyncHandler(async (req, res) => {
     const {
       name,
+      location,
+      email,
       gender,
       bio,
       hourlyRate,
@@ -525,6 +531,8 @@ router.put(
     }
 
     tutor.name = name;
+    tutor.location = location;
+    tutor.email = email;
     tutor.gender = gender;
     tutor.bio = bio;
     tutor.hourlyRate = Number(hourlyRate);

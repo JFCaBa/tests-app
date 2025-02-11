@@ -32,6 +32,7 @@ const TutorForm = () => {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
+    location: "",
     email: "",
     subjects: [],
     hourlyRate: "",
@@ -121,6 +122,18 @@ const TutorForm = () => {
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="name">Location</Label>
+                <Input
+                  id="name"
+                  value={formData.location}
+                  onChange={(e) =>
+                    setFormData({ ...formData, location: e.target.value })
                   }
                   required
                 />
