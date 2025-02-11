@@ -20,7 +20,7 @@ const SessionCard = ({ session, onJoin }) => {
   const { t } = useTranslation();
 
   // Safely access tutor name with fallback
-  const tutorName = session.tutor?.name || t("tuition.unknownTutor");
+  const tutorName = session.tutorId?.name || t("tuition.unknownTutor");
 
   return (
     <Card className="mb-4">
