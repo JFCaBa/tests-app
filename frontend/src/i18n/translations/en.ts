@@ -295,5 +295,7 @@ export default {
     selectPaymentMethod: "Select payment method",
     phonePayment: "Phone Payment",
     bookingSuccessfull: "Booking Successful",
+    phoneNumber: "Phone Number",
+    continueWithPhonePayment: "Continue with Phone Payment",
   },
 };

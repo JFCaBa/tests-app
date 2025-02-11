@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import PhoneInput from "react-phone-number-input";
 import axios from "axios";
 
@@ -34,6 +34,7 @@ const BookingPage = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [events, setEvents] = useState([]);
   const { t } = useTranslation();
+  const [{ isPending }] = usePayPalScriptReducer();
 
   useEffect(() => {
     const fetchTutorDetails = async () => {
@@ -41,10 +42,7 @@ const BookingPage = () => {
         const response = await axios.get(`/tutors/${tutorId}`);
         setTutor(response.data);
 
-        const slotsResponse = await axios.get(
-          `/tutors/${tutorId}/availability`
-        );
-        const slots = slotsResponse.data;
+        const slots = response.data.availability;
         setAvailableSlots(slots);
 
         const calendarEvents = slots.map((slot) => ({
@@ -79,7 +77,7 @@ const BookingPage = () => {
       moment(event.start).isSame(moment(start), "hour")
     );
 
-    if (!selectedEvent) {
+    if (selectedEvent) {
       toast({
         variant: "destructive",
         title: "Unavailable Slot",
@@ -92,7 +90,6 @@ const BookingPage = () => {
     setSelectedSlot({
       start,
       end: endTime,
-      resource: selectedEvent.resource,
     });
   };
 
@@ -101,21 +98,32 @@ const BookingPage = () => {
     setSelectedSlot({
       start: event.start,
       end: event.end,
-      resource: event.resource,
     });
   };
 
   const handlePaypalPayment = async (data, actions) => {
-    return actions.order.create({
-      purchase_units: [
-        {
-          amount: {
-            currency_code: "USD",
-            value: tutor.hourlyRate,
+    try {
+      // Create the order on PayPal
+      const order = await actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "USD",
+              value: "10",
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
+
+      return order;
+    } catch (error) {
+      console.error("Error creating PayPal order:", error);
+      toast({
+        variant: "destructive",
+        title: "Payment Error",
+        description: "There was an error processing your payment.",
+      });
+    }
   };
 
   const handlePhonePayment = async () => {
@@ -149,6 +157,38 @@ const BookingPage = () => {
         title: "Booking Failed",
         description:
           error.response?.data?.message || "Failed to create booking",
+      });
+    }
+  };
+
+  const handlePaymentApproval = async (data, actions) => {
+    try {
+      // Capture the payment after approval
+      const paymentDetails = await actions.order.capture();
+
+      // Send the payment details to the backend to confirm and complete the booking
+      const response = await axios.post("/tutors/sessions", {
+        tutorId,
+        startTime: selectedSlot.start,
+        endTime: selectedSlot.end,
+        paymentMethod: "paypal",
+        paypalOrderId: data.orderID,
+        paymentDetails,
+      });
+
+      toast({
+        title: "Booking Successful",
+        description: "Your session has been booked successfully.",
+      });
+
+      // Navigate to the sessions page or another page
+      navigate("/tuition/sessions");
+    } catch (error) {
+      console.error("Error capturing PayPal payment:", error);
+      toast({
+        variant: "destructive",
+        title: "Payment Failed",
+        description: "There was an error confirming your payment.",
       });
     }
   };
@@ -203,7 +243,7 @@ const BookingPage = () => {
                 views={["week", "day"]}
                 defaultView="week"
                 min={moment().startOf("day").add(9, "hours").toDate()}
-                max={moment().startOf("day").add(19, "hours").toDate()}
+                max={moment().startOf("day").add(18, "hours").toDate()}
                 step={60}
                 timeslots={1}
                 defaultDate={new Date()}
@@ -213,7 +253,7 @@ const BookingPage = () => {
 
             <div>
               {selectedSlot && (
-                <div className="space-y-6">
+                <div className="space-y-8">
                   <div>
                     <h3 className="text-lg font-medium mb-2">
                       {t("tuition.selectTime")}
@@ -238,16 +278,13 @@ const BookingPage = () => {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {tutor.phonePayments && (
-                          <SelectItem value="phone">
-                            {t("tuition.phonePayment")}
-                          </SelectItem>
-                        )}
-                        {tutor.paypalPayments && (
-                          <SelectItem value="paypal">
-                            {t("tuition.paypal")}
-                          </SelectItem>
-                        )}
+                        <SelectItem value="phone">
+                          {t("tuition.phonePayment")}
+                        </SelectItem>
+
+                        <SelectItem value="paypal">
+                          {t("tuition.paypal")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -255,42 +292,30 @@ const BookingPage = () => {
                   {paymentMethod === "phone" && (
                     <div>
                       <label className="block text-sm font-medium mb-2">
-                        Phone Number
+                        {t("tuition.phoneNumber")}
                       </label>
                       <PhoneInput
                         international
                         value={phoneNumber}
                         onChange={setPhoneNumber}
-                        className="mb-4"
+                        className="w-full sm:w-1/2"
                       />
                       <Button onClick={handlePhonePayment} className="w-full">
-                        Continue with Phone Payment
+                        {t("tuition.continueWithPhonePayment")}
                       </Button>
                     </div>
                   )}
 
-                  {paymentMethod === "paypal" && (
-                    <PayPalButtons
-                      createOrder={handlePaypalPayment}
-                      onApprove={async (data, actions) => {
-                        await actions.order.capture();
-                        const response = await axios.post("/tutors/sessions", {
-                          tutorId,
-                          startTime: selectedSlot.start,
-                          endTime: selectedSlot.end,
-                          paymentMethod: "paypal",
-                          paypalOrderId: data.orderID,
-                        });
-
-                        toast({
-                          title: "Booking Successful",
-                          description: "Your session has been booked",
-                        });
-
-                        navigate("/tuition/sessions");
-                      }}
-                    />
-                  )}
+                  {paymentMethod === "paypal" &&
+                    (isPending ? (
+                      <div className="spinner" />
+                    ) : (
+                      <PayPalButtons
+                        style={{ layout: "vertical" }}
+                        createOrder={handlePaypalPayment}
+                        onApprove={handlePaymentApproval}
+                      />
+                    ))}
                 </div>
               )}
             </div>

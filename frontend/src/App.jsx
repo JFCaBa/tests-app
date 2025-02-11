@@ -30,6 +30,7 @@ import QuestionManager from "./components/admin/QuestionManager";
 import TestStatistics from "./components/admin/TestStatistics";
 import ErrorBoundary from "./components/ErrorBoundary";
 import FlashcardGame from "./components/flashcard/FlashcardGame";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -46,244 +47,155 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Error Boundary Wrapper
+const withErrorBoundary = (Component) => (
+  <ErrorBoundary>
+    <Component />
+  </ErrorBoundary>
+);
+
 const App = () => {
   const { isAuthenticated } = useAuth();
 
   return (
     <SettingsProvider>
-      <BrowserRouter
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      <PayPalScriptProvider
+        options={{
+          clientId: "sb",
+          currency: "USD",
+          intent: "capture",
+        }}
       >
-        <Routes>
-          {/* Public Routes */}
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/subjects" />
-              ) : (
-                <ErrorBoundary>
-                  <LandingPage />
-                </ErrorBoundary>
-              )
-            }
-          />
-          <Route
-            path="/demo"
-            element={
-              <ErrorBoundary>
-                <DemoTest />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <ErrorBoundary>
-                <LoginForm />
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <ErrorBoundary>
-                <RegisterForm />
-              </ErrorBoundary>
-            }
-          />
+        <BrowserRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
+          <Routes>
+            {/* Public Routes */}
+            <Route
+              path="/"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/subjects" />
+                ) : (
+                  withErrorBoundary(LandingPage)
+                )
+              }
+            />
+            <Route path="/demo" element={withErrorBoundary(DemoTest)} />
+            <Route path="/login" element={withErrorBoundary(LoginForm)} />
+            <Route path="/register" element={withErrorBoundary(RegisterForm)} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }
-          >
+            {/* Protected Routes */}
             <Route
-              path="subjects"
+              path="/"
               element={
-                <ErrorBoundary>
-                  <SubjectSelection />
-                </ErrorBoundary>
+                <ProtectedRoute>
+                  <MainLayout />
+                </ProtectedRoute>
               }
-            />
-            <Route
-              path="practice/summary"
-              element={
-                <ErrorBoundary>
-                  <TestSummary />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="practice/:subject"
-              element={
-                <ErrorBoundary>
-                  <PracticeMode />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="practice/:subject/:mode"
-              element={
-                <ErrorBoundary>
-                  <PracticeSession />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="tuition"
-              element={
-                <ErrorBoundary>
-                  <TuitionPage />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="tuition/book/:tutorId"
-              element={
-                <ErrorBoundary>
-                  <BookingPage />
-                </ErrorBoundary>
-              }
-            />
+            >
+              <Route
+                path="subjects"
+                element={withErrorBoundary(SubjectSelection)}
+              />
+              <Route
+                path="practice/summary"
+                element={withErrorBoundary(TestSummary)}
+              />
+              <Route
+                path="practice/:subject"
+                element={withErrorBoundary(PracticeMode)}
+              />
+              <Route
+                path="practice/:subject/:mode"
+                element={withErrorBoundary(PracticeSession)}
+              />
+              <Route path="tuition" element={withErrorBoundary(TuitionPage)} />
+              <Route
+                path="tuition/book/:tutorId"
+                element={withErrorBoundary(BookingPage)}
+              />
+              <Route
+                path="admin/tutors"
+                element={withErrorBoundary(TutorManager)}
+              />
+              <Route
+                path="/admin/tutors/new"
+                element={withErrorBoundary(TutorForm)}
+              />
+              <Route
+                path="/admin/tutors/:id/edit"
+                element={withErrorBoundary(TutorForm)}
+              />
 
-            <Route
-              path="admin/tutors"
-              element={
-                <ErrorBoundary>
-                  <TutorManager />
-                </ErrorBoundary>
-              }
-            />
-
-            <Route
-              path="/admin/tutors/new"
-              element={
-                <ErrorBoundary>
-                  <TutorForm />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="/admin/tutors/:id/edit"
-              element={
-                <ErrorBoundary>
-                  <TutorForm />
-                </ErrorBoundary>
-              }
-            />
-
-            {/* User Settings and Profile Routes */}
-            <Route
-              path="profile"
-              element={
-                <ErrorBoundary>
-                  <Profile />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="settings"
-              element={
-                <ErrorBoundary>
+              {/* User Settings and Profile Routes */}
+              <Route path="profile" element={withErrorBoundary(Profile)} />
+              <Route
+                path="settings"
+                element={
                   <React.Suspense fallback={<div>Loading...</div>}>
-                    <Settings />
+                    {withErrorBoundary(Settings)}
                   </React.Suspense>
-                </ErrorBoundary>
-              }
-            />
-            {/* Progress and Statistic Routes */}
-            <Route
-              path="progress"
-              element={
-                <ErrorBoundary>
+                }
+              />
+              {/* Progress and Statistic Routes */}
+              <Route
+                path="progress"
+                element={
                   <React.Suspense fallback={<div>Loading...</div>}>
-                    <Progress />
+                    {withErrorBoundary(Progress)}
                   </React.Suspense>
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="statistics"
-              element={
-                <ErrorBoundary>
+                }
+              />
+              <Route
+                path="statistics"
+                element={
                   <React.Suspense fallback={<div>Loading...</div>}>
-                    <Statistics />
+                    {withErrorBoundary(Statistics)}
                   </React.Suspense>
-                </ErrorBoundary>
-              }
-            />
-            {/* Subscription and Coach Routes */}
-            <Route
-              path="subscription"
-              element={
-                <ErrorBoundary>
-                  <SubscriptionNotice />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="coach"
-              element={
-                <ErrorBoundary>
-                  <SubscriptionRoute>
-                    <CoachChat />
-                  </SubscriptionRoute>
-                </ErrorBoundary>
-              }
-            />
-            {/* Flashcard Routes */}
-            <Route
-              path="flashcards"
-              element={
-                <ErrorBoundary>
-                  <FlashcardGame />
-                </ErrorBoundary>
-              }
-            />
-            {/* Admin Routes */}
-            <Route
-              path="admin"
-              element={
-                <ErrorBoundary>
-                  <AdminDashboard />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="admin/users"
-              element={
-                <ErrorBoundary>
-                  <UserManager />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="admin/questions"
-              element={
-                <ErrorBoundary>
-                  <QuestionManager />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="admin/tests"
-              element={
-                <ErrorBoundary>
-                  <TestStatistics />
-                </ErrorBoundary>
-              }
-            />
-          </Route>
+                }
+              />
+              {/* Subscription and Coach Routes */}
+              <Route
+                path="subscription"
+                element={withErrorBoundary(SubscriptionNotice)}
+              />
+              <Route
+                path="coach"
+                element={
+                  <ErrorBoundary>
+                    <SubscriptionRoute>
+                      <CoachChat />
+                    </SubscriptionRoute>
+                  </ErrorBoundary>
+                }
+              />
+              {/* Flashcard Routes */}
+              <Route
+                path="flashcards"
+                element={withErrorBoundary(FlashcardGame)}
+              />
+              {/* Admin Routes */}
+              <Route path="admin" element={withErrorBoundary(AdminDashboard)} />
+              <Route
+                path="admin/users"
+                element={withErrorBoundary(UserManager)}
+              />
+              <Route
+                path="admin/questions"
+                element={withErrorBoundary(QuestionManager)}
+              />
+              <Route
+                path="admin/tests"
+                element={withErrorBoundary(TestStatistics)}
+              />
+            </Route>
 
-          {/* Catch all */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Catch all */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </BrowserRouter>
+      </PayPalScriptProvider>
     </SettingsProvider>
   );
 };
