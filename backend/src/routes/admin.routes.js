@@ -121,10 +121,10 @@ router.get(
       ]);
 
       const [upcomingSessions, pastSessions] = await Promise.all([
-        Session.countDocuments({
+        TutorSession.countDocuments({
           startTime: { $gt: new Date() },
         }),
-        Session.countDocuments({
+        TutorSession.countDocuments({
           startTime: { $lte: new Date() },
         }),
       ]);
