@@ -308,5 +308,6 @@ export default {
     upcoming: "Upcoming",
     unknownTutor: "Unknown tutor",
     past: "Past",
+    noSessionsFound: "No Sessions Found",
   },
 };

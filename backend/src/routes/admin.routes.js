@@ -1,6 +1,12 @@
 import fs from "fs/promises";
 import express from "express";
-import { User, Question, ChatMessage, Tutor } from "../models/index.js";
+import {
+  User,
+  Question,
+  ChatMessage,
+  Tutor,
+  TutorSession,
+} from "../models/index.js";
 import { auth, validation, errors, upload } from "../middleware/index.js";
 
 const { asyncHandler } = errors;
@@ -67,7 +73,7 @@ router.put(
   })
 );
 
-// MARK: - /questions GET
+// MARK: - /stats GET
 // @route   GET /api/admin/stats
 // @desc    Get system statistics
 // @access  Admin
@@ -112,6 +118,15 @@ router.get(
           },
           { $sort: { _id: 1 } },
         ]),
+      ]);
+
+      const [upcomingSessions, pastSessions] = await Promise.all([
+        Session.countDocuments({
+          startTime: { $gt: new Date() },
+        }),
+        Session.countDocuments({
+          startTime: { $lte: new Date() },
+        }),
       ]);
 
       // Calculate test statistics
@@ -166,6 +181,10 @@ router.get(
         tests: {
           totalTests: testStatistics.totalTests,
           averageScore: testStatistics.averageScore || 0,
+        },
+        sessions: {
+          upcoming: upcomingSessions,
+          past: pastSessions,
         },
         lastUpdated: new Date(),
       };

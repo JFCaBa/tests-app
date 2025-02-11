@@ -7,6 +7,7 @@ import {
   Settings,
   Book,
   GraduationCap,
+  Calendar,
 } from "lucide-react";
 import {
   Card,
@@ -29,6 +30,7 @@ export const AdminDashboard = () => {
     questions: { total: 0, active: 0, bySubject: [] },
     tests: { totalTests: 0, averageScore: 0 },
     tutors: { total: 0, active: 0 },
+    sessions: { upcoming: 0, past: 0 },
   });
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
@@ -118,6 +120,12 @@ export const AdminDashboard = () => {
       value: `${stats.tests.averageScore.toFixed(1)}%`,
       icon: Settings,
       color: "bg-orange-100 text-orange-700",
+    },
+    {
+      title: "Tutoring Sessions",
+      value: `${stats.sessions.upcoming} upcoming / ${stats.sessions.past} past`,
+      icon: Calendar, // Add import for Calendar from lucide-react
+      color: "bg-yellow-100 text-yellow-700",
     },
   ];
 
