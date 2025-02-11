@@ -17,10 +17,10 @@ const SubscriptionRoute = ({ children }) => {
     return <Navigate to="/login" />;
   }
 
-  // For now, only allow admins
-  if (!isAdmin) {
-    return <Navigate to="/subscription" />;
-  }
+  // For now, open to everyone
+  // if (!isAdmin) {
+  //   return <Navigate to="/subscription" />;
+  // }
 
   return children;
 };
