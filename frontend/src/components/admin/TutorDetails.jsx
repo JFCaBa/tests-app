@@ -193,18 +193,29 @@ const TutorDetails = () => {
                     <div key={session._id} className="p-4 border rounded-lg">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <p className="font-medium">{session.student.name}</p>
                           <p className="text-sm text-gray-500">
                             {formatDate(session.startTime)}
                           </p>
                         </div>
-                        <Badge variant="secondary">{session.duration}h</Badge>
+                        <Badge>
+                          {(
+                            (new Date(session.endTime) -
+                              new Date(session.startTime)) /
+                            (1000 * 60 * 60)
+                          ).toFixed(2)}{" "}
+                          h
+                        </Badge>
                       </div>
                       <div className="text-sm text-gray-600">
                         <p>Subject: {session.subject}</p>
                         <p>
                           Fee:{" "}
-                          {formatCurrency(session.duration * tutor.hourlyRate)}
+                          {formatCurrency(
+                            ((new Date(session.endTime) -
+                              new Date(session.startTime)) /
+                              (1000 * 60 * 60)) *
+                              tutor.hourlyRate
+                          )}
                         </p>
                       </div>
                     </div>
