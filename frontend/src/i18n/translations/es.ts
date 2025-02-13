@@ -118,6 +118,7 @@ export default {
     aiCoach: "Entrenador AI",
     admin: "Administrador",
     demo: "Test Demo",
+    tuition: "Tutoría",
   },
   menu: {
     menu: "Menú",
@@ -139,15 +140,6 @@ export default {
     createAccount: "Crear Cuenta",
     alreadyHaveAccount: "¿Ya tienes cuenta?",
     dontHaveAccount: "¿No tienes cuenta?",
-  },
-  subjects: {
-    listening: "Escucha",
-    grammar: "Gramática",
-    history: "Historia",
-    laws: "Leyes",
-    reading: "Lectura",
-    writing: "Escritura",
-    all: "Todas las Asignaturas",
   },
   difficulty: {
     easy: "Fácil",
@@ -312,5 +304,208 @@ export default {
     bookYourFirstSession: "Reserva tu primera sesión",
     upcomming: "Próximas",
     past: "Pasadas",
+    noSessionsFound: "No Hay Sessiones",
+  },
+  audio: {
+    errors: {
+      playback: "No se pudo reproducir el audio. Intenta nuevamente.",
+      loading: "No se pudo cargar el archivo de audio",
+    },
+    buttons: {
+      play: "Reproducir",
+      pause: "Pausa",
+      replay: "Reproducir de nuevo",
+      mute: "Silenciar",
+      unmute: "Activar sonido",
+    },
+  },
+  practice: {
+    settings: {
+      title: "Configuraciones de práctica",
+      difficulty: {
+        label: "Nivel de dificultad",
+        placeholder: "Selecciona dificultad",
+        work: "Permiso de trabajo",
+        temp: "Residencia temporal",
+        perm: "Residencia permanente",
+      },
+      questions: {
+        label: "Número de preguntas",
+        placeholder: "Selecciona la cantidad de preguntas",
+        count: "{{count}} preguntas",
+      },
+    },
+    modes: {
+      title: "Elige modo de práctica",
+      timed: {
+        name: "Práctica cronometrada",
+        description: "Practica con un límite de tiempo para cada pregunta",
+      },
+      targeted: {
+        name: "Práctica dirigida",
+        description: "Enfócate en temas o tipos de preguntas específicos",
+      },
+      continuous: {
+        name: "Práctica continua",
+        description: "Practica sin límites de tiempo ni restricciones",
+      },
+      review: {
+        name: "Revisar preguntas anteriores",
+        description: "Revisa preguntas de sesiones pasadas",
+      },
+      start: "Iniciar {{mode}}",
+    },
+    back: "Volver a los temas",
+  },
+  practiceSession: {
+    title: "Práctica de {subject}",
+    stats: {
+      progress: "{correct} correctas de {total} preguntas",
+      timer: {
+        timeLeft: "{time}s",
+        total: "Total: {time}s",
+      },
+    },
+    loading: "Cargando...",
+    errors: {
+      loadQuestion: "No se pudo cargar la pregunta",
+      checkAnswer: "No se pudo verificar la respuesta",
+      submitResults: "No se pudieron enviar los resultados del test",
+      answerRetrieval: "Error al obtener la respuesta correcta",
+      notAvailable: "No disponible",
+      sampleResponse: "Respuesta de ejemplo no disponible",
+    },
+    feedback: {
+      correct: "¡Correcto!",
+      incorrect: "Incorrecto. La respuesta correcta era: {answer}",
+      timeUp: "¡Se acabó el tiempo! La respuesta correcta era: {answer}",
+      explanation: "Explicación",
+    },
+    writing: {
+      placeholder: "Escribe tu respuesta aquí...",
+      toggleExample: {
+        show: "Mostrar ejemplo",
+        hide: "Ocultar ejemplo",
+      },
+      sampleResponse: "Respuesta de ejemplo:",
+    },
+    buttons: {
+      next: "Siguiente pregunta",
+      viewResults: "Ver resultados",
+    },
+  },
+  subjects: {
+    title: "Elige un tema",
+    descriptions: {
+      listening: "Practica tus habilidades de comprensión auditiva",
+      grammar: "Domina la estructura y reglas del idioma",
+      history: "Aprende sobre eventos históricos y su importancia",
+      laws: "Comprende los principios y regulaciones legales",
+      reading: "Mejora tu comprensión lectora",
+      writing: "Mejora tus habilidades de escritura",
+    },
+    listening: "Escucha",
+    grammar: "Gramática",
+    history: "Historia",
+    laws: "Leyes",
+    reading: "Lectura",
+    writing: "Escritura",
+    all: "Todos los temas",
+  },
+  testSummary: {
+    title: "Resultados del test",
+    mode: "{subject} - Modo {mode}",
+    stats: {
+      accuracy: {
+        title: "Precisión",
+        result: "{correct} de {total} correctas",
+      },
+      performance: {
+        title: "Desempeño",
+        messages: {
+          excellent: "¡Excelente trabajo!",
+          good: "¡Buen trabajo!",
+          keep: "¡Sigue practicando!",
+          more: "¡Más práctica te ayudará!",
+        },
+        streak: "¡Racha de {streak} preguntas!",
+      },
+      timeSpent: {
+        title: "Tiempo invertido",
+        minutes: "{minutes} min",
+        perQuestion: "{seconds} seg por pregunta",
+      },
+    },
+    backToSubjects: "Volver a los temas",
+  },
+  timeline: {
+    title: "Cronograma de aprendizaje",
+    stats: {
+      activities: "{count} actividades",
+    },
+    timeFormat: {
+      hoursAgo: "Hace {hours} horas",
+    },
+    achievements: {
+      dedicatedLearner: {
+        title: "Estudiante dedicado",
+        description: "Completó 10 tests",
+      },
+      excellence: {
+        title: "Excelencia alcanzada",
+        description: "Obtuvo un puntaje de 90% o más en un test",
+      },
+    },
+    test: {
+      completed: "Test completado de {subject}",
+      score: "Puntaje: {score}% - {correct}/{total} correctas",
+    },
+    empty: {
+      title: "Aún no hay actividad de aprendizaje.",
+      subtitle: "¡Comienza a practicar para ver tu progreso!",
+    },
+  },
+  progress: {
+    loading: "Cargando...",
+    cards: {
+      currentLevel: {
+        title: "Nivel actual",
+        based: "Basado en tu desempeño",
+        levels: {
+          beginner: "Principiante",
+          intermediate: "Intermedio",
+          advanced: "Avanzado",
+        },
+      },
+      testsCompleted: {
+        title: "Tests completados",
+        subtitle: "Total de tests realizados",
+      },
+      averageScore: {
+        title: "Puntaje promedio",
+        subtitle: "A través de todos los temas",
+      },
+      bestSubject: {
+        title: "Mejor tema",
+        subtitle: "Mejor desempeño",
+        na: "N/A",
+      },
+    },
+    charts: {
+      mastery: {
+        title: "Dominio de los temas",
+        subtitle: "Desempeño a través de diferentes temas",
+      },
+    },
+    subjects: {
+      title: "Progreso detallado por tema",
+      subtitle: "Tu progreso desglosado por tema",
+      details: {
+        averageScore: "Puntaje promedio",
+        testsTaken: "Tests realizados",
+        bestScore: "Mejor puntaje",
+      },
+      practice: "Práctica",
+    },
   },
 };

@@ -45,7 +45,7 @@ export const MainLayout = () => {
     { href: "/statistics", icon: BarChart, label: t("nav.statistics") },
     { href: "/flashcards", icon: Clock, label: t("nav.flashcards") },
     { href: "/coach", icon: Bot, label: t("nav.aiCoach") },
-    { href: "/tuition", icon: GraduationCap, label: "Tuition" },
+    { href: "/tuition", icon: GraduationCap, label: t("nav.tuition") },
     ...(isAdmin
       ? [{ href: "/admin", icon: LayoutDashboard, label: t("nav.admin") }]
       : []),

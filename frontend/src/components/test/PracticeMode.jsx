@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Timer, Target, Infinity, Book } from "lucide-react";
 import { useSettings } from "../../contexts/SettingsContext";
 import { Button } from "@/components/ui/button";
@@ -21,35 +22,36 @@ import {
 const practiceTypes = [
   {
     id: "timed",
-    name: "Timed Practice",
-    description: "Practice with a time limit for each question",
+    name: "modes.timed.name",
+    description: "modes.timed.description",
     icon: Timer,
     color: "bg-orange-100 text-orange-700",
   },
   {
     id: "targeted",
-    name: "Targeted Practice",
-    description: "Focus on specific topics or question types",
+    name: "modes.targeted.name",
+    description: "modes.targeted.description",
     icon: Target,
     color: "bg-green-100 text-green-700",
   },
   {
     id: "continuous",
-    name: "Continuous Practice",
-    description: "Practice without time limits or restrictions",
+    name: "modes.continuous.name",
+    description: "modes.continuous.description",
     icon: Infinity,
     color: "bg-blue-100 text-blue-700",
   },
   {
     id: "review",
-    name: "Review Previous",
-    description: "Review questions from past sessions",
+    name: "modes.review.name",
+    description: "modes.review.description",
     icon: Book,
     color: "bg-purple-100 text-purple-700",
   },
 ];
 
 export const PracticeMode = () => {
+  const { t } = useTranslation();
   const { subject } = useParams();
   const navigate = useNavigate();
   const { settings } = useSettings();
@@ -71,46 +73,57 @@ export const PracticeMode = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Practice Settings</h2>
+        <h2 className="text-3xl font-bold mb-4">
+          {t("practice.settings.title")}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Difficulty Level
+              {t("practice.settings.difficulty.label")}
             </label>
             <Select value={difficulty} onValueChange={setDifficulty}>
               <SelectTrigger>
-                <SelectValue placeholder="Select difficulty" />
+                <SelectValue
+                  placeholder={t("practice.settings.difficulty.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="easy">Разрешение на работу</SelectItem>
-                <SelectItem value="medium">
-                  Разрешение на временное проживание
+                <SelectItem value="easy">
+                  {t("practice.settings.difficulty.work")}
                 </SelectItem>
-                <SelectItem value="hard">Вид на жительство</SelectItem>
+                <SelectItem value="medium">
+                  {t("practice.settings.difficulty.temp")}
+                </SelectItem>
+                <SelectItem value="hard">
+                  {t("practice.settings.difficulty.perm")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Number of Questions
+              {t("practice.settings.questions.label")}
             </label>
             <Select value={questionCount} onValueChange={setQuestionCount}>
               <SelectTrigger>
-                <SelectValue placeholder="Select question count" />
+                <SelectValue
+                  placeholder={t("practice.settings.questions.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5">5 Questions</SelectItem>
-                <SelectItem value="10">10 Questions</SelectItem>
-                <SelectItem value="15">15 Questions</SelectItem>
-                <SelectItem value="20">20 Questions</SelectItem>
+                {[5, 10, 15, 20].map((count) => (
+                  <SelectItem key={count} value={count.toString()}>
+                    {t("practice.settings.questions.count", { count })}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
       </div>
 
-      <h3 className="text-2xl font-bold mb-6">Choose Practice Mode</h3>
+      <h3 className="text-2xl font-bold mb-6">{t("practice.modes.title")}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {practiceTypes.map((type) => {
           const Icon = type.icon;
@@ -126,11 +139,17 @@ export const PracticeMode = () => {
                 >
                   <Icon className="w-6 h-6" />
                 </div>
-                <CardTitle>{type.name}</CardTitle>
-                <CardDescription>{type.description}</CardDescription>
+                <CardTitle>{t(`practice.${type.name}`)}</CardTitle>
+                <CardDescription>
+                  {t(`practice.${type.description}`)}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">Start {type.name}</Button>
+                <Button className="w-full">
+                  {t("practice.modes.start", {
+                    mode: t(`practice.${type.name}`),
+                  })}
+                </Button>
               </CardContent>
             </Card>
           );
@@ -139,7 +158,7 @@ export const PracticeMode = () => {
 
       <div className="mt-8">
         <Button variant="outline" onClick={() => navigate("/subjects")}>
-          Back to Subjects
+          {t("practice.back")}
         </Button>
       </div>
     </div>

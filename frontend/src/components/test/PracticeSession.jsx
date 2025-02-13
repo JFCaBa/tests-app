@@ -158,63 +158,6 @@ export const PracticeSession = () => {
     }
   };
 
-  const handleTimeUp = () => {
-    if (feedback || currentQuestion.type === QuestionTypes.WRITING) return;
-
-    setTimerActive(false);
-    const timeSpentOnQuestion = calculateTimeSpent();
-    setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
-
-    const answer = {
-      questionId: currentQuestion._id,
-      answer: null,
-      timeSpent: timeSpentOnQuestion,
-      correct: false,
-    };
-
-    setStats((prev) => {
-      const newTotal = prev.total + 1;
-      const newStats = {
-        ...prev,
-        total: newTotal,
-        streak: 0,
-        answers: [...prev.answers, answer],
-      };
-
-      setProgress((newTotal * 100) / questionCount);
-
-      if (newTotal >= questionCount) {
-        setTimeout(() => {
-          const sessionTimeSpent = Math.floor(
-            (Date.now() - sessionStartTime) / 1000
-          );
-          navigate("/practice/summary", {
-            state: {
-              stats: {
-                ...newStats,
-                timeSpent: sessionTimeSpent,
-                questionTimers,
-                totalTimeSpent: totalTimeSpent + timeSpentOnQuestion,
-              },
-              subject,
-              mode,
-              difficulty,
-            },
-          });
-        }, 0);
-      }
-
-      return newStats;
-    });
-
-    if (stats.total < questionCount) {
-      setFeedback({
-        correct: false,
-        message: "Time's up! The correct answer was: " + getCorrectAnswerText(),
-      });
-    }
-  };
-
   const handleAnswer = async (answer) => {
     if (feedback || currentQuestion.type === QuestionTypes.WRITING) return;
 
@@ -470,26 +413,96 @@ export const PracticeSession = () => {
     );
   }
 
+  const handleTimeUp = () => {
+    if (feedback || currentQuestion.type === QuestionTypes.WRITING) return;
+
+    setTimerActive(false);
+    const timeSpentOnQuestion = calculateTimeSpent();
+    setTotalTimeSpent((prev) => prev + timeSpentOnQuestion);
+
+    const answer = {
+      questionId: currentQuestion._id,
+      answer: null,
+      timeSpent: timeSpentOnQuestion,
+      correct: false,
+    };
+
+    setStats((prev) => {
+      const newTotal = prev.total + 1;
+      const newStats = {
+        ...prev,
+        total: newTotal,
+        streak: 0,
+        answers: [...prev.answers, answer],
+      };
+
+      setProgress((newTotal * 100) / questionCount);
+
+      if (newTotal >= questionCount) {
+        setTimeout(() => {
+          const sessionTimeSpent = Math.floor(
+            (Date.now() - sessionStartTime) / 1000
+          );
+          navigate("/practice/summary", {
+            state: {
+              stats: {
+                ...newStats,
+                timeSpent: sessionTimeSpent,
+                questionTimers,
+                totalTimeSpent: totalTimeSpent + timeSpentOnQuestion,
+              },
+              subject,
+              mode,
+              difficulty,
+            },
+          });
+        }, 0);
+      }
+
+      return newStats;
+    });
+
+    if (stats.total < questionCount) {
+      setFeedback({
+        correct: false,
+        message: t("practiceSession.feedback.timeUp", {
+          answer: getCorrectAnswerText(),
+        }),
+      });
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-2xl font-bold">
-              {subject.charAt(0).toUpperCase() + subject.slice(1)} Practice
+              {t("practiceSession.title", {
+                subject: subject.charAt(0).toUpperCase() + subject.slice(1),
+              })}
             </h2>
             <p className="text-gray-600">
-              {stats.correct} correct out of {stats.total} questions
+              {t("practiceSession.stats.progress", {
+                correct: stats.correct,
+                total: stats.total,
+              })}
             </p>
           </div>
           {mode === "timed" && timeLeft !== null && (
             <div className="flex items-center gap-4">
               <div className="flex items-center">
                 <Clock className="mr-2 h-5 w-5 text-gray-500" />
-                <span className="text-xl font-semibold">{timeLeft}s</span>
+                <span className="text-xl font-semibold">
+                  {t("practiceSession.stats.timer.timeLeft", {
+                    time: timeLeft,
+                  })}
+                </span>
               </div>
               <div className="text-sm text-gray-500">
-                Total: {Math.floor(totalTimeSpent)}s
+                {t("practiceSession.stats.timer.total", {
+                  time: Math.floor(totalTimeSpent),
+                })}
               </div>
             </div>
           )}

@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Award, Clock, Target, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/card";
 
 export const TestSummary = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { stats, subject, mode, difficulty } = location.state || {};
@@ -22,20 +24,27 @@ export const TestSummary = () => {
   }
 
   const percentage = Math.round((stats.correct / stats.total) * 100);
+
   const getPerformanceMessage = () => {
-    if (percentage >= 90) return "Excellent work!";
-    if (percentage >= 70) return "Good job!";
-    if (percentage >= 50) return "Keep practicing!";
-    return "More practice will help!";
+    if (percentage >= 90)
+      return t("testSummary.stats.performance.messages.excellent");
+    if (percentage >= 70)
+      return t("testSummary.stats.performance.messages.good");
+    if (percentage >= 50)
+      return t("testSummary.stats.performance.messages.keep");
+    return t("testSummary.stats.performance.messages.more");
   };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-2xl">Test Results</CardTitle>
+          <CardTitle className="text-2xl">{t("testSummary.title")}</CardTitle>
           <CardDescription>
-            {subject.charAt(0).toUpperCase() + subject.slice(1)} - {mode} Mode
+            {t("testSummary.mode", {
+              subject: subject.charAt(0).toUpperCase() + subject.slice(1),
+              mode,
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -44,13 +53,18 @@ export const TestSummary = () => {
               <CardHeader className="pb-2">
                 <div className="flex items-center space-x-2">
                   <Target className="h-4 w-4 text-blue-500" />
-                  <CardTitle className="text-sm">Accuracy</CardTitle>
+                  <CardTitle className="text-sm">
+                    {t("testSummary.stats.accuracy.title")}
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{percentage}%</div>
                 <p className="text-sm text-gray-500">
-                  {stats.correct} out of {stats.total} correct
+                  {t("testSummary.stats.accuracy.result", {
+                    correct: stats.correct,
+                    total: stats.total,
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -59,7 +73,9 @@ export const TestSummary = () => {
               <CardHeader className="pb-2">
                 <div className="flex items-center space-x-2">
                   <Award className="h-4 w-4 text-green-500" />
-                  <CardTitle className="text-sm">Performance</CardTitle>
+                  <CardTitle className="text-sm">
+                    {t("testSummary.stats.performance.title")}
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -67,7 +83,11 @@ export const TestSummary = () => {
                   {getPerformanceMessage()}
                 </div>
                 <p className="text-sm text-gray-500">
-                  {stats.streak > 1 ? `${stats.streak} questions streak!` : ""}
+                  {stats.streak > 1
+                    ? t("testSummary.stats.performance.streak", {
+                        streak: stats.streak,
+                      })
+                    : ""}
                 </p>
               </CardContent>
             </Card>
@@ -76,15 +96,21 @@ export const TestSummary = () => {
               <CardHeader className="pb-2">
                 <div className="flex items-center space-x-2">
                   <Clock className="h-4 w-4 text-purple-500" />
-                  <CardTitle className="text-sm">Time Spent</CardTitle>
+                  <CardTitle className="text-sm">
+                    {t("testSummary.stats.timeSpent.title")}
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {Math.round(stats.timeSpent / 60)} min
+                  {t("testSummary.stats.timeSpent.minutes", {
+                    minutes: Math.round(stats.timeSpent / 60),
+                  })}
                 </div>
                 <p className="text-sm text-gray-500">
-                  {Math.round(stats.timeSpent / stats.total)} sec per question
+                  {t("testSummary.stats.timeSpent.perQuestion", {
+                    seconds: Math.round(stats.timeSpent / stats.total),
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -96,7 +122,7 @@ export const TestSummary = () => {
             onClick={() => navigate("/subjects")}
             className="w-full sm:w-auto"
           >
-            Back to Subjects
+            {t("testSummary.backToSubjects")}
           </Button>
         </CardFooter>
       </Card>

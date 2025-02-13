@@ -137,15 +137,6 @@ export default {
     alreadyHaveAccount: "Already have an account?",
     dontHaveAccount: "Don't have an account?",
   },
-  subjects: {
-    listening: "Listening",
-    grammar: "Grammar",
-    history: "History",
-    laws: "Laws",
-    reading: "Reading",
-    writing: "Writing",
-    all: "All Subjects",
-  },
   difficulty: {
     easy: "Easy",
     medium: "Medium",
@@ -309,5 +300,207 @@ export default {
     unknownTutor: "Unknown tutor",
     past: "Past",
     noSessionsFound: "No Sessions Found",
+  },
+  audio: {
+    errors: {
+      playback: "Failed to play audio. Please try again.",
+      loading: "Failed to load audio file",
+    },
+    buttons: {
+      play: "Play",
+      pause: "Pause",
+      replay: "Replay",
+      mute: "Mute",
+      unmute: "Unmute",
+    },
+  },
+  practice: {
+    settings: {
+      title: "Practice Settings",
+      difficulty: {
+        label: "Difficulty Level",
+        placeholder: "Select difficulty",
+        work: "Work Permission",
+        temp: "Temporary Residence",
+        perm: "Permanent Residence",
+      },
+      questions: {
+        label: "Number of Questions",
+        placeholder: "Select question count",
+        count: "{{count}} Questions",
+      },
+    },
+    modes: {
+      title: "Choose Practice Mode",
+      timed: {
+        name: "Timed Practice",
+        description: "Practice with a time limit for each question",
+      },
+      targeted: {
+        name: "Targeted Practice",
+        description: "Focus on specific topics or question types",
+      },
+      continuous: {
+        name: "Continuous Practice",
+        description: "Practice without time limits or restrictions",
+      },
+      review: {
+        name: "Review Previous",
+        description: "Review questions from past sessions",
+      },
+      start: "Start {{mode}}",
+    },
+    back: "Back to Subjects",
+  },
+  practiceSession: {
+    title: "{subject} Practice",
+    stats: {
+      progress: "{correct} correct out of {total} questions",
+      timer: {
+        timeLeft: "{time}s",
+        total: "Total: {time}s",
+      },
+    },
+    loading: "Loading...",
+    errors: {
+      loadQuestion: "Failed to load question",
+      checkAnswer: "Failed to check answer",
+      submitResults: "Failed to submit test results",
+      answerRetrieval: "Error retrieving correct answer",
+      notAvailable: "Not available",
+      sampleResponse: "Sample response not available",
+    },
+    feedback: {
+      correct: "Correct!",
+      incorrect: "Incorrect. The correct answer was: {answer}",
+      timeUp: "Time's up! The correct answer was: {answer}",
+      explanation: "Explanation",
+    },
+    writing: {
+      placeholder: "Write your answer here...",
+      toggleExample: {
+        show: "Show Example",
+        hide: "Hide Example",
+      },
+      sampleResponse: "Sample Response:",
+    },
+    buttons: {
+      next: "Next Question",
+      viewResults: "View Results",
+    },
+  },
+  subjects: {
+    title: "Choose a Subject",
+    descriptions: {
+      listening: "Practice your listening comprehension skills",
+      grammar: "Master language structure and rules",
+      history: "Learn about historical events and their significance",
+      laws: "Understand legal principles and regulations",
+      reading: "Enhance your reading comprehension",
+      writing: "Improve your writing skills",
+    },
+    listening: "Listening",
+    grammar: "Grammar",
+    history: "History",
+    laws: "Laws",
+    reading: "Reading",
+    writing: "Writing",
+    all: "All Subjects",
+  },
+  testSummary: {
+    title: "Test Results",
+    mode: "{subject} - {mode} Mode",
+    stats: {
+      accuracy: {
+        title: "Accuracy",
+        result: "{correct} out of {total} correct",
+      },
+      performance: {
+        title: "Performance",
+        messages: {
+          excellent: "Excellent work!",
+          good: "Good job!",
+          keep: "Keep practicing!",
+          more: "More practice will help!",
+        },
+        streak: "{streak} questions streak!",
+      },
+      timeSpent: {
+        title: "Time Spent",
+        minutes: "{minutes} min",
+        perQuestion: "{seconds} sec per question",
+      },
+    },
+    backToSubjects: "Back to Subjects",
+  },
+  timeline: {
+    title: "Learning Timeline",
+    stats: {
+      activities: "{count} activities",
+    },
+    timeFormat: {
+      hoursAgo: "{hours} hours ago",
+    },
+    achievements: {
+      dedicatedLearner: {
+        title: "Dedicated Learner",
+        description: "Completed 10 tests",
+      },
+      excellence: {
+        title: "Excellence Achieved",
+        description: "Scored 90% or higher on a test",
+      },
+    },
+    test: {
+      completed: "Completed {subject} Test",
+      score: "Score: {score}% - {correct}/{total} correct",
+    },
+    empty: {
+      title: "No learning activity yet.",
+      subtitle: "Start practicing to see your progress!",
+    },
+  },
+  progress: {
+    loading: "Loading...",
+    cards: {
+      currentLevel: {
+        title: "Current Level",
+        based: "Based on your performance",
+        levels: {
+          beginner: "Beginner",
+          intermediate: "Intermediate",
+          advanced: "Advanced",
+        },
+      },
+      testsCompleted: {
+        title: "Tests Completed",
+        subtitle: "Total tests taken",
+      },
+      averageScore: {
+        title: "Average Score",
+        subtitle: "Across all subjects",
+      },
+      bestSubject: {
+        title: "Best Subject",
+        subtitle: "Highest performance",
+        na: "N/A",
+      },
+    },
+    charts: {
+      mastery: {
+        title: "Subject Mastery",
+        subtitle: "Performance across different subjects",
+      },
+    },
+    subjects: {
+      title: "Detailed Subject Progress",
+      subtitle: "Your progress breakdown by subject",
+      details: {
+        averageScore: "Average Score",
+        testsTaken: "Tests Taken",
+        bestScore: "Best Score",
+      },
+      practice: "Practice",
+    },
   },
 };

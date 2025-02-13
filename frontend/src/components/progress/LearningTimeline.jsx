@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -13,6 +14,8 @@ import axios from "axios";
 import { testService } from "../../services/test.service";
 
 const TimelineItem = ({ item }) => {
+  const { t } = useTranslation();
+
   const getIcon = () => {
     switch (item.type) {
       case "test_completed":
@@ -40,7 +43,9 @@ const TimelineItem = ({ item }) => {
     const diffInHours = (now - itemDate) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
-      return `${Math.round(diffInHours)} hours ago`;
+      return t("timeline.timeFormat.hoursAgo", {
+        hours: Math.round(diffInHours),
+      });
     } else {
       return itemDate.toLocaleDateString();
     }
@@ -61,6 +66,7 @@ const TimelineItem = ({ item }) => {
 };
 
 export const LearningTimeline = () => {
+  const { t } = useTranslation();
   const [timelineData, setTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,22 +78,26 @@ export const LearningTimeline = () => {
           testService.getStats(),
         ]);
 
-        // Transform test history into timeline format
         const testItems = history.map((test) => ({
           type: "test_completed",
-          title: `Completed ${test.subject} Test`,
-          description: `Score: ${test.score}% - ${test.correctAnswers}/${test.totalQuestions} correct`,
+          title: t("timeline.test.completed", { subject: test.subject }),
+          description: t("timeline.test.score", {
+            score: test.score,
+            correct: test.correctAnswers,
+            total: test.totalQuestions,
+          }),
           timestamp: test.testDate,
           score: test.score,
         }));
 
-        // Add achievements based on stats
         const achievements = [];
         if (stats.totalTests >= 10) {
           achievements.push({
             type: "achievement",
-            title: "Dedicated Learner",
-            description: "Completed 10 tests",
+            title: t("timeline.achievements.dedicatedLearner.title"),
+            description: t(
+              "timeline.achievements.dedicatedLearner.description"
+            ),
             timestamp: new Date().toISOString(),
           });
         }
@@ -95,13 +105,12 @@ export const LearningTimeline = () => {
         if (stats.highestScore >= 90) {
           achievements.push({
             type: "achievement",
-            title: "Excellence Achieved",
-            description: "Scored 90% or higher on a test",
+            title: t("timeline.achievements.excellence.title"),
+            description: t("timeline.achievements.excellence.description"),
             timestamp: new Date().toISOString(),
           });
         }
 
-        // Combine and sort all items by timestamp
         const allItems = [...testItems, ...achievements].sort(
           (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
         );
@@ -115,13 +124,13 @@ export const LearningTimeline = () => {
     };
 
     fetchTimeline();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Learning Timeline</CardTitle>
+          <CardTitle>{t("timeline.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center items-center h-48">
@@ -136,9 +145,9 @@ export const LearningTimeline = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Learning Timeline</span>
+          <span>{t("timeline.title")}</span>
           <span className="text-sm font-normal text-gray-500">
-            {timelineData.length} activities
+            {t("timeline.stats.activities", { count: timelineData.length })}
           </span>
         </CardTitle>
       </CardHeader>
@@ -153,8 +162,8 @@ export const LearningTimeline = () => {
           ) : (
             <div className="text-center text-gray-500 py-8">
               <GraduationCap className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p>No learning activity yet.</p>
-              <p className="text-sm">Start practicing to see your progress!</p>
+              <p>{t("timeline.empty.title")}</p>
+              <p className="text-sm">{t("timeline.empty.subtitle")}</p>
             </div>
           )}
         </ScrollArea>

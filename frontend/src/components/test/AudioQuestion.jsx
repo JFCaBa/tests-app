@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Play, Pause, RefreshCw, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,8 +18,8 @@ export const AudioQuestion = ({
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const audioRef = useRef(null);
+  const { t } = useTranslation();
 
-  // Get the audio URL directly from backend
   const getAudioUrl = (audioPath) => {
     if (!audioPath) return "";
     const filename = audioPath.split("/").pop();
@@ -35,7 +36,7 @@ export const AudioQuestion = ({
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
           console.error("Audio playback failed:", error);
-          setError("Failed to play audio. Please try again.");
+          setError(t("audio.errors.playback"));
         });
       }
     }
@@ -75,7 +76,6 @@ export const AudioQuestion = ({
 
       <Card className="bg-gray-50">
         <CardContent className="pt-6">
-          {/* Original audio controls */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-4">
               <Button
@@ -83,6 +83,9 @@ export const AudioQuestion = ({
                 size="icon"
                 onClick={handlePlayPause}
                 className="h-12 w-12"
+                aria-label={
+                  isPlaying ? t("audio.buttons.pause") : t("audio.buttons.play")
+                }
               >
                 {isPlaying ? (
                   <Pause className="h-6 w-6" />
@@ -96,6 +99,7 @@ export const AudioQuestion = ({
                 size="icon"
                 onClick={handleReplay}
                 className="h-8 w-8"
+                aria-label={t("audio.buttons.replay")}
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
@@ -105,6 +109,9 @@ export const AudioQuestion = ({
                 size="icon"
                 onClick={handleToggleMute}
                 className="h-8 w-8"
+                aria-label={
+                  isMuted ? t("audio.buttons.unmute") : t("audio.buttons.mute")
+                }
               >
                 {isMuted ? (
                   <VolumeX className="h-4 w-4" />
@@ -126,11 +133,10 @@ export const AudioQuestion = ({
             onEnded={handleEnded}
             onError={(e) => {
               console.error("Audio error:", e);
-              setError("Failed to load audio file");
+              setError(t("audio.errors.loading"));
             }}
           />
 
-          {/* Text to Speech for explanation */}
           {question.explanation && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
