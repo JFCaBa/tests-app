@@ -328,7 +328,7 @@ export default {
       questions: {
         label: "Number of Questions",
         placeholder: "Select question count",
-        count: "{{count}} Questions",
+        count: "{Questions",
       },
     },
     modes: {
@@ -437,7 +437,7 @@ export default {
   timeline: {
     title: "Learning Timeline",
     stats: {
-      activities: "{count} activities",
+      activities: "activities",
     },
     timeFormat: {
       hoursAgo: "{hours} hours ago",

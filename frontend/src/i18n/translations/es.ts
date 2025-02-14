@@ -332,7 +332,7 @@ export default {
       questions: {
         label: "Número de preguntas",
         placeholder: "Selecciona la cantidad de preguntas",
-        count: "{{count}} preguntas",
+        count: "preguntas",
       },
     },
     modes: {
@@ -441,7 +441,7 @@ export default {
   timeline: {
     title: "Cronograma de aprendizaje",
     stats: {
-      activities: "{count} actividades",
+      activities: "actividades",
     },
     timeFormat: {
       hoursAgo: "Hace {hours} horas",

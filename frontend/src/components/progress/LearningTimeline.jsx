@@ -147,7 +147,7 @@ export const LearningTimeline = () => {
         <CardTitle className="flex items-center justify-between">
           <span>{t("timeline.title")}</span>
           <span className="text-sm font-normal text-gray-500">
-            {t("timeline.stats.activities", { count: timelineData.length })}
+            {timelineData.length} {t("timeline.stats.activities")}
           </span>
         </CardTitle>
       </CardHeader>

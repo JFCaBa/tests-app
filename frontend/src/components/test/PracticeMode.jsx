@@ -114,7 +114,7 @@ export const PracticeMode = () => {
               <SelectContent>
                 {[5, 10, 15, 20].map((count) => (
                   <SelectItem key={count} value={count.toString()}>
-                    {t("practice.settings.questions.count", { count })}
+                    {count} {t("practice.settings.questions.count")}
                   </SelectItem>
                 ))}
               </SelectContent>
