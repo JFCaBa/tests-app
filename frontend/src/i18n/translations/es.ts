@@ -508,4 +508,32 @@ export default {
       practice: "Práctica",
     },
   },
+  recentActivity: {
+    title: "Actividad Reciente",
+    chart: {
+      date: "Fecha: {date}",
+      score: "Puntuación",
+      percentage: "{value}%",
+    },
+    stats: {
+      totalTests: {
+        title: "Total de Pruebas",
+      },
+      averageScore: {
+        title: "Puntuación Promedio",
+      },
+      highestScore: {
+        title: "Puntuación Más Alta",
+      },
+      thisWeek: {
+        title: "Esta Semana",
+      },
+    },
+    recent: {
+      title: "Pruebas Recientes",
+      item: "{subject}: {score}%",
+    },
+    noData: "No hay datos disponibles para el tema seleccionado",
+    loading: "Cargando...",
+  },
 };

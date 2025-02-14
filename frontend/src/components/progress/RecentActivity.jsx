@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
@@ -18,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import axios from "axios";
-import { useTranslation } from "react-i18next";
 
 export const RecentActivity = () => {
   const { t } = useTranslation();
@@ -48,7 +48,6 @@ export const RecentActivity = () => {
         const response = await axios.get("/tests/stats");
         const { recentTests, totalTests, statsBySubject } = response.data;
 
-        // Process activity data for the chart
         const processedData = recentTests
           .map((test) => ({
             date: new Date(test.testDate).toLocaleDateString(),
@@ -59,7 +58,6 @@ export const RecentActivity = () => {
 
         setActivityData(processedData);
 
-        // Calculate stats
         const thisWeekTests = recentTests.filter((test) => {
           const testDate = new Date(test.testDate);
           const weekAgo = new Date();
@@ -97,7 +95,7 @@ export const RecentActivity = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>{t("recentActivity.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center items-center h-48">
@@ -111,10 +109,10 @@ export const RecentActivity = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Recent Activity</CardTitle>
+        <CardTitle>{t("recentActivity.title")}</CardTitle>
         <Select value={selectedSubject} onValueChange={setSelectedSubject}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder={t("stats.selectSubject")} />
+            <SelectValue placeholder={t("common.subject")} />
           </SelectTrigger>
           <SelectContent>
             {subjects.map((subject) => (
@@ -128,19 +126,35 @@ export const RecentActivity = () => {
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center">
-            <p className="text-sm text-gray-500">{t("stats.totalTests")}</p>
+            <p className="text-sm text-gray-500">
+              {t("recentActivity.stats.totalTests.title")}
+            </p>
             <p className="text-2xl font-bold">{stats.totalTests}</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">{t("stats.averageScore")}</p>
-            <p className="text-2xl font-bold">{stats.averageScore}%</p>
+            <p className="text-sm text-gray-500">
+              {t("recentActivity.stats.averageScore.title")}
+            </p>
+            <p className="text-2xl font-bold">
+              {t("recentActivity.chart.percentage", {
+                value: stats.averageScore,
+              })}
+            </p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">{t("test.highestScore")}</p>
-            <p className="text-2xl font-bold">{stats.highestScore}%</p>
+            <p className="text-sm text-gray-500">
+              {t("recentActivity.stats.highestScore.title")}
+            </p>
+            <p className="text-2xl font-bold">
+              {t("recentActivity.chart.percentage", {
+                value: stats.highestScore,
+              })}
+            </p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">{t("tests.thisWeek")}</p>
+            <p className="text-sm text-gray-500">
+              {t("recentActivity.stats.thisWeek.title")}
+            </p>
             <p className="text-2xl font-bold">{stats.testsThisWeek}</p>
           </div>
         </div>
@@ -158,11 +172,18 @@ export const RecentActivity = () => {
                 <YAxis
                   domain={[0, 100]}
                   tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `${value}%`}
+                  tickFormatter={(value) =>
+                    t("recentActivity.chart.percentage", { value })
+                  }
                 />
                 <Tooltip
-                  formatter={(value) => [`${value}%`, t("test.score")]}
-                  labelFormatter={(label) => `Date: ${label}`}
+                  formatter={(value) => [
+                    t("recentActivity.chart.percentage", { value }),
+                    t("recentActivity.chart.score"),
+                  ]}
+                  labelFormatter={(label) =>
+                    t("recentActivity.chart.date", { date: label })
+                  }
                 />
                 <Line
                   type="monotone"
@@ -176,7 +197,7 @@ export const RecentActivity = () => {
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">{t("common.noDataAvailable")}</p>
+              <p className="text-gray-500">{t("recentActivity.noData")}</p>
             </div>
           )}
         </div>
@@ -184,12 +205,15 @@ export const RecentActivity = () => {
         {filteredData.length > 0 && (
           <div className="mt-4">
             <p className="text-sm text-gray-500 mb-2">
-              {t("stats.recentTests")}:
+              {t("recentActivity.recent.title")}:
             </p>
             <div className="flex flex-wrap gap-2">
               {filteredData.slice(0, 5).map((test, index) => (
                 <Badge key={index} variant="secondary">
-                  {test.subject}: {test.score}%
+                  {t("recentActivity.recent.item", {
+                    subject: test.subject,
+                    score: test.score,
+                  })}
                 </Badge>
               ))}
             </div>

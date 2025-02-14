@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   Card,
@@ -28,6 +29,7 @@ const calculatePercentage = (correct, total) => {
 };
 
 export const Progress = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [progressData, setProgressData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,6 @@ export const Progress = () => {
     const fetchProgress = async () => {
       try {
         if (user?.testHistory) {
-          // Calculate statistics from test history
           const statsBySubject = user.testHistory.reduce((acc, test) => {
             const subject = test.subject;
             if (!acc[subject]) {
@@ -60,7 +61,6 @@ export const Progress = () => {
             return acc;
           }, {});
 
-          // Calculate averages and prepare final data
           const progressData = {
             stats: {
               totalTests: user.testHistory.length,
@@ -103,7 +103,6 @@ export const Progress = () => {
     );
   }
 
-  // Prepare data for visualization
   const subjectProgress = Object.entries(
     progressData?.stats?.statsBySubject || {}
   ).map(([subject, data]) => ({
@@ -115,13 +114,16 @@ export const Progress = () => {
   }));
 
   const calculateLevel = (tests, avgScore) => {
-    if (tests < 3) return "Beginner";
-    if (tests < 8) return avgScore > 70 ? "Intermediate" : "Beginner";
+    if (tests < 3) return t("progress.cards.currentLevel.levels.beginner");
+    if (tests < 8)
+      return avgScore > 70
+        ? t("progress.cards.currentLevel.levels.intermediate")
+        : t("progress.cards.currentLevel.levels.beginner");
     return avgScore > 80
-      ? "Advanced"
+      ? t("progress.cards.currentLevel.levels.advanced")
       : avgScore > 60
-      ? "Intermediate"
-      : "Beginner";
+      ? t("progress.cards.currentLevel.levels.intermediate")
+      : t("progress.cards.currentLevel.levels.beginner");
   };
 
   const overallProgress = progressData?.stats?.averageScore || 0;
@@ -134,18 +136,19 @@ export const Progress = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      {/* Achievement Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Trophy className="w-4 h-4 mr-2 text-yellow-500" />
-              Current Level
+              {t("progress.cards.currentLevel.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{level}</div>
-            <p className="text-sm text-gray-500">Based on your performance</p>
+            <p className="text-sm text-gray-500">
+              {t("progress.cards.currentLevel.based")}
+            </p>
           </CardContent>
         </Card>
 
@@ -153,12 +156,14 @@ export const Progress = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Target className="w-4 h-4 mr-2 text-blue-500" />
-              Tests Completed
+              {t("progress.cards.testsCompleted.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalTests}</div>
-            <p className="text-sm text-gray-500">Total tests taken</p>
+            <p className="text-sm text-gray-500">
+              {t("progress.cards.testsCompleted.subtitle")}
+            </p>
           </CardContent>
         </Card>
 
@@ -166,14 +171,16 @@ export const Progress = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <TrendingUp className="w-4 h-4 mr-2 text-green-500" />
-              Average Score
+              {t("progress.cards.averageScore.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {overallProgress.toFixed(1)}%
             </div>
-            <p className="text-sm text-gray-500">Across all subjects</p>
+            <p className="text-sm text-gray-500">
+              {t("progress.cards.averageScore.subtitle")}
+            </p>
           </CardContent>
         </Card>
 
@@ -181,7 +188,7 @@ export const Progress = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Award className="w-4 h-4 mr-2 text-purple-500" />
-              Best Subject
+              {t("progress.cards.bestSubject.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -190,22 +197,23 @@ export const Progress = () => {
                 (best, current) =>
                   current.progress > (best?.progress || 0) ? current : best,
                 {}
-              )?.subject || "N/A"}
+              )?.subject || t("progress.cards.bestSubject.na")}
             </div>
-            <p className="text-sm text-gray-500">Highest performance</p>
+            <p className="text-sm text-gray-500">
+              {t("progress.cards.bestSubject.subtitle")}
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Progress Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <LearningTimeline />
 
         <Card>
           <CardHeader>
-            <CardTitle>Subject Mastery</CardTitle>
+            <CardTitle>{t("progress.charts.mastery.title")}</CardTitle>
             <CardDescription>
-              Performance across different subjects
+              {t("progress.charts.mastery.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -229,11 +237,10 @@ export const Progress = () => {
         </Card>
       </div>
 
-      {/* Detailed Subject Progress */}
       <Card>
         <CardHeader>
-          <CardTitle>Detailed Subject Progress</CardTitle>
-          <CardDescription>Your progress breakdown by subject</CardDescription>
+          <CardTitle>{t("progress.subjects.title")}</CardTitle>
+          <CardDescription>{t("progress.subjects.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -249,21 +256,27 @@ export const Progress = () => {
                     size="sm"
                     onClick={() => handleStartPractice(subject.subject)}
                   >
-                    Practice
+                    {t("progress.subjects.practice")}
                   </Button>
                 </div>
                 <ProgressIndicator value={subject.progress} className="h-2" />
                 <div className="grid grid-cols-3 gap-4 text-sm text-gray-500">
                   <div>
-                    <span className="font-medium">Average Score:</span>{" "}
+                    <span className="font-medium">
+                      {t("progress.subjects.details.averageScore")}:
+                    </span>{" "}
                     {subject.progress.toFixed(1)}%
                   </div>
                   <div>
-                    <span className="font-medium">Tests Taken:</span>{" "}
+                    <span className="font-medium">
+                      {t("progress.subjects.details.testsTaken")}:
+                    </span>{" "}
                     {subject.tests}
                   </div>
                   <div>
-                    <span className="font-medium">Best Score:</span>{" "}
+                    <span className="font-medium">
+                      {t("progress.subjects.details.bestScore")}:
+                    </span>{" "}
                     {subject.bestScore.toFixed(1)}%
                   </div>
                 </div>
@@ -273,7 +286,6 @@ export const Progress = () => {
         </CardContent>
       </Card>
 
-      {/* Recent Activity */}
       <div className="lg:col-span-2">
         <RecentActivity />
       </div>

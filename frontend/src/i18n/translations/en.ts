@@ -504,4 +504,32 @@ export default {
       practice: "Practice",
     },
   },
+  recentActivity: {
+    title: "Recent Activity",
+    chart: {
+      date: "Date: {date}",
+      score: "Score",
+      percentage: "{value}%",
+    },
+    stats: {
+      totalTests: {
+        title: "Total Tests",
+      },
+      averageScore: {
+        title: "Average Score",
+      },
+      highestScore: {
+        title: "Highest Score",
+      },
+      thisWeek: {
+        title: "This Week",
+      },
+    },
+    recent: {
+      title: "Recent Tests",
+      item: "{subject}: {score}%",
+    },
+    noData: "No data available for the selected subject",
+    loading: "Loading...",
+  },
 };

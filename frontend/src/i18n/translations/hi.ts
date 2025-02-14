@@ -495,4 +495,32 @@ export default {
       practice: "अभ्यास",
     },
   },
+  recentActivity: {
+    title: "हाल की गतिविधि",
+    chart: {
+      date: "तारीख: {date}",
+      score: "स्कोर",
+      percentage: "{value}%",
+    },
+    stats: {
+      totalTests: {
+        title: "कुल टेस्ट",
+      },
+      averageScore: {
+        title: "औसत स्कोर",
+      },
+      highestScore: {
+        title: "उच्चतम स्कोर",
+      },
+      thisWeek: {
+        title: "इस सप्ताह",
+      },
+    },
+    recent: {
+      title: "हाल के टेस्ट",
+      item: "{subject}: {score}%",
+    },
+    noData: "चुने गए विषय के लिए कोई डेटा उपलब्ध नहीं है",
+    loading: "लोड हो रहा है...",
+  },
 };
