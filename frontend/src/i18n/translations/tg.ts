@@ -330,7 +330,7 @@ export default {
       questions: {
         label: "Миқдори саволҳо",
         placeholder: "Миқдори саволҳоро интихоб кунед",
-        count: "{Саволҳо",
+        count: "Саволҳо",
       },
     },
     modes: {
@@ -356,12 +356,12 @@ export default {
     back: "Бозгашт ба мавзӯъҳо",
   },
   practiceSession: {
-    title: "{subject} Машқӣ",
+    title: "{{subject}} Машқӣ",
     stats: {
-      progress: "{correct} дуруст аз {total} савол",
+      progress: "{{correct}} дуруст аз {{total}} савол",
       timer: {
-        timeLeft: "{time}с",
-        total: "Ҳамагӣ: {time}с",
+        timeLeft: "{{time}}с",
+        total: "Ҳамагӣ: {{time}}с",
       },
     },
     loading: "Бор шуда истодааст...",
@@ -412,11 +412,11 @@ export default {
   },
   testSummary: {
     title: "Натиҷаҳои имтиҳон",
-    mode: "{subject} - Реҷаи {mode}",
+    mode: "{{subject}} - Реҷаи {{mode}}",
     stats: {
       accuracy: {
         title: "Дақиқӣ",
-        result: "{correct} дуруст аз {total}",
+        result: "{{correct}} дуруст аз {{total}}",
       },
       performance: {
         title: "Иҷро",
@@ -430,8 +430,8 @@ export default {
       },
       timeSpent: {
         title: "Вақти сарфшуда",
-        minutes: "{minutes} дақ",
-        perQuestion: "{seconds} сония барои ҳар як савол",
+        minutes: "{{minutes}} дақ",
+        perQuestion: "{{seconds}} сония барои ҳар як савол",
       },
     },
     backToSubjects: "Бозгашт ба мавзӯъҳо",
@@ -455,8 +455,8 @@ export default {
       },
     },
     test: {
-      completed: "Имтиҳони {subject} анҷом дод",
-      score: "Ҳисоб: {score}% - {correct}/{total} дуруст",
+      completed: "Имтиҳони {{subject}} анҷом дод",
+      score: "Ҳисоб: {{score}}% - {{correct}}/{{total}} дуруст",
     },
     empty: {
       title: "Ҳоло ҳеҷ фаъолияти омӯзишӣ нест.",
@@ -509,9 +509,9 @@ export default {
   recentActivity: {
     title: "Фаъолияти охирин",
     chart: {
-      date: "Сана: {date}",
+      date: "Сана: {{date}}",
       score: "Ҳисоб",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -529,7 +529,7 @@ export default {
     },
     recent: {
       title: "Имтиҳонҳои охирин",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "Барои мавзӯъи интихобшуда маълумот дастрас нест",
     loading: "Бор шуда истодааст...",

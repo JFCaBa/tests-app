@@ -328,7 +328,7 @@ export default {
       questions: {
         label: "Number of Questions",
         placeholder: "Select question count",
-        count: "{Questions",
+        count: "Questions",
       },
     },
     modes: {
@@ -354,12 +354,12 @@ export default {
     back: "Back to Subjects",
   },
   practiceSession: {
-    title: "{subject} Practice",
+    title: "{{subject}} Practice",
     stats: {
-      progress: "{correct} correct out of {total} questions",
+      progress: "{{correct}} correct out of {{total}} questions",
       timer: {
-        timeLeft: "{time}s",
-        total: "Total: {time}s",
+        timeLeft: "{{time}}s",
+        total: "Total: {{time}}s",
       },
     },
     loading: "Loading...",
@@ -373,8 +373,8 @@ export default {
     },
     feedback: {
       correct: "Correct!",
-      incorrect: "Incorrect. The correct answer was: {answer}",
-      timeUp: "Time's up! The correct answer was: {answer}",
+      incorrect: "Incorrect. The correct answer was: {{answer}}",
+      timeUp: "Time's up! The correct answer was: {{answer}}",
       explanation: "Explanation",
     },
     writing: {
@@ -410,11 +410,11 @@ export default {
   },
   testSummary: {
     title: "Test Results",
-    mode: "{subject} - {mode} Mode",
+    mode: "{{subject}} - {{mode}} Mode",
     stats: {
       accuracy: {
         title: "Accuracy",
-        result: "{correct} out of {total} correct",
+        result: "{{correct}} out of {{total}} correct",
       },
       performance: {
         title: "Performance",
@@ -428,8 +428,8 @@ export default {
       },
       timeSpent: {
         title: "Time Spent",
-        minutes: "{minutes} min",
-        perQuestion: "{seconds} sec per question",
+        minutes: "{{minutes}} min",
+        perQuestion: "{{seconds}} sec per question",
       },
     },
     backToSubjects: "Back to Subjects",
@@ -440,7 +440,7 @@ export default {
       activities: "activities",
     },
     timeFormat: {
-      hoursAgo: "{hours} hours ago",
+      hoursAgo: "{{hours}} hours ago",
     },
     achievements: {
       dedicatedLearner: {
@@ -453,8 +453,8 @@ export default {
       },
     },
     test: {
-      completed: "Completed {subject} Test",
-      score: "Score: {score}% - {correct}/{total} correct",
+      completed: "Completed {{subject}} Test",
+      score: "Score: {{score}}% - {{correct}}/{{total}} correct",
     },
     empty: {
       title: "No learning activity yet.",
@@ -507,9 +507,9 @@ export default {
   recentActivity: {
     title: "Recent Activity",
     chart: {
-      date: "Date: {date}",
+      date: "Date: {{date}}",
       score: "Score",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -527,7 +527,7 @@ export default {
     },
     recent: {
       title: "Recent Tests",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "No data available for the selected subject",
     loading: "Loading...",

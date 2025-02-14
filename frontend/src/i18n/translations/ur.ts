@@ -355,12 +355,12 @@ export default {
     back: "موضوعات کے پیچھے",
   },
   practiceSession: {
-    title: "{subject} مشق",
+    title: "{{subject}} مشق",
     stats: {
-      progress: "{correct} صحیح {total} سوالات میں سے",
+      progress: "{{correct}} صحیح {{total}} سوالات میں سے",
       timer: {
-        timeLeft: "{time} ثانیے",
-        total: "کل: {time} ثانیے",
+        timeLeft: "{{time}} ثانیے",
+        total: "کل: {{time}} ثانیے",
       },
     },
     loading: "لوڈ ہو رہا ہے...",
@@ -374,8 +374,8 @@ export default {
     },
     feedback: {
       correct: "صحیح!",
-      incorrect: "غلط۔ صحیح جواب تھا: {answer}",
-      timeUp: "وقت ختم ہو گیا! صحیح جواب تھا: {answer}",
+      incorrect: "غلط۔ صحیح جواب تھا: {{answer}}",
+      timeUp: "وقت ختم ہو گیا! صحیح جواب تھا: {{answer}}",
       explanation: "وضاحت",
     },
     writing: {
@@ -411,11 +411,11 @@ export default {
   },
   testSummary: {
     title: "ٹیسٹ نتائج",
-    mode: "{subject} - {mode} مدود",
+    mode: "{{subject}} - {{mode}} مدود",
     stats: {
       accuracy: {
         title: "دقت",
-        result: "{correct} صحیح {total} میں سے",
+        result: "{{correct}} صحیح {{total}} میں سے",
       },
       performance: {
         title: "پرفارمنس",
@@ -425,12 +425,12 @@ export default {
           keep: "مشق کریں!",
           more: "زیادہ مشق مدد کرے گی!",
         },
-        streak: "{streak} سوالات سلسلہ!",
+        streak: "{{streak}} سوالات سلسلہ!",
       },
       timeSpent: {
         title: "وقت صرف کیا",
-        minutes: "{minutes} منٹ",
-        perQuestion: "{seconds} ثانیے سوال پر",
+        minutes: "{{minutes}} منٹ",
+        perQuestion: "{{seconds}} ثانیے سوال پر",
       },
     },
     backToSubjects: "موضوعات کے پیچھے",
@@ -454,8 +454,8 @@ export default {
       },
     },
     test: {
-      completed: "{subject} ٹیسٹ مکمل کیا",
-      score: "سکور: {score}% - {correct}/{total} صحیح",
+      completed: "{{subject}} ٹیسٹ مکمل کیا",
+      score: "سکور: {{score}}% - {{correct}}/{{total}} صحیح",
     },
     empty: {
       title: "ابھی تک کوئی محفوظیت کی فعالیت نہیں۔",
@@ -508,9 +508,9 @@ export default {
   recentActivity: {
     title: "حالیہ فعالیت",
     chart: {
-      date: "تاریخ: {date}",
+      date: "تاریخ: {{date}}",
       score: "سکور",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -528,7 +528,7 @@ export default {
     },
     recent: {
       title: "حالیہ ٹیسٹ",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "منتخب موضوع کے لیے کوئی دیٹا نہیں دستیاب",
     loading: "لوڈ ہو رہا ہے...",

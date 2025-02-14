@@ -345,12 +345,12 @@ export default {
     back: "विषयों पर वापस जाएं",
   },
   practiceSession: {
-    title: "{subject} अभ्यास",
+    title: "{{subject}} अभ्यास",
     stats: {
-      progress: "{correct} सही {total} प्रश्नों में से",
+      progress: "{{correct}} सही {{total}} प्रश्नों में से",
       timer: {
-        timeLeft: "{time} सेकंड",
-        total: "कुल: {time} सेकंड",
+        timeLeft: "{{time}} सेकंड",
+        total: "कुल: {{time}} सेकंड",
       },
     },
     loading: "लोड हो रहा है...",
@@ -364,8 +364,8 @@ export default {
     },
     feedback: {
       correct: "सही!",
-      incorrect: "गलत। सही उत्तर था: {answer}",
-      timeUp: "समय समाप्त! सही उत्तर था: {answer}",
+      incorrect: "गलत। सही उत्तर था: {{answer}}",
+      timeUp: "समय समाप्त! सही उत्तर था: {{answer}}",
       explanation: "व्याख्या",
     },
     writing: {
@@ -401,11 +401,11 @@ export default {
   },
   testSummary: {
     title: "परीक्षा परिणाम",
-    mode: "{subject} - {mode} मोड",
+    mode: "{{subject}} - {{mode}} मोड",
     stats: {
       accuracy: {
         title: "सटीकता",
-        result: "{correct} में से {total} सही",
+        result: "{{correct}} में से {{total}} सही",
       },
       performance: {
         title: "प्रदर्शन",
@@ -415,12 +415,12 @@ export default {
           keep: "अभ्यास जारी रखें!",
           more: "अधिक अभ्यास से मदद मिलेगी!",
         },
-        streak: "{streak} प्रश्नों की लकीर!",
+        streak: "{{streak}} प्रश्नों की लकीर!",
       },
       timeSpent: {
         title: "समय बिताया",
-        minutes: "{minutes} मिनट",
-        perQuestion: "{seconds} सेकंड प्रति प्रश्न",
+        minutes: "{{minutes}} मिनट",
+        perQuestion: "{{seconds}} सेकंड प्रति प्रश्न",
       },
     },
     backToSubjects: "विषयों पर वापस जाएं",
@@ -428,10 +428,10 @@ export default {
   timeline: {
     title: "अधिगम समयरेखा",
     stats: {
-      activities: "{count} गतिविधियाँ",
+      activities: "{{count}} गतिविधियाँ",
     },
     timeFormat: {
-      hoursAgo: "{hours} घंटे पहले",
+      hoursAgo: "{{hours}} घंटे पहले",
     },
     achievements: {
       dedicatedLearner: {
@@ -444,8 +444,8 @@ export default {
       },
     },
     test: {
-      completed: "{subject} परीक्षण पूरा हुआ",
-      score: "अंक: {score}% - {correct}/{total} सही",
+      completed: "{{subject}} परीक्षण पूरा हुआ",
+      score: "अंक: {{score}}% - {{correct}}/{{total}} सही",
     },
     empty: {
       title: "अभी तक कोई अधिगम गतिविधि नहीं",
@@ -498,9 +498,9 @@ export default {
   recentActivity: {
     title: "हाल की गतिविधि",
     chart: {
-      date: "तारीख: {date}",
+      date: "तारीख: {{date}}",
       score: "स्कोर",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -518,7 +518,7 @@ export default {
     },
     recent: {
       title: "हाल के टेस्ट",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "चुने गए विषय के लिए कोई डेटा उपलब्ध नहीं है",
     loading: "लोड हो रहा है...",

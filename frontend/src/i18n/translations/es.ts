@@ -358,12 +358,12 @@ export default {
     back: "Volver a los temas",
   },
   practiceSession: {
-    title: "Práctica de {subject}",
+    title: "Práctica de {{subject}}",
     stats: {
-      progress: "{correct} correctas de {total} preguntas",
+      progress: "{{correct}} correctas de {{total}} preguntas",
       timer: {
-        timeLeft: "{time}s",
-        total: "Total: {time}s",
+        timeLeft: "{{time}}s",
+        total: "Total: {{time}}s",
       },
     },
     loading: "Cargando...",
@@ -414,11 +414,11 @@ export default {
   },
   testSummary: {
     title: "Resultados del test",
-    mode: "{subject} - Modo {mode}",
+    mode: "{{subject}} - Modo {{mode}}",
     stats: {
       accuracy: {
         title: "Precisión",
-        result: "{correct} de {total} correctas",
+        result: "{{correct}} de {{total}} correctas",
       },
       performance: {
         title: "Desempeño",
@@ -428,12 +428,12 @@ export default {
           keep: "¡Sigue practicando!",
           more: "¡Más práctica te ayudará!",
         },
-        streak: "¡Racha de {streak} preguntas!",
+        streak: "¡Racha de {{streak}} preguntas!",
       },
       timeSpent: {
         title: "Tiempo invertido",
-        minutes: "{minutes} min",
-        perQuestion: "{seconds} seg por pregunta",
+        minutes: "{{minutes}} min",
+        perQuestion: "{{seconds}} seg por pregunta",
       },
     },
     backToSubjects: "Volver a los temas",
@@ -457,8 +457,8 @@ export default {
       },
     },
     test: {
-      completed: "Test completado de {subject}",
-      score: "Puntaje: {score}% - {correct}/{total} correctas",
+      completed: "Test completado de {{subject}}",
+      score: "Puntaje: {{score}}% - {{correct}}/{{total}} correctas",
     },
     empty: {
       title: "Aún no hay actividad de aprendizaje.",
@@ -511,9 +511,9 @@ export default {
   recentActivity: {
     title: "Actividad Reciente",
     chart: {
-      date: "Fecha: {date}",
+      date: "Fecha: {{date}}",
       score: "Puntuación",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -531,7 +531,7 @@ export default {
     },
     recent: {
       title: "Pruebas Recientes",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "No hay datos disponibles para el tema seleccionado",
     loading: "Cargando...",

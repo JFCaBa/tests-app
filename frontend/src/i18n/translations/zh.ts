@@ -323,17 +323,17 @@ export default {
         name: "回顾以前",
         description: "回顾过去的会话中的问题",
       },
-      start: "开始{{模式}}",
+      start: "开始 {{mode}",
     },
     back: "返回科目",
   },
   practiceSession: {
-    title: "{subject} 练习",
+    title: "{{subject}} 练习",
     stats: {
-      progress: "{correct} 正确 / {total} 题目",
+      progress: "{{correct}} 正确 / {{total}} 题目",
       timer: {
-        timeLeft: "{time} 秒",
-        total: "总计: {time} 秒",
+        timeLeft: "{{time}} 秒",
+        total: "总计: {{time}} 秒",
       },
     },
     loading: "加载中...",
@@ -347,8 +347,8 @@ export default {
     },
     feedback: {
       correct: "正确！",
-      incorrect: "错误。正确答案是：{answer}",
-      timeUp: "时间到！正确答案是：{answer}",
+      incorrect: "错误。正确答案是：{{answer}}",
+      timeUp: "时间到！正确答案是：{{answer}}",
       explanation: "解释",
     },
     writing: {
@@ -384,11 +384,11 @@ export default {
   },
   testSummary: {
     title: "测试结果",
-    mode: "{subject} - {mode} 模式",
+    mode: "{{subject}} - {{mode}} 模式",
     stats: {
       accuracy: {
         title: "准确率",
-        result: "{correct} / {total} 正确",
+        result: "{{correct}} / {{total}} 正确",
       },
       performance: {
         title: "表现",
@@ -402,8 +402,8 @@ export default {
       },
       timeSpent: {
         title: "用时",
-        minutes: "{minutes} 分钟",
-        perQuestion: "{seconds} 秒 / 题目",
+        minutes: "{{minutes}} 分钟",
+        perQuestion: "{{seconds}} 秒 / 题目",
       },
     },
     backToSubjects: "返回科目",
@@ -414,7 +414,7 @@ export default {
       activities: "活动",
     },
     timeFormat: {
-      hoursAgo: "{hours} 小时前",
+      hoursAgo: "{{hours}} 小时前",
     },
     achievements: {
       dedicatedLearner: {
@@ -427,8 +427,8 @@ export default {
       },
     },
     test: {
-      completed: "已完成 {subject} 测试",
-      score: "得分：{score}% - {correct}/{total} 正确",
+      completed: "已完成 {{subject}} 测试",
+      score: "得分：{{score}}% - {{correct}}/{{total}} 正确",
     },
     empty: {
       title: "尚未有学习活动。",
@@ -481,9 +481,9 @@ export default {
   recentActivity: {
     title: "近期活动",
     chart: {
-      date: "日期：{date}",
+      date: "日期：{{date}}",
       score: "得分",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -501,7 +501,7 @@ export default {
     },
     recent: {
       title: "近期测试",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "所选科目没有可用数据",
     loading: "加载中...",

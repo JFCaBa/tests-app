@@ -330,7 +330,7 @@ export default {
       questions: {
         label: "Savollar Soni",
         placeholder: "Savollar sonini tanlang",
-        count: "{Savollar",
+        count: "Savollar",
       },
     },
     modes: {
@@ -356,12 +356,12 @@ export default {
     back: "Mavzularga Qaytish",
   },
   practiceSession: {
-    title: "{subject} mashq",
+    title: "{{subject}} mashq",
     stats: {
-      progress: "{correct} savoldan {total} to'g'ri javob",
+      progress: "{{correct}} savoldan {{total}} to'g'ri javob",
       timer: {
-        timeLeft: "{time}s qolgan vaqt",
-        total: "Jami: {time}s",
+        timeLeft: "{{time}}s qolgan vaqt",
+        total: "Jami: {{time}}s",
       },
     },
     loading: "Yuklanmoqda...",
@@ -412,11 +412,11 @@ export default {
   },
   testSummary: {
     title: "Test natijalari",
-    mode: "{subject} - {mode} rejimi",
+    mode: "{{subject}} - {{mode}} rejimi",
     stats: {
       accuracy: {
         title: "To'g'rilik",
-        result: "{correct} dan {total} to'g'ri",
+        result: "{{correct{}} dan {{total}} to'g'ri",
       },
       performance: {
         title: "Performans",
@@ -426,12 +426,12 @@ export default {
           keep: "Mashqdan davom eting!",
           more: "Ko'proq mashq yordam beradi!",
         },
-        streak: "{streak} savolga to'g'ri javob berdingiz!",
+        streak: "{{streak}} savolga to'g'ri javob berdingiz!",
       },
       timeSpent: {
         title: "Vaqt sarflandi",
-        minutes: "{minutes} daqiqa",
-        perQuestion: "{seconds} soniya har bir savol uchun",
+        minutes: "{{minutes}} daqiqa",
+        perQuestion: "{{seconds}} soniya har bir savol uchun",
       },
     },
     backToSubjects: "Fanlarga qaytish",
@@ -455,8 +455,8 @@ export default {
       },
     },
     test: {
-      completed: "{subject} Test yakunlandi",
-      score: "Ball: {score}% - {correct}/{total} to'g'ri",
+      completed: "{{subject}} Test yakunlandi",
+      score: "Ball: {{score}}% - {{correct}}/{{total}} to'g'ri",
     },
     empty: {
       title: "Hali o'rganish faoliyati yo'q.",
@@ -509,9 +509,9 @@ export default {
   recentActivity: {
     title: "So'nggi faoliyat",
     chart: {
-      date: "Sana: {date}",
+      date: "Sana: {{date}}",
       score: "Ball",
-      percentage: "{value}%",
+      percentage: "{{value}}%",
     },
     stats: {
       totalTests: {
@@ -529,7 +529,7 @@ export default {
     },
     recent: {
       title: "So'nggi testlar",
-      item: "{subject}: {score}%",
+      item: "{{subject}}: {{score}}%",
     },
     noData: "Tanlangan fanda ma'lumot mavjud emas",
     loading: "Yuklanmoqda...",
