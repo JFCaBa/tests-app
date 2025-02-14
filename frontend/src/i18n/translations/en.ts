@@ -115,6 +115,7 @@ export default {
     aiCoach: "AI Coach",
     admin: "Admin",
     demo: "Demo Test",
+    tuition: "Tuition",
   },
   menu: {
     menu: "Menu",
