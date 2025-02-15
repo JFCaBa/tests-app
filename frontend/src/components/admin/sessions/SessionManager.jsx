@@ -157,8 +157,10 @@ const SessionManager = () => {
                     <TableCell>
                       {new Date(session.startTime).toLocaleString()}
                     </TableCell>
-                    <TableCell>{session.tutor.name}</TableCell>
-                    <TableCell>{session.student.name}</TableCell>
+                    <TableCell>{session.tutorId?.name || "N/A"}</TableCell>
+                    <TableCell>
+                      {session.studentId?.username || "N/A"}
+                    </TableCell>
                     <TableCell className="capitalize">
                       {session.subject}
                     </TableCell>

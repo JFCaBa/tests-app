@@ -53,7 +53,26 @@ const SessionForm = () => {
 
         if (id) {
           const sessionRes = await axios.get(`/admin/sessions/${id}`);
-          setFormData(sessionRes.data);
+          console.log("Session data:", sessionRes.data);
+          const session = sessionRes.data;
+
+          // Format the date for datetime-local input
+          const startTime = new Date(session.startTime);
+          const formattedDate = startTime.toISOString().slice(0, 16); // Format: "YYYY-MM-DDTHH:mm"
+
+          // Calculate duration in minutes
+          const endTime = new Date(session.endTime);
+          const durationInMinutes = Math.round((endTime - startTime) / 60000);
+
+          setFormData({
+            tutorId: session.tutorId._id || session.tutorId,
+            studentId: session.studentId._id || session.studentId,
+            subject: session.subject,
+            startTime: formattedDate,
+            duration: durationInMinutes,
+            notes: session.notes || "",
+            status: session.status,
+          });
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -132,7 +151,7 @@ const SessionForm = () => {
               <div>
                 <Label htmlFor="student">Student</Label>
                 <Select
-                  value={formData.studentId}
+                  value={formData.studentId._id}
                   onValueChange={(value) =>
                     setFormData({ ...formData, studentId: value })
                   }
