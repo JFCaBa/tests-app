@@ -8,6 +8,7 @@ import {
   Book,
   GraduationCap,
   Calendar,
+  Plus,
 } from "lucide-react";
 import {
   Card,
@@ -30,13 +31,10 @@ export const AdminDashboard = () => {
     questions: { total: 0, active: 0, bySubject: [] },
     tests: { totalTests: 0, averageScore: 0 },
     tutors: { total: 0, active: 0 },
-    sessions: { upcoming: 0, past: 0 },
+    sessions: { upcoming: 0, past: 0, total: 0 },
   });
   const [loading, setLoading] = useState(true);
-  const [showUpload, setShowUpload] = useState(false);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
-
-  // Initialize question form data
   const [formData, setFormData] = useState({
     subject: "",
     type: "",
@@ -123,8 +121,16 @@ export const AdminDashboard = () => {
     },
     {
       title: "Tutoring Sessions",
-      value: `${stats.sessions.upcoming} upcoming / ${stats.sessions.past} past`,
-      icon: Calendar, // Add import for Calendar from lucide-react
+      value: (
+        <div className="text-sm">
+          <span className="text-green-600">
+            {stats.sessions.upcoming} upcoming
+          </span>
+          <span className="mx-1">/</span>
+          <span className="text-gray-600">{stats.sessions.past} past</span>
+        </div>
+      ),
+      icon: Calendar,
       color: "bg-yellow-100 text-yellow-700",
     },
   ];
@@ -141,12 +147,18 @@ export const AdminDashboard = () => {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <Button onClick={() => setShowQuestionForm(true)}>
-          Upload Questions
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={() => navigate("/admin/sessions/new")}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Session
+          </Button>
+          <Button onClick={() => setShowQuestionForm(true)}>
+            Upload Questions
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((card, index) => {
           const Icon = card.icon;
           return (
@@ -168,13 +180,18 @@ export const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Quick Actions Card */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Manage your test application</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <Button
+              className="w-full"
+              onClick={() => navigate("/admin/sessions")}
+            >
+              Manage Sessions
+            </Button>
             <Button
               className="w-full"
               onClick={() => navigate("/admin/tutors")}
@@ -196,7 +213,6 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Questions by Subject Card */}
         <Card>
           <CardHeader>
             <CardTitle>Questions by Subject</CardTitle>
@@ -217,7 +233,6 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* System Maintenance Section */}
         <div className="col-span-full">
           <h2 className="text-2xl font-bold mb-4">System Maintenance</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -227,7 +242,6 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Question Form Modal */}
       {showQuestionForm && (
         <QuestionForm
           formData={formData}

@@ -15,6 +15,8 @@ import BookingPage from "./components/tuition/BookingPage";
 import TutorManager from "./components/admin/TutorManager";
 import TutorForm from "./components/admin/TutorForm";
 import TutorDetails from "./components/admin/TutorDetails";
+import SessionManager from "./components/admin/sessions/SessionManager";
+import SessionForm from "./components/admin/sessions/SessionForm";
 const Progress = React.lazy(() => import("@/components/progress/Progress"));
 const Settings = React.lazy(() => import("@/components/settings/Settings"));
 const Statistics = React.lazy(() =>
@@ -198,6 +200,18 @@ const App = () => {
               <Route
                 path="admin/tests"
                 element={withErrorBoundary(TestStatistics)}
+              />
+              <Route
+                path="admin/sessions"
+                element={withErrorBoundary(SessionManager)}
+              />
+              <Route
+                path="admin/sessions/new"
+                element={withErrorBoundary(SessionForm)}
+              />
+              <Route
+                path="admin/sessions/:id"
+                element={withErrorBoundary(SessionForm)}
               />
             </Route>
 

@@ -73,10 +73,6 @@ router.put(
   })
 );
 
-// MARK: - /stats GET
-// @route   GET /api/admin/stats
-// @desc    Get system statistics
-// @access  Admin
 router.get(
   "/stats",
   asyncHandler(async (req, res) => {
@@ -102,8 +98,8 @@ router.get(
         User.countDocuments({ role: "admin" }),
 
         // Tutor statistics
-        Tutor.countDocuments(), // Total tutors
-        Tutor.countDocuments({ active: true }), // Active tutors
+        Tutor.countDocuments(),
+        Tutor.countDocuments({ active: true }),
 
         // Question statistics
         Question.countDocuments(),
@@ -120,13 +116,23 @@ router.get(
         ]),
       ]);
 
-      const [upcomingSessions, pastSessions] = await Promise.all([
+      // Get session statistics
+      const [
+        upcomingSessions,
+        pastSessions,
+        pendingSessions,
+        confirmedSessions,
+        completedSessions,
+      ] = await Promise.all([
         TutorSession.countDocuments({
           startTime: { $gt: new Date() },
         }),
         TutorSession.countDocuments({
           startTime: { $lte: new Date() },
         }),
+        TutorSession.countDocuments({ status: "pending" }),
+        TutorSession.countDocuments({ status: "confirmed" }),
+        TutorSession.countDocuments({ status: "completed" }),
       ]);
 
       // Calculate test statistics
@@ -156,13 +162,11 @@ router.get(
         },
       ]);
 
-      // Get the test statistics or use defaults if no tests exist
       const testStatistics = testStats[0] || {
         totalTests: 0,
         averageScore: 0,
       };
 
-      // Format the response
       const response = {
         users: {
           total: totalUsers,
@@ -185,6 +189,12 @@ router.get(
         sessions: {
           upcoming: upcomingSessions,
           past: pastSessions,
+          byStatus: {
+            pending: pendingSessions,
+            confirmed: confirmedSessions,
+            completed: completedSessions,
+          },
+          total: upcomingSessions + pastSessions,
         },
         lastUpdated: new Date(),
       };

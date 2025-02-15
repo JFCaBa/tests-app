@@ -5,6 +5,7 @@ import adminRoutes from "./admin.routes.js";
 import chatRoutes from "./chat.routes.js";
 import coachRoutes from "./coach.routes.js";
 import tutorRoutes from "./tutors.routes.js";
+import sessionsRoutes from "./sessions.routes.js";
 import { errors } from "../middleware/index.js";
 
 export const setupRoutes = (app) => {
@@ -16,6 +17,7 @@ export const setupRoutes = (app) => {
   app.use("/api/coach", coachRoutes);
   app.use("/api/chat", chatRoutes);
   app.use("/api/tutors", tutorRoutes);
+  app.use("/api/admin/sessions", sessionsRoutes);
 
   // Health check route
   app.get("/health", (req, res) => {
@@ -36,4 +38,5 @@ export default {
   admin: adminRoutes,
   chat: chatRoutes,
   tutor: tutorRoutes,
+  sessions: sessionsRoutes,
 };
