@@ -15,6 +15,7 @@ import coachRoutes from "./routes/coach.routes.js";
 import tutorRoutes from "./routes/tutors.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
+import sessionsRoutes from "./routes/sessions.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +48,7 @@ app.use("/api/coach", coachRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/tutors", tutorRoutes);
+app.use("/api/sessions", sessionsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
