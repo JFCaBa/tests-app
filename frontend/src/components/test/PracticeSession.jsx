@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Clock, AlertCircle, Eye, Info } from "lucide-react";
@@ -25,6 +26,7 @@ const QuestionTypes = {
 };
 
 export const PracticeSession = () => {
+  const { t } = useTranslation();
   const { subject, mode } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
