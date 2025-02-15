@@ -234,18 +234,19 @@ export default {
     noDataAvailable: "No data available",
   },
   coach: {
-    askQuestion: "Ask your study coach...",
     selectSubject: "Select a subject first",
     selectSubjectToStart:
       "Select a subject and ask questions about exam preparation",
     typing: "Coach is typing...",
     suggestions: "Suggestions",
     cleanMessages: "Clean Messages",
-    confirmClean:
-      "This will remove all chat messages. This action cannot be undone.",
     troubleResponding:
       "I'm having trouble responding right now. Please try again.",
     cleaning: "Cleaning ...",
+    studyCoach: "Study Coach",
+    confirmClean:
+      "Are you sure you want to delete all messages for this subject?",
+    askQuestion: "Ask a question...",
   },
   flashcards: {
     flip: "Flip",
@@ -407,6 +408,26 @@ export default {
     reading: "Reading",
     writing: "Writing",
     all: "All Subjects",
+    details: {
+      listening: {
+        name: "Listening",
+      },
+      grammar: {
+        name: "Grammar",
+      },
+      history: {
+        name: "History",
+      },
+      laws: {
+        name: "Laws",
+      },
+      reading: {
+        name: "Reading",
+      },
+      writing: {
+        name: "Writing",
+      },
+    },
   },
   testSummary: {
     title: "Test Results",
@@ -531,5 +552,43 @@ export default {
     },
     noData: "No data available for the selected subject",
     loading: "Loading...",
+  },
+  suggestions: {
+    listening: {
+      title: "Listening",
+      comprehension: "How can I improve my listening comprehension?",
+      mistakes: "What are common mistakes in listening tests?",
+      tips: "Tips for understanding fast speech",
+    },
+    grammar: {
+      title: "Grammar",
+      cases: "Help with case usage",
+      aspects: "Verb aspects explanation",
+      commonMistakes: "Common grammar mistakes",
+    },
+    history: {
+      title: "History",
+      dates: "Key historical dates to remember",
+      figures: "Important historical figures",
+      examTips: "Tips for history exam preparation",
+    },
+    laws: {
+      title: "Laws",
+      concepts: "Essential legal concepts",
+      questions: "Common law test questions",
+      terminology: "How to study legal terminology",
+    },
+    reading: {
+      title: "Reading",
+      strategies: "Reading comprehension strategies",
+      speed: "How to improve reading speed",
+      context: "Tips for understanding context",
+    },
+    writing: {
+      title: "Writing",
+      structure: "Writing structure tips",
+      mistakes: "Common writing mistakes",
+      improvement: "How to improve essay writing",
+    },
   },
 };

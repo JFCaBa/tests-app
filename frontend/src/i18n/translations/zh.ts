@@ -381,6 +381,26 @@ export default {
     reading: "阅读",
     writing: "写作",
     all: "所有科目",
+    details: {
+      listening: {
+        name: "听力",
+      },
+      grammar: {
+        name: "语法",
+      },
+      history: {
+        name: "历史",
+      },
+      laws: {
+        name: "法律",
+      },
+      reading: {
+        name: "阅读",
+      },
+      writing: {
+        name: "写作",
+      },
+    },
   },
   testSummary: {
     title: "测试结果",
@@ -505,5 +525,43 @@ export default {
     },
     noData: "所选科目没有可用数据",
     loading: "加载中...",
+  },
+  suggestions: {
+    listening: {
+      title: "听力",
+      comprehension: "我如何提高我的听力理解能力？",
+      mistakes: "听力测试中常见的错误有哪些？",
+      tips: "快速理解语音的技巧",
+    },
+    grammar: {
+      title: "语法",
+      cases: "帮助使用语法结构",
+      aspects: "动词方面的解释",
+      commonMistakes: "常见的语法错误",
+    },
+    history: {
+      title: "历史",
+      dates: "需要记住的重要历史日期",
+      figures: "重要历史人物",
+      examTips: "历史考试备考提示",
+    },
+    laws: {
+      title: "法律",
+      concepts: "基本法律概念",
+      questions: "常见法律考试问题",
+      terminology: "如何学习法律术语？",
+    },
+    reading: {
+      title: "阅读",
+      strategies: "阅读理解策略",
+      speed: "如何提高阅读速度？",
+      context: "理解上下文的提示",
+    },
+    writing: {
+      title: "写作",
+      structure: "写作结构提示",
+      mistakes: "常见的写作错误",
+      improvement: "如何提高作文写作？",
+    },
   },
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -6,19 +7,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SUBJECTS } from "./constants";
+import { SUBJECTS, getSubjectName } from "./constants";
 
 const SubjectSelector = ({ value, onChange }) => {
+  const { t } = useTranslation();
+
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger>
-        <SelectValue placeholder="Select subject" />
+        <SelectValue placeholder={t("coach.selectSubject")} />
       </SelectTrigger>
       <SelectContent>
         {SUBJECTS.map((subject) => (
           <SelectItem key={subject.id} value={subject.id}>
             <span className="flex items-center gap-2">
-              {subject.icon} {subject.name}
+              {subject.icon} {getSubjectName(subject.id, t)}
             </span>
           </SelectItem>
         ))}

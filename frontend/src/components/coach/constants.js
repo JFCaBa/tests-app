@@ -1,10 +1,12 @@
+import { useTranslation } from "react-i18next";
+
 export const SUBJECTS = [
-  { id: "listening", name: "Listening", icon: "🎧" },
-  { id: "grammar", name: "Grammar", icon: "📝" },
-  { id: "history", name: "History", icon: "📚" },
-  { id: "laws", name: "Laws", icon: "⚖️" },
-  { id: "reading", name: "Reading", icon: "📖" },
-  { id: "writing", name: "Writing", icon: "✍️" },
+  { id: "listening", name: "", icon: "🎧" },
+  { id: "grammar", name: "", icon: "📝" },
+  { id: "history", name: "", icon: "📚" },
+  { id: "laws", name: "", icon: "⚖️" },
+  { id: "reading", name: "", icon: "📖" },
+  { id: "writing", name: "", icon: "✍️" },
 ];
 
 export const SUGGESTIONS = {
@@ -38,4 +40,9 @@ export const SUGGESTIONS = {
     "Common writing mistakes",
     "How to improve essay writing",
   ],
+};
+
+// Function to get the translated name of a subject
+export const getSubjectName = (subjectId, t) => {
+  return t(`subjects.details.${subjectId}.name`);
 };

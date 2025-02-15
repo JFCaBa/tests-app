@@ -411,6 +411,26 @@ export default {
     reading: "Lectura",
     writing: "Escritura",
     all: "Todos los temas",
+    details: {
+      listening: {
+        name: "Escucha",
+      },
+      grammar: {
+        name: "Gramática",
+      },
+      history: {
+        name: "Historia",
+      },
+      laws: {
+        name: "Leyes",
+      },
+      reading: {
+        name: "Lectura",
+      },
+      writing: {
+        name: "Escritura",
+      },
+    },
   },
   testSummary: {
     title: "Resultados del test",
@@ -535,5 +555,43 @@ export default {
     },
     noData: "No hay datos disponibles para el tema seleccionado",
     loading: "Cargando...",
+  },
+  suggestions: {
+    listening: {
+      title: "Escucha",
+      comprehension: "¿Cómo puedo mejorar mi comprensión auditiva?",
+      mistakes: "¿Cuáles son los errores comunes en las pruebas de escucha?",
+      tips: "Consejos para entender el habla rápida",
+    },
+    grammar: {
+      title: "Gramática",
+      cases: "Ayuda con el uso de casos",
+      aspects: "Explicación de los aspectos verbales",
+      commonMistakes: "Errores comunes de gramática",
+    },
+    history: {
+      title: "Historia",
+      dates: "Fechas históricas clave para recordar",
+      figures: "Figuras históricas importantes",
+      examTips: "Consejos para prepararte para el examen de historia",
+    },
+    laws: {
+      title: "Leyes",
+      concepts: "Conceptos legales esenciales",
+      questions: "Preguntas comunes en los exámenes de derecho",
+      terminology: "Cómo estudiar terminología legal",
+    },
+    reading: {
+      title: "Lectura",
+      strategies: "Estrategias de comprensión lectora",
+      speed: "Cómo mejorar la velocidad de lectura",
+      context: "Consejos para entender el contexto",
+    },
+    writing: {
+      title: "Escritura",
+      structure: "Consejos sobre la estructura de la escritura",
+      mistakes: "Errores comunes en la escritura",
+      improvement: "Cómo mejorar la redacción de ensayos",
+    },
   },
 };

@@ -409,6 +409,26 @@ export default {
     reading: "O'qish",
     writing: "Yozish",
     all: "Barcha fanlar",
+    details: {
+      listening: {
+        name: "Eslatib o'tish",
+      },
+      grammar: {
+        name: "Grammatika",
+      },
+      history: {
+        name: "Tarix",
+      },
+      laws: {
+        name: "Qonunlar",
+      },
+      reading: {
+        name: "O'qish",
+      },
+      writing: {
+        name: "Yozish",
+      },
+    },
   },
   testSummary: {
     title: "Test natijalari",
@@ -533,5 +553,43 @@ export default {
     },
     noData: "Tanlangan fanda ma'lumot mavjud emas",
     loading: "Yuklanmoqda...",
+  },
+  suggestions: {
+    listening: {
+      title: "Eslatib o'tish",
+      comprehension: "Eslatib o'tishni yaxshilash uchun nima qilishim kerak?",
+      mistakes: "Eslatib o'tish testlariда кўп учинчи хатолар қандай?",
+      tips: "Tez gaplashni tushunish uchun maslahatlar",
+    },
+    grammar: {
+      title: "Grammatika",
+      cases: "Vazn ishlatishda yordam",
+      aspects: "Fi'l aspektlarining ta'rifnomasi",
+      commonMistakes: "Ko'p uchinchi grammatikada xatoliklar",
+    },
+    history: {
+      title: "Tarix",
+      dates: "Esda saqlash uchun muhim tarixiy sanaalar",
+      figures: "Muhim tarixiy shaxslar",
+      examTips: "Tarix imtihoniga tayyorlanish uchun maslahatlar",
+    },
+    laws: {
+      title: "Qonunlar",
+      concepts: "Asosiy qonuniy masalalar",
+      questions: "Ko'p uchinchi qonuniy test savollari",
+      terminology: "Qonuniy terminologiyani qanday o'rganish kerak?",
+    },
+    reading: {
+      title: "O'qish",
+      strategies: "O'qishni tushunish uchun strategiyalar",
+      speed: "O'qish tezligini qanday yaxshilash mumkin?",
+      context: "Tushunish uchun maslahatlar",
+    },
+    writing: {
+      title: "Yozish",
+      structure: "Yozish strukturasiga oid maslahatlar",
+      mistakes: "Ko'p uchinchi yozishda xatoliklar",
+      improvement: "Maqola yozishni qanday yaxshilash mumkin?",
+    },
   },
 };

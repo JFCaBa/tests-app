@@ -67,14 +67,12 @@ const CoachChat = () => {
     async (text) => {
       setIsTyping(true);
       let currentText = "";
-
       for (let i = 0; i < text.length; i++) {
         currentText += text[i];
         setDisplayText(currentText);
         await new Promise((resolve) => setTimeout(resolve, TYPING_SPEED));
         scrollToBottom();
       }
-
       setIsTyping(false);
       return text;
     },
@@ -162,7 +160,6 @@ const CoachChat = () => {
         getLearningContext()
       );
 
-      // Start typing simulation
       const typedResponse = await simulateTyping(response);
 
       const botMessage = {
@@ -200,7 +197,7 @@ const CoachChat = () => {
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2">
               <Bot className="w-6 h-6" />
-              Study Coach
+              {t("coach.studyCoach")}
             </CardTitle>
             {messages.length > 0 && (
               <Button
@@ -215,13 +212,11 @@ const CoachChat = () => {
             )}
           </div>
           <CardDescription>{t("coach.selectSubjectToStart")}</CardDescription>
-
           <SubjectSelector
             value={selectedSubject}
             onChange={handleSubjectChange}
           />
         </CardHeader>
-
         <CardContent className="flex-1 overflow-hidden flex flex-col gap-4">
           <ScrollArea className="flex-1" ref={scrollRef}>
             <div className="pr-4">
@@ -236,7 +231,6 @@ const CoachChat = () => {
               {isTyping && <Message message={displayText} isUser={false} />}
             </div>
           </ScrollArea>
-
           <div className="flex flex-col gap-4">
             {selectedSubject && (
               <Suggestions
@@ -247,7 +241,6 @@ const CoachChat = () => {
                 }}
               />
             )}
-
             <div className="flex gap-2">
               <Input
                 value={input}
@@ -257,7 +250,7 @@ const CoachChat = () => {
                 }
                 placeholder={
                   selectedSubject
-                    ? t("coack.askQuestion")
+                    ? t("coach.askQuestion")
                     : t("coach.selectSubject")
                 }
                 disabled={!selectedSubject || loading}
@@ -276,7 +269,6 @@ const CoachChat = () => {
           </div>
         </CardContent>
       </Card>
-
       <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
