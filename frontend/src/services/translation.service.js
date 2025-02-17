@@ -10,9 +10,11 @@ class TranslationService {
    */
   async translate(text) {
     try {
+      const preferredLanguage =
+        localStorage.getItem("preferredLanguage") || "en";
       const params = new URLSearchParams({
         q: text.trim(),
-        langpair: "ru|en",
+        langpair: `es|${preferredLanguage}`,
       });
 
       const response = await fetch(`${this.API_URL}?${params}`);
