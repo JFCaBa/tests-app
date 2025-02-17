@@ -59,6 +59,7 @@ export default defineConfig({
         entryFileNames: "assets/[name]-[hash].js",
       },
     },
+    outDir: "build", // This is crucial: sets the output directory
   },
   optimizeDeps: {
     include: [
@@ -69,4 +70,6 @@ export default defineConfig({
       "@radix-ui/react-toast",
     ],
   },
+  root: "./", // This is crucial: sets the project root
+  publicDir: "./public", // This is crucial: sets the public directory
 });
