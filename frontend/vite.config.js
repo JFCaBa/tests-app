@@ -45,26 +45,17 @@ export default defineConfig({
       },
     },
     target: "esnext",
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Group React and ReactDOM into the vendor chunk
-          if (
-            id.includes("node_modules/react") ||
-            id.includes("node_modules/react-dom") ||
-            id.includes("node_modules/react-router-dom") || // Include other React-related deps
-            id.includes("node_modules/scheduler") // Include React's scheduler
-          ) {
-            return "vendor-react";
-          }
-          if (id.includes("node_modules")) {
-            return "vendor"; // Splitting node_modules into one vendor chunk
-          }
-        },
-        chunkFileNames: "assets/[name]-[hash].js",
-        entryFileNames: "assets/[name]-[hash].js",
-      },
-    },
+    // rollupOptions: {
+    //   output: {
+    //     manualChunks: (id) => {
+    //       if (id.includes("node_modules")) {
+    //         return "vendor"; // Splitting node_modules into one vendor chunk
+    //       }
+    //     },
+    //     chunkFileNames: "assets/[name]-[hash].js",
+    //     entryFileNames: "assets/[name]-[hash].js",
+    //   },
+    // },
     outDir: "build", // This is crucial: sets the output directory
   },
   optimizeDeps: {
