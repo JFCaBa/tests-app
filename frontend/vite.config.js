@@ -48,9 +48,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
+          // Group React and ReactDOM into the vendor chunk
           if (
             id.includes("node_modules/react") ||
-            id.includes("node_modules/react-dom")
+            id.includes("node_modules/react-dom") ||
+            id.includes("node_modules/react-router-dom") || // Include other React-related deps
+            id.includes("node_modules/scheduler") // Include React's scheduler
           ) {
             return "vendor-react";
           }
