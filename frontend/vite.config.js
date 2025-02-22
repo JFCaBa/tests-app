@@ -48,11 +48,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
+          if (
+            id.includes("node_modules/react") ||
+            id.includes("node_modules/react-dom")
+          ) {
+            return "vendor-react";
+          }
           if (id.includes("node_modules")) {
-            if (id.includes("@radix-ui")) return "vendor-radix";
-            if (id.includes("react")) return "vendor-react";
-            if (id.includes("recharts")) return "vendor-charts";
-            return "vendor-others";
+            return "vendor"; // Splitting node_modules into one vendor chunk
           }
         },
         chunkFileNames: "assets/[name]-[hash].js",
