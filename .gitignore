@@ -37,3 +37,7 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# backup files
+testmyrussian_dump_*.tar.gz
+testmyrussian_uploads_*.tar.gz
