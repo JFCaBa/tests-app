@@ -37,7 +37,7 @@ export default defineConfig({
     open: true,
   },
   build: {
-    sourcemap: process.env.NODE_ENV !== "production",
+    sourcemap: false,
     minify: "terser",
     terserOptions: {
       compress: {
@@ -45,18 +45,24 @@ export default defineConfig({
       },
     },
     target: "esnext",
-    // rollupOptions: {
-    //   output: {
-    //     manualChunks: (id) => {
-    //       if (id.includes("node_modules")) {
-    //         return "vendor"; // Splitting node_modules into one vendor chunk
-    //       }
-    //     },
-    //     chunkFileNames: "assets/[name]-[hash].js",
-    //     entryFileNames: "assets/[name]-[hash].js",
-    //   },
-    // },
-    outDir: "build", // This is crucial: sets the output directory
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-others': [
+            'axios',
+            'react-router-dom',
+            'react-i18next',
+            'i18next',
+            'lucide-react',
+            'class-variance-authority',
+            'clsx',
+            'tailwind-merge',
+          ],
+        },
+      },
+    },
+    outDir: "dist", // Changed from build to dist to match Dockerfile
   },
   optimizeDeps: {
     include: [

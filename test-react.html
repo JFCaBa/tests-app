@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React Test</title>
+</head>
+<body>
+    <div id="test-root">Loading...</div>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script>
+        console.log('React:', typeof React);
+        console.log('ReactDOM:', typeof ReactDOM);
+        console.log('useLayoutEffect:', typeof React.useLayoutEffect);
+
+        const e = React.createElement;
+        const root = ReactDOM.createRoot(document.getElementById('test-root'));
+        root.render(e('h1', null, 'React is working!'));
+    </script>
+</body>
+</html>

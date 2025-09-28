@@ -11,7 +11,7 @@ import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Suspense fallback="Loading...">
+    <Suspense fallback="Loading application...">
       <AuthProvider>
         <SettingsProvider>
           <CoachProvider>

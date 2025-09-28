@@ -24,7 +24,7 @@ const app = express();
 
 // Middleware
 const corsOptions = {
-  origin: ["https://testmyrussian.com", "https://www.testmyrussian.com"],
+  origin: config.corsOrigin === '*' ? true : config.corsOrigin.split(','),
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -37,7 +37,8 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Serve static files from the uploads directory
-app.use("/uploads", express.static("/var/www/testmyrussian.com/uploads"));
+const uploadsPath = config.uploadPath || "/var/www/testmyrussian.com/uploads";
+app.use("/uploads", express.static(uploadsPath));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -58,19 +59,19 @@ app.use((err, req, res, next) => {
 });
 
 // Debug static file serving
-const uploadsPath = path.join(__dirname, "../uploads");
+const debugUploadsPath = path.join(__dirname, "../uploads");
 app.get("/debug-static", (req, res) => {
   const testFile = path.join(
-    uploadsPath,
+    debugUploadsPath,
     "audio",
     "audio-1738069076455-15569576.mp3"
   );
   res.json({
-    uploadsPath,
+    debugUploadsPath,
     testFile,
     exists: fs.existsSync(testFile),
-    files: fs.existsSync(path.join(uploadsPath, "audio"))
-      ? fs.readdirSync(path.join(uploadsPath, "audio"))
+    files: fs.existsSync(path.join(debugUploadsPath, "audio"))
+      ? fs.readdirSync(path.join(debugUploadsPath, "audio"))
       : [],
   });
 });

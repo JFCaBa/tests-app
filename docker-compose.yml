@@ -23,12 +23,12 @@ services:
     container_name: test-app-backend
     restart: always
     ports:
-      - "3000:3000"
+      - "1999:3000"
     depends_on:
       - mongodb
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:password@mongodb:27017/test-app
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/test-app?authSource=admin
       - JWT_SECRET=supersecretjwtkeychangeme
       - CORS_ORIGIN=*
       - UPLOAD_PATH=/app/uploads
@@ -45,7 +45,7 @@ services:
     container_name: test-app-frontend
     restart: always
     ports:
-      - "80:80"
+      - "5173:80"
     depends_on:
       - backend
     networks:
