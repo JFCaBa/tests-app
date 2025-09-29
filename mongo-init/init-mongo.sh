@@ -7,6 +7,6 @@ echo "Starting MongoDB data import..."
 sleep 5
 
 # Import all collections from the dump
-mongorestore --host localhost --username admin --password password --authenticationDatabase admin --db test-app /docker-entrypoint-initdb.d/test-app
+mongorestore --host localhost --username admin --password password --authenticationDatabase admin --db test-app /docker-entrypoint-initdb.d/
 
 echo "MongoDB data import completed!"
