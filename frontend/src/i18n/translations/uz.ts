@@ -592,4 +592,186 @@ export default {
       improvement: "Maqola yozishni qanday yaxshilash mumkin?",
     },
   },
+  footer: {
+    rights: "Barcha huquqlar himoyalangan.",
+    contact: "Aloqa",
+    privacy: "Maxfiylik Siyosati",
+    terms: "Shartlar va Qoidalar",
+  },
+  contact: {
+    title: "Aloqa Ma'lumotlari",
+    subtitle: "Test My Russian va bizning joylashuvimiz haqida ko'proq bilib oling",
+    location: {
+      title: "Bizning Joylashuvimiz",
+      city: "Sankt-Peterburg",
+      country: "Rossiya",
+      description: "Biz Sankt-Peterburg, Rossiyada joylashganmiz va butun dunyo bo'ylab rus tili testlash va ta'lim xizmatlarini taqdim etamiz.",
+    },
+    languages: {
+      title: "Mavjud Tillar",
+      description: "Bizning platforma bir nechta tillarda mavjud:",
+    },
+    service: {
+      title: "Xizmat Ko'rsatish Hududi",
+      description: "Biz butun dunyo bo'ylab rus tilini o'rganayotgan talabalar va mutaxassislarga xizmat ko'rsatamiz:",
+    },
+    about: {
+      title: "Biz Haqimizda",
+      description: "Test My Russian - bu barcha malaka darajalaridagi o'rganuvchilar uchun keng qamrovli rus tili testlash, mashq materiallari, repetitorlik xizmatlari va AI bilan ta'minlangan murabbiylikni taqdim etuvchi ta'lim platformasidir.",
+    },
+    website: "Veb-sayt",
+  },
+  privacy: {
+    title: "Maxfiylik Siyosati",
+    lastUpdated: "Oxirgi yangilanish: Oktabr 2025",
+    intro: {
+      title: "Kirish",
+      content: "Test My Russian kompaniyasida ('biz', 'bizning', 'bizniki') sizning maxfiyligingizni himoya qilish muhimdir. Ushbu Maxfiylik Siyosati sizning testmyrussian.com veb-saytimiz va bog'liq xizmatlarimizdan foydalanganingizda ma'lumotlaringizni qanday to'playmiz, ishlatamiz va himoya qilishimizni tushuntiradi.",
+    },
+    dataCollection: {
+      title: "Biz To'playdigan Ma'lumotlar",
+      intro: "Biz sizning to'g'ridan-to'g'ri taqdim etgan ma'lumotlaringizni to'playmiz, jumladan:",
+      items: {
+        personal: "Shaxsiy ma'lumotlar (ism, elektron pochta manzili, telefon raqami)",
+        account: "Hisob ma'lumotlari va profil ma'lumotlari",
+        test: "Test natijalari, mashq sessiyalari ma'lumotlari va o'rganish jarayoni",
+        usage: "Foydalanish ma'lumotlari, qurilma ma'lumotlari va tahlillar",
+      },
+    },
+    dataUse: {
+      title: "Ma'lumotlaringizni Qanday Ishlatamiz",
+      intro: "Biz to'plagan ma'lumotlarni quyidagilar uchun ishlatamiz:",
+      items: {
+        service: "Ta'lim xizmatlarimizni taqdim etish, saqlash va yaxshilash",
+        improve: "O'qitish usullarimizning samaradorligini tahlil qilish va yaxshilash",
+        personalize: "O'rganish tajribangizni shaxsiylashtirish va jarayoningizni kuzatish",
+        communicate: "Yangilanishlar, takliflar va yordam bo'yicha siz bilan aloqa qilish",
+        analytics: "Platformadan foydalanish va o'rganish natijalari bo'yicha tahlillar va tushunchalar yaratish",
+      },
+    },
+    dataProtection: {
+      title: "Ma'lumotlarni Himoya Qilish",
+      content: "Biz shaxsiy ma'lumotlaringizni ruxsatsiz kirish, o'zgartirish, oshkor qilish yoki yo'q qilishdan himoya qilish uchun tegishli texnik va tashkiliy xavfsizlik choralarini amalga oshiramiz. Biz sanoat standartlariga mos shifrlash, xavfsiz serverlar va muntazam xavfsizlik auditlaridan foydalanamiz.",
+    },
+    cookies: {
+      title: "Cookie va Kuzatuv",
+      content: "Biz xizmatlarimizni yaxshilash, foydalanuvchi tajribasini shaxsiylashtirish va trafikni tahlil qilish uchun cookie va o'xshash kuzatuv texnologiyalaridan foydalanamiz. Brauzer sozlamalaringiz orqali cookie-larni boshqarishingiz mumkin, lekin ba'zi funktsiyalar to'g'ri ishlamasligi mumkin.",
+    },
+    thirdParty: {
+      title: "Uchinchi Tomon Xizmatlari",
+      intro: "Biz xizmatlarimizni taqdim etish uchun ishonchli uchinchi tomon xizmat ko'rsatuvchilar bilan ma'lumotlarni almashishimiz mumkin:",
+      items: {
+        yandex: "Yandex reklama xizmatlari",
+        payment: "Obuna xizmatlari uchun to'lov protsessorlari",
+        analytics: "Xizmatlarimizni yaxshilash uchun tahlil provayderlari",
+      },
+    },
+    rights: {
+      title: "Sizning Huquqlaringiz",
+      intro: "Sizda quyidagi huquqlar mavjud:",
+      items: {
+        access: "Shaxsiy ma'lumotlaringizga kirish, yangilash yoki o'chirish",
+        correct: "Noto'g'ri yoki to'liq bo'lmagan ma'lumotlarni to'g'rilash",
+        delete: "Hisobingiz va bog'liq ma'lumotlarni o'chirishni so'rash",
+        export: "Ma'lumotlaringizni portativ formatda eksport qilish",
+      },
+    },
+    children: {
+      title: "Bolalar Maxfiyligi",
+      content: "Bizning xizmatimiz 16 yoshdan oshgan foydalanuvchilar uchun mo'ljallangan. Biz ongli ravishda 16 yoshdan kichik bolalardan shaxsiy ma'lumotlarni to'plamaymiz. Agar siz 16 yoshdan kichik bo'lgan bolaning shaxsiy ma'lumotlarini taqdim etganingizni anglasak, biz ushbu ma'lumotlarni o'chirishga choralar ko'ramiz.",
+    },
+    changes: {
+      title: "Ushbu Siyosatdagi O'zgarishlar",
+      content: "Biz vaqti-vaqti bilan ushbu Maxfiylik Siyosatini yangilashimiz mumkin. Biz ushbu sahifada yangi versiyani e'lon qilish orqali sizga har qanday o'zgarishlar haqida xabar beramiz. Siz ushbu Maxfiylik Siyosatini vaqti-vaqti bilan ko'rib chiqishingizni maslahat beramiz.",
+    },
+    contact: {
+      title: "Biz Bilan Bog'laning",
+      content: "Agar sizda ushbu Maxfiylik Siyosati haqida savollaringiz bo'lsa, biz bilan bog'laning:",
+      location: "Test My Russian",
+      city: "Sankt-Peterburg",
+      country: "Rossiya",
+    },
+  },
+  terms: {
+    title: "Shartlar va Qoidalar",
+    lastUpdated: "Oxirgi yangilanish: Oktabr 2025",
+    acceptance: {
+      title: "Shartlarni Qabul Qilish",
+      content: "Test My Russian ('Xizmat', 'biz', 'bizning', 'bizniki')ga kirish va undan foydalanish orqali siz ushbu Shartlar va Qoidalar ('Shartlar')ga rioya qilishga rozilik bildirasiz. Agar siz ushbu Shartlarning har qanday qismiga rozi bo'lmasangiz, Xizmatdan foydalanmang.",
+    },
+    services: {
+      title: "Xizmatlar Tavsifi",
+      intro: "Test My Russian onlayn rus tili ta'lim xizmatlarini taqdim etadi, jumladan:",
+      items: {
+        tests: "Rus tili malakasi testlari va baholashlar",
+        practice: "Mashq savollari va mashqlar",
+        tutoring: "Yakka-yakkadan repetitorlik sessiялari",
+        coaching: "AI bilan ta'minlangan til murabbiylik",
+        flashcards: "Lug'at va grammatika flashcard tizimlari",
+      },
+    },
+    accounts: {
+      title: "Foydalanuvchi Hisobları",
+      intro: "Ba'zi funktsiyalardan foydalanish uchun hisob yaratishingiz kerak. Siz quyidagilarni qabul qilasiz:",
+      items: {
+        accurate: "To'g'ri va to'liq ro'yxatdan o'tish ma'lumotlarini taqdim etish",
+        secure: "Parolingiz va hisobingiz xavfsizligini saqlash",
+        responsible: "Hisobingiz ostidagi barcha faoliyat uchun javobgar bo'lish",
+        notify: "Hisobingizdan ruxsatsiz foydalanish haqida darhol bizga xabar berish",
+      },
+    },
+    usage: {
+      title: "Qabul Qilinadigan Foydalanish",
+      intro: "Siz quyidagilarni qilmaslikka rozilik bildirasiz:",
+      prohibited: {
+        violate: "Har qanday qo'llaniladigan qonunlar yoki qoidalarni buzish",
+        hack: "Tizimlarimizga ruxsatsiz kirish uchun harakat qilish",
+        spam: "Boshqa foydalanuvchilar yoki xodimlarimizni spam qilish, ta'qib qilish yoki suiiste'mol qilish",
+        impersonate: "Har qanday shaxs yoki tashkilotni taqlid qilish",
+        share: "Hisob ma'lumotlaringizni boshqalar bilan baham ko'rish",
+        scrape: "Ruxsatsiz kontentimizni qirish, nusxalash yoki qayta tarqatish",
+      },
+    },
+    intellectual: {
+      title: "Intellektual Mulk",
+      content: "Test My Russian'dagi barcha kontent, savdo belgilari va ma'lumotlar bizga yoki litsenziya beruvchilarga tegishli va mualliflik huquqi, savdo belgisi va boshqa intellektual mulk qonunlari bilan himoyalangan. Siz bizning yozma ruxsatimiz bo'lmasa, har qanday kontentdan foydalana olmaysiz, nusxa olmaysiz yoki tarqata olmaysiz.",
+    },
+    payments: {
+      title: "To'lovlar va Obunalar",
+      intro: "Pullik xizmatlar uchun:",
+      items: {
+        pricing: "Narxlar xabar berilgandan keyin o'zgarishi mumkin",
+        billing: "Obunalar oldindan takroriy asosda to'lanadi",
+        refunds: "Qaytarishlar bizning qaytarish siyosatimizga muvofiq taqdim etiladi",
+        cancellation: "Istalgan vaqtda obunangizni bekor qilishingiz mumkin",
+      },
+    },
+    disclaimer: {
+      title: "Kafolatlardan Voz Kechish",
+      content: "Bizning xizmatlarimiz kafolatsiz 'shunday' taqdim etiladi. Biz mahsulot, xizmatlar yoki kontentimiz haqida hech qanday aniq yoki nazarda tutilgan kafolatlar bermaymiz, jumladan, sotish qobiliyati, ma'lum maqsadga mos kelish va huquqni buzmaslik kafolatlari.",
+    },
+    limitation: {
+      title: "Javobgarlikni Cheklash",
+      content: "Qonun tomonidan ruxsat berilgan maksimal darajada, Test My Russian yoki uning direktori, xodimlari yoki agentlari Xizmatdan foydalanish natijasida yuzaga kelgan bevosita, bilvosita, tasodifiy, maxsus, oqibatli yoki jazolash zarar uchun javobgar bo'lmaydi.",
+    },
+    termination: {
+      title: "Tugatish",
+      content: "Biz ushbu Shartlarni buzganingiz uchun yoki har qanday boshqa sababga ko'ra hisobingizni to'xtatish yoki tugatish huquqini saqlab qolamiz. Tugatishdan keyin, Xizmatdan foydalanish huquqingiz darhol to'xtaydi.",
+    },
+    governing: {
+      title: "Boshqaruvchi Qonun",
+      content: "Ushbu shartlar Rossiya Federatsiyasi qonunlari bilan tartibga solinadi va talqin qilinadi. Har qanday nizolar Sankt-Peterburg, Rossiya sudlarining eksklyuziv yurisdiktsiyasiga bo'ysunadi.",
+    },
+    changes: {
+      title: "Shartlardagi O'zgarishlar",
+      content: "Biz istalgan vaqtda ushbu shartlarni o'zgartirishimiz mumkin. Muhim o'zgarishlar haqida sizga xizmat orqali yoki hisobingizga bog'langan elektron pochta manziliga xabar beramiz. Xizmatdan o'zgarishlardan keyin davom etish yangi Shartlarni qabul qilishni bildiradi.",
+    },
+    contact: {
+      title: "Aloqa Ma'lumotlari",
+      content: "Ushbu Shartlar va Qoidalar haqida savollaringiz bo'lsa, biz bilan bog'laning:",
+      location: "Test My Russian",
+      city: "Sankt-Peterburg",
+      country: "Rossiya",
+    },
+  },
 };

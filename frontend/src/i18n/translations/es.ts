@@ -594,4 +594,205 @@ export default {
       improvement: "Cómo mejorar la redacción de ensayos",
     },
   },
+  footer: {
+    rights: "Todos los derechos reservados.",
+    contact: "Contacto",
+    privacy: "Política de Privacidad",
+    terms: "Términos y Condiciones",
+  },
+  contact: {
+    title: "Información de Contacto",
+    subtitle: "Conozca más sobre Test My Russian y nuestra ubicación",
+    location: {
+      title: "Nuestra Ubicación",
+      city: "San Petersburgo",
+      country: "Rusia",
+      description:
+        "Tenemos nuestra sede en San Petersburgo, Rusia, brindando servicios de evaluación y educación del idioma ruso en todo el mundo.",
+    },
+    languages: {
+      title: "Idiomas Disponibles",
+      description: "Nuestra plataforma está disponible en varios idiomas:",
+    },
+    service: {
+      title: "Área de Servicio",
+      description:
+        "Servimos a estudiantes y profesionales de todo el mundo que están aprendiendo ruso para:",
+    },
+    about: {
+      title: "Sobre Nosotros",
+      description:
+        "Test My Russian es una plataforma educativa que proporciona evaluaciones integrales del idioma ruso, materiales de práctica, servicios de tutoría y coaching impulsado por IA para estudiantes de todos los niveles de competencia.",
+    },
+    website: "Sitio Web",
+  },
+  privacy: {
+    title: "Política de Privacidad",
+    lastUpdated: "Última actualización: Octubre 2025",
+    intro: {
+      title: "Introducción",
+      content:
+        "Test My Russian ('nosotros', 'nos' o 'nuestro') está comprometido con la protección de su privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y protegemos su información cuando utiliza nuestra plataforma de evaluación y educación del idioma ruso.",
+    },
+    dataCollection: {
+      title: "Información que Recopilamos",
+      intro: "Recopilamos información que usted nos proporciona directamente, incluyendo:",
+      items: {
+        personal: "Información personal (nombre, dirección de correo electrónico, número de teléfono)",
+        account: "Credenciales de cuenta e información de perfil",
+        test: "Resultados de pruebas, datos de sesiones de práctica y progreso de aprendizaje",
+        usage: "Datos de uso, información del dispositivo y análisis",
+      },
+    },
+    dataUse: {
+      title: "Cómo Usamos su Información",
+      intro: "Utilizamos la información que recopilamos para:",
+      items: {
+        service: "Proporcionar, mantener y mejorar nuestros servicios educativos",
+        improve: "Analizar y mejorar la efectividad de nuestros métodos de enseñanza",
+        personalize: "Personalizar su experiencia de aprendizaje y seguir su progreso",
+        communicate: "Comunicarnos con usted sobre actualizaciones, ofertas y soporte",
+        analytics: "Generar análisis e información sobre el uso de la plataforma y los resultados del aprendizaje",
+      },
+    },
+    dataProtection: {
+      title: "Protección de Datos",
+      content:
+        "Implementamos medidas de seguridad técnicas y organizativas apropiadas para proteger su información personal contra el acceso, alteración, divulgación o destrucción no autorizados. Sus datos se almacenan de forma segura y se cifran tanto en tránsito como en reposo.",
+    },
+    cookies: {
+      title: "Cookies y Seguimiento",
+      content:
+        "Utilizamos cookies y tecnologías de seguimiento similares para mejorar su experiencia, analizar el uso de la plataforma y mejorar nuestros servicios. Puede controlar la configuración de cookies a través de las preferencias de su navegador.",
+    },
+    thirdParty: {
+      title: "Servicios de Terceros",
+      intro:
+        "Podemos compartir información con proveedores de servicios de terceros de confianza que nos ayudan a operar nuestra plataforma, incluyendo:",
+      items: {
+        yandex: "Servicios de publicidad de Yandex",
+        payment: "Procesadores de pagos para servicios de suscripción",
+        analytics: "Proveedores de análisis para mejorar nuestros servicios",
+      },
+    },
+    rights: {
+      title: "Sus Derechos",
+      intro: "Usted tiene derecho a:",
+      items: {
+        access: "Acceder, actualizar o eliminar su información personal",
+        correct: "Corregir datos inexactos o incompletos",
+        delete: "Solicitar la eliminación de su cuenta y datos asociados",
+        export: "Exportar sus datos en un formato portátil",
+      },
+    },
+    children: {
+      title: "Privacidad de los Niños",
+      content:
+        "Nuestro servicio está destinado a usuarios mayores de 16 años. No recopilamos intencionalmente información personal de niños menores de 16 años sin el consentimiento de los padres.",
+    },
+    changes: {
+      title: "Cambios a esta Política",
+      content:
+        "Podemos actualizar esta Política de Privacidad de vez en cuando. Le notificaremos sobre cualquier cambio significativo publicando la nueva política en esta página y actualizando la fecha de 'Última actualización'.",
+    },
+    contact: {
+      title: "Contáctenos",
+      content:
+        "Si tiene preguntas sobre esta Política de Privacidad o nuestras prácticas de datos, contáctenos:",
+      location: "Test My Russian",
+      city: "San Petersburgo",
+      country: "Rusia",
+    },
+  },
+  terms: {
+    title: "Términos y Condiciones",
+    lastUpdated: "Última actualización: Octubre 2025",
+    acceptance: {
+      title: "Aceptación de los Términos",
+      content:
+        "Al acceder y usar Test My Russian, acepta y acuerda estar sujeto a estos Términos y Condiciones. Si no está de acuerdo con estos términos, no use nuestros servicios.",
+    },
+    services: {
+      title: "Descripción de los Servicios",
+      intro:
+        "Test My Russian proporciona servicios de educación del idioma ruso en línea, incluyendo:",
+      items: {
+        tests: "Pruebas y evaluaciones de competencia en ruso",
+        practice: "Preguntas y ejercicios de práctica",
+        tutoring: "Sesiones de tutoría individuales",
+        coaching: "Coaching de idiomas impulsado por IA",
+        flashcards: "Sistemas de tarjetas didácticas de vocabulario y gramática",
+      },
+    },
+    accounts: {
+      title: "Cuentas de Usuario",
+      intro: "Para usar ciertas funciones, debe crear una cuenta. Usted acepta:",
+      items: {
+        accurate: "Proporcionar información de registro precisa y completa",
+        secure: "Mantener la seguridad de su contraseña y cuenta",
+        responsible: "Ser responsable de todas las actividades bajo su cuenta",
+        notify: "Notificarnos inmediatamente sobre cualquier uso no autorizado de su cuenta",
+      },
+    },
+    usage: {
+      title: "Uso Aceptable",
+      intro: "Usted acepta no:",
+      prohibited: {
+        violate: "Violar ninguna ley o regulación aplicable",
+        hack: "Intentar obtener acceso no autorizado a nuestros sistemas",
+        spam: "Enviar spam, acosar o abusar de otros usuarios o nuestro personal",
+        impersonate: "Hacerse pasar por cualquier persona o entidad",
+        share: "Compartir sus credenciales de cuenta con otros",
+        scrape: "Extraer, copiar o redistribuir nuestro contenido sin permiso",
+      },
+    },
+    intellectual: {
+      title: "Propiedad Intelectual",
+      content:
+        "Todo el contenido, marcas comerciales y datos en Test My Russian, incluyendo preguntas, materiales, software y diseño, son propiedad de Test My Russian o nuestros licenciantes. No puede copiar, reproducir o redistribuir nuestro contenido sin permiso expreso por escrito.",
+    },
+    payments: {
+      title: "Pagos y Suscripciones",
+      intro: "Para servicios pagos:",
+      items: {
+        pricing: "Los precios están sujetos a cambios con previo aviso",
+        billing: "Las suscripciones se facturan por adelantado de forma recurrente",
+        refunds: "Los reembolsos se proporcionan de acuerdo con nuestra política de reembolsos",
+        cancellation: "Puede cancelar su suscripción en cualquier momento",
+      },
+    },
+    disclaimer: {
+      title: "Descargo de Responsabilidad de Garantías",
+      content:
+        "Nuestros servicios se proporcionan 'tal cual' sin garantías de ningún tipo. No garantizamos que nuestros servicios sean ininterrumpidos, libres de errores, o que los resultados de usar nuestra plataforma cumplan con sus expectativas o aseguren aprobar exámenes oficiales.",
+    },
+    limitation: {
+      title: "Limitación de Responsabilidad",
+      content:
+        "En la máxima medida permitida por la ley, Test My Russian no será responsable de ningún daño indirecto, incidental, especial o consecuente que surja del uso de nuestros servicios.",
+    },
+    termination: {
+      title: "Terminación",
+      content:
+        "Nos reservamos el derecho de suspender o terminar su cuenta en cualquier momento por violaciones de estos términos o por cualquier otra razón a nuestro exclusivo criterio.",
+    },
+    governing: {
+      title: "Ley Aplicable",
+      content:
+        "Estos términos se rigen por las leyes de la Federación Rusa. Cualquier disputa se resolverá en los tribunales de San Petersburgo, Rusia.",
+    },
+    changes: {
+      title: "Cambios a los Términos",
+      content:
+        "Podemos modificar estos términos en cualquier momento. El uso continuado de nuestros servicios después de los cambios constituye la aceptación de los términos modificados.",
+    },
+    contact: {
+      title: "Información de Contacto",
+      content:
+        "Para preguntas sobre estos Términos y Condiciones, contáctenos:",
+      location: "Test My Russian",
+      city: "San Petersburgo",
+      country: "Rusia",
+    },
+  },
 };

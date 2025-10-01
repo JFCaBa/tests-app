@@ -564,4 +564,186 @@ export default {
       improvement: "如何提高作文写作？",
     },
   },
+  footer: {
+    rights: "保留所有权利。",
+    contact: "联系我们",
+    privacy: "隐私政策",
+    terms: "条款和条件",
+  },
+  contact: {
+    title: "联系信息",
+    subtitle: "了解更多关于 Test My Russian 和我们的位置",
+    location: {
+      title: "我们的位置",
+      city: "圣彼得堡",
+      country: "俄罗斯",
+      description: "我们总部位于俄罗斯圣彼得堡，为全球提供俄语测试和教育服务。",
+    },
+    languages: {
+      title: "可用语言",
+      description: "我们的平台支持多种语言：",
+    },
+    service: {
+      title: "服务区域",
+      description: "我们为全球学习俄语的学生和专业人士提供服务，用于：",
+    },
+    about: {
+      title: "关于我们",
+      description: "Test My Russian 是一个教育平台，为各个水平的学习者提供全面的俄语测试、练习材料、辅导服务和人工智能驱动的指导。",
+    },
+    website: "网站",
+  },
+  privacy: {
+    title: "隐私政策",
+    lastUpdated: "最后更新：2025年10月",
+    intro: {
+      title: "简介",
+      content: "Test My Russian（'我们'、'我们的'）致力于保护您的隐私。本隐私政策解释了当您使用我们的俄语测试和教育平台时，我们如何收集、使用、披露和保护您的信息。",
+    },
+    dataCollection: {
+      title: "我们收集的信息",
+      intro: "我们收集您直接提供给我们的信息，包括：",
+      items: {
+        personal: "个人信息（姓名、电子邮件地址、电话号码）",
+        account: "账户凭据和个人资料信息",
+        test: "测试结果、练习会话数据和学习进度",
+        usage: "使用数据、设备信息和分析",
+      },
+    },
+    dataUse: {
+      title: "我们如何使用您的信息",
+      intro: "我们使用收集的信息来：",
+      items: {
+        service: "提供、维护和改进我们的教育服务",
+        improve: "分析和改进我们教学方法的有效性",
+        personalize: "个性化您的学习体验并跟踪您的进度",
+        communicate: "与您沟通有关更新、优惠和支持的信息",
+        analytics: "生成有关平台使用和学习成果的分析和见解",
+      },
+    },
+    dataProtection: {
+      title: "数据保护",
+      content: "我们实施适当的技术和组织安全措施，以保护您的个人信息免遭未经授权的访问、更改、披露或破坏。您的数据在传输和静态状态下都经过安全存储和加密。",
+    },
+    cookies: {
+      title: "Cookie和跟踪",
+      content: "我们使用Cookie和类似的跟踪技术来增强您的体验、分析平台使用情况并改进我们的服务。您可以通过浏览器偏好设置控制Cookie设置。",
+    },
+    thirdParty: {
+      title: "第三方服务",
+      intro: "我们可能会与帮助我们运营平台的可信第三方服务提供商共享信息，包括：",
+      items: {
+        yandex: "Yandex 广告服务",
+        payment: "订阅服务的支付处理器",
+        analytics: "分析提供商以改进我们的服务",
+      },
+    },
+    rights: {
+      title: "您的权利",
+      intro: "您有权：",
+      items: {
+        access: "访问、更新或删除您的个人信息",
+        correct: "更正不准确或不完整的数据",
+        delete: "请求删除您的账户和相关数据",
+        export: "以可移植格式导出您的数据",
+      },
+    },
+    children: {
+      title: "儿童隐私",
+      content: "我们的服务面向16岁及以上的用户。未经父母同意，我们不会故意收集16岁以下儿童的个人信息。",
+    },
+    changes: {
+      title: "本政策的变更",
+      content: "我们可能会不时更新本隐私政策。我们将通过在本页面发布新政策并更新'最后更新'日期来通知您任何重大变更。",
+    },
+    contact: {
+      title: "联系我们",
+      content: "如果您对本隐私政策或我们的数据实践有任何疑问，请联系我们：",
+      location: "Test My Russian",
+      city: "圣彼得堡",
+      country: "俄罗斯",
+    },
+  },
+  terms: {
+    title: "条款和条件",
+    lastUpdated: "最后更新：2025年10月",
+    acceptance: {
+      title: "接受条款",
+      content: "通过访问和使用 Test My Russian，您接受并同意受这些条款和条件的约束。如果您不同意这些条款，请不要使用我们的服务。",
+    },
+    services: {
+      title: "服务描述",
+      intro: "Test My Russian 提供在线俄语教育服务，包括：",
+      items: {
+        tests: "俄语能力测试和评估",
+        practice: "练习题和练习",
+        tutoring: "一对一辅导课程",
+        coaching: "人工智能驱动的语言指导",
+        flashcards: "词汇和语法闪卡系统",
+      },
+    },
+    accounts: {
+      title: "用户账户",
+      intro: "要使用某些功能，您必须创建一个账户。您同意：",
+      items: {
+        accurate: "提供准确和完整的注册信息",
+        secure: "维护您的密码和账户的安全",
+        responsible: "对您账户下的所有活动负责",
+        notify: "立即通知我们您账户的任何未经授权使用",
+      },
+    },
+    usage: {
+      title: "可接受的使用",
+      intro: "您同意不：",
+      prohibited: {
+        violate: "违反任何适用的法律或法规",
+        hack: "试图未经授权访问我们的系统",
+        spam: "向其他用户或我们的员工发送垃圾邮件、骚扰或滥用",
+        impersonate: "冒充任何人或实体",
+        share: "与他人共享您的账户凭据",
+        scrape: "未经许可抓取、复制或重新分发我们的内容",
+      },
+    },
+    intellectual: {
+      title: "知识产权",
+      content: "Test My Russian 上的所有内容、商标和数据，包括问题、材料、软件和设计，均为 Test My Russian 或我们的许可方的财产。未经明确书面许可，您不得复制、再现或重新分发我们的内容。",
+    },
+    payments: {
+      title: "付款和订阅",
+      intro: "对于付费服务：",
+      items: {
+        pricing: "价格可能会在通知后发生变化",
+        billing: "订阅按周期提前计费",
+        refunds: "根据我们的退款政策提供退款",
+        cancellation: "您可以随时取消订阅",
+      },
+    },
+    disclaimer: {
+      title: "免责声明",
+      content: "我们的服务按'原样'提供，不提供任何形式的保证。我们不保证我们的服务将不间断、无错误，或使用我们平台的结果将满足您的期望或确保通过官方考试。",
+    },
+    limitation: {
+      title: "责任限制",
+      content: "在法律允许的最大范围内，Test My Russian 对因使用我们的服务而产生的任何间接、附带、特殊或后果性损害不承担责任。",
+    },
+    termination: {
+      title: "终止",
+      content: "我们保留因违反这些条款或出于任何其他原因随时暂停或终止您的账户的权利，由我们自行决定。",
+    },
+    governing: {
+      title: "适用法律",
+      content: "这些条款受俄罗斯联邦法律管辖。任何争议应在俄罗斯圣彼得堡的法院解决。",
+    },
+    changes: {
+      title: "条款变更",
+      content: "我们可能随时修改这些条款。变更后继续使用我们的服务即表示接受修改后的条款。",
+    },
+    contact: {
+      title: "联系信息",
+      content: "如对这些条款和条件有任何疑问，请联系我们：",
+      location: "Test My Russian",
+      city: "圣彼得堡",
+      country: "俄罗斯",
+    },
+  },
 };

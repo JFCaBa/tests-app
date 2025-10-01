@@ -36,6 +36,9 @@ import FlashcardGame from "./components/flashcard/FlashcardGame";
 import Sessions from "./components/tuition/Sessions";
 import { NotFound } from "./components/NotFound";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { Contact } from "./components/contact/Contact";
+import { PrivacyPolicy } from "./components/legal/PrivacyPolicy";
+import { TermsConditions } from "./components/legal/TermsConditions";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -143,6 +146,9 @@ const App = () => {
 
               {/* User Settings and Profile Routes */}
               <Route path="profile" element={withErrorBoundary(Profile)} />
+              <Route path="contact" element={withErrorBoundary(Contact)} />
+              <Route path="privacy" element={withErrorBoundary(PrivacyPolicy)} />
+              <Route path="terms" element={withErrorBoundary(TermsConditions)} />
               <Route
                 path="settings"
                 element={

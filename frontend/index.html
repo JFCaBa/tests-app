@@ -22,9 +22,13 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Master Russian language skills with Test My Russian - an interactive platform offering practice tests, tutoring, flashcards, and AI coaching for all proficiency levels." />
-    <meta name="keywords" content="Russian language, Russian tests, Russian tutoring, learn Russian, Russian practice, language learning" />
+    <meta name="keywords" content="Russian language, Russian tests, Russian tutoring, learn Russian, Russian practice, language learning, Saint Petersburg" />
     <meta name="author" content="Test My Russian" />
     <meta name="robots" content="index, follow" />
+    <meta name="geo.region" content="RU-SPE" />
+    <meta name="geo.placename" content="Saint Petersburg, Russia" />
+    <meta name="geo.position" content="59.9343;30.3351" />
+    <meta name="ICBM" content="59.9343, 30.3351" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -38,6 +42,45 @@
     <meta name="twitter:description" content="Interactive platform for Russian language learning with practice tests, tutoring, and AI coaching." />
 
     <title>Test My Russian - Master Russian Language Skills</title>
+
+    <!-- Structured Data for Geographic Affiliation -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Test My Russian",
+      "description": "Interactive platform for Russian language learning with practice tests, tutoring, and AI coaching",
+      "url": "https://testmyrussian.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Saint Petersburg",
+        "addressRegion": "Saint Petersburg",
+        "addressCountry": "RU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "59.9343",
+        "longitude": "30.3351"
+      },
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "Russia"
+        },
+        {
+          "@type": "Place",
+          "name": "Worldwide"
+        }
+      ],
+      "availableLanguage": ["ru", "en", "uz", "tg", "es", "hi", "ur", "zh"],
+      "inLanguage": ["ru", "en", "uz", "tg", "es", "hi", "ur", "zh"],
+      "educationalCredentialAwarded": "Russian Language Proficiency",
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "Russian language learners"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
