@@ -8,6 +8,21 @@ export const NotFound = () => {
   useEffect(() => {
     // Set document title for SEO
     document.title = "404 - Page Not Found | Test My Russian";
+
+    // Update meta description for 404 page
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute(
+        "content",
+        "Page not found. The page you're looking for doesn't exist or has been moved."
+      );
+    }
+
+    // Set proper status code indication for crawlers
+    const metaRobots = document.querySelector('meta[name="robots"]');
+    if (metaRobots) {
+      metaRobots.setAttribute("content", "noindex, follow");
+    }
   }, []);
 
   return (
