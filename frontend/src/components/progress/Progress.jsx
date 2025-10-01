@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { LearningTimeline } from "@/components/progress/LearningTimeline";
 import { RecentActivity } from "@/components/progress/RecentActivity";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 const calculatePercentage = (correct, total) => {
   if (!total) return 0;
@@ -289,6 +290,8 @@ export const Progress = () => {
       <div className="lg:col-span-2">
         <RecentActivity />
       </div>
+
+      <YandexAdBanner />
     </div>
   );
 };

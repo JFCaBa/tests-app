@@ -17,6 +17,7 @@ import {
   Cell,
 } from "recharts";
 import axios from "axios";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 const COLORS = [
   "#0088FE",
@@ -257,6 +258,8 @@ export const Statistics = () => {
           </CardContent>
         </Card>
       </div>
+
+      <YandexAdBanner />
     </div>
   );
 };

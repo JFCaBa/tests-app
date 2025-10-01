@@ -10,6 +10,7 @@ import {
   PenTool,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 const subjects = [
   {
@@ -87,6 +88,7 @@ export const SubjectSelection = () => {
           );
         })}
       </div>
+      <YandexAdBanner />
     </div>
   );
 };

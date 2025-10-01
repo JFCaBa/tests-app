@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useTranslation } from "react-i18next";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 const TYPING_SPEED = 25; // ms per character
 
@@ -191,7 +192,7 @@ const CoachChat = () => {
   const processedMessages = processMessages(messages);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-gray-50/80">
+    <div className="fixed inset-0 flex flex-col items-center justify-center p-4 bg-gray-50/80 overflow-auto">
       <Card className="w-full max-w-4xl h-[80vh] flex flex-col">
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -288,6 +289,10 @@ const CoachChat = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <div className="mt-4 w-full max-w-4xl">
+        <YandexAdBanner />
+      </div>
     </div>
   );
 };

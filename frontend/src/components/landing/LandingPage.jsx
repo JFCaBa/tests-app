@@ -17,6 +17,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -110,7 +111,7 @@ export const LandingPage = () => {
               <Button
                 size="lg"
                 className="bg-blue-500 hover:bg-blue-600"
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/login")}
               >
                 {t("landing.hero.getStarted")}
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -282,6 +283,11 @@ export const LandingPage = () => {
             </radialGradient>
           </defs>
         </svg>
+      </div>
+
+      {/* Ad Banner Section */}
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <YandexAdBanner />
       </div>
     </div>
   );

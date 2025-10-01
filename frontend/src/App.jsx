@@ -34,6 +34,7 @@ import TestStatistics from "./components/admin/TestStatistics";
 import ErrorBoundary from "./components/ErrorBoundary";
 import FlashcardGame from "./components/flashcard/FlashcardGame";
 import Sessions from "./components/tuition/Sessions";
+import { NotFound } from "./components/NotFound";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 // Protected Route Component
@@ -215,8 +216,8 @@ const App = () => {
               />
             </Route>
 
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" />} />
+            {/* Catch all - 404 Page */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </PayPalScriptProvider>

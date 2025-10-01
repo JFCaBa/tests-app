@@ -51,6 +51,14 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/tutors", tutorRoutes);
 app.use("/api/admin/sessions", sessionsRoutes);
 
+// 404 handler for API routes - must come after all API routes
+app.use("/api/*", (req, res) => {
+  res.status(404).json({
+    message: "API endpoint not found",
+    path: req.originalUrl
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   res.setHeader("Content-Type", "text/html; charset=UTF-8");

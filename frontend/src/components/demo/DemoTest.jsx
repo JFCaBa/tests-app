@@ -131,12 +131,12 @@ export const DemoTest = () => {
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle className="text-2xl">t("demo.welcome.title")</CardTitle>
-            <CardDescription>t("demo.welcome.subtitle")</CardDescription>
+            <CardTitle className="text-2xl">{t("demo.welcome.title")}</CardTitle>
+            <CardDescription>{t("demo.welcome.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-4">
-              <h3 className="font-semibold">t("demo.welcome.whatToExpect")</h3>
+              <h3 className="font-semibold">{t("demo.welcome.whatToExpect")}</h3>
               <ul className="list-disc pl-5 space-y-2">
                 <li>3 questions showcasing different subjects</li>
                 <li>Grammar</li>
@@ -157,7 +157,7 @@ export const DemoTest = () => {
         </Card>
         {/* Ad Banner Section */}
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          {/* <YandexAdBanner /> */}
+          <YandexAdBanner />
         </div>
       </div>
     );

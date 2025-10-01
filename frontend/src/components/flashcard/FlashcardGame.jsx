@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { useSettings } from "../../contexts/SettingsContext";
 import { useTranslation } from "react-i18next";
+import YandexAdBanner from "../ads/YandexAdBanner";
 
 const FlashcardGame = () => {
   const { settings } = useSettings();
@@ -280,6 +281,8 @@ const FlashcardGame = () => {
           <p className="text-gray-600">{t("flashcards.selectSubject")}</p>
         </div>
       )}
+
+      <YandexAdBanner />
     </div>
   );
 };

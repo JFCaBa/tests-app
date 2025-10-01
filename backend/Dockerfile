@@ -6,17 +6,17 @@ RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy source code
-COPY src/ ./src/
-COPY .env.example ./.env
+COPY backend/src/ ./src/
+COPY backend/.env.example ./.env
 
 # Copy startup script and uploads backup
-COPY start.sh .
+COPY backend/start.sh .
 COPY testmyrussian_uploads_20250928_082741.tar.gz /backup/
 
 # Make startup script executable

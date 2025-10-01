@@ -38,7 +38,7 @@ router.get(
       .select("-password")
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .sort({ createdAt: -1 });
+      .sort({ lastLogin: -1 });
 
     const count = await User.countDocuments(query);
 
