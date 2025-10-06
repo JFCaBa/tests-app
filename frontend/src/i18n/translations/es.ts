@@ -377,8 +377,8 @@ export default {
     },
     feedback: {
       correct: "¡Correcto!",
-      incorrect: "Incorrecto. La respuesta correcta era: {answer}",
-      timeUp: "¡Se acabó el tiempo! La respuesta correcta era: {answer}",
+      incorrect: "Incorrecto. La respuesta correcta era: {{answer}}",
+      timeUp: "¡Se acabó el tiempo! La respuesta correcta era: {{answer}}",
       explanation: "Explicación",
     },
     writing: {
@@ -464,7 +464,7 @@ export default {
       activities: "actividades",
     },
     timeFormat: {
-      hoursAgo: "Hace {hours} horas",
+      hoursAgo: "Hace {{hours}} horas",
     },
     achievements: {
       dedicatedLearner: {

@@ -445,7 +445,7 @@ export default {
           keep: "Keep practicing!",
           more: "More practice will help!",
         },
-        streak: "{streak} questions streak!",
+        streak: "{{streak}} questions streak!",
       },
       timeSpent: {
         title: "Time Spent",

@@ -375,8 +375,8 @@ export default {
     },
     feedback: {
       correct: "Дуруст!",
-      incorrect: "Нодуруст. Ҷавоби дуруст ин буд: {answer}",
-      timeUp: "Вақт тамом шуд! Ҷавоби дуруст ин буд: {answer}",
+      incorrect: "Нодуруст. Ҷавоби дуруст ин буд: {{answer}}",
+      timeUp: "Вақт тамом шуд! Ҷавоби дуруст ин буд: {{answer}}",
       explanation: "Тавзеҳ",
     },
     writing: {
@@ -446,7 +446,7 @@ export default {
           keep: "Идома диҳед!",
           more: "Машқи бештар кӯмак мекунад!",
         },
-        streak: "{streak} савол пайваста!",
+        streak: "{{streak}} савол пайваста!",
       },
       timeSpent: {
         title: "Вақти сарфшуда",
@@ -462,7 +462,7 @@ export default {
       activities: "фаъолиятҳо",
     },
     timeFormat: {
-      hoursAgo: "{hours} соат пеш",
+      hoursAgo: "{{hours}} соат пеш",
     },
     achievements: {
       dedicatedLearner: {

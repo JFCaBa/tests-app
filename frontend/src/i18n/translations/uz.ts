@@ -446,7 +446,7 @@ export default {
           keep: "Mashqdan davom eting!",
           more: "Ko'proq mashq yordam beradi!",
         },
-        streak: "{{streak}} savolga to'g'ri javob berdingiz!",
+        streak: "{{streak}} ta savol qatorli javob!",
       },
       timeSpent: {
         title: "Vaqt sarflandi",

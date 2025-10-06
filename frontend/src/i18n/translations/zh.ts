@@ -302,7 +302,7 @@ export default {
       questions: {
         label: "问题数量",
         placeholder: "选择问题数量",
-        count: "{问题数}",
+        count: "{{count}} 问题",
       },
     },
     modes: {
@@ -323,7 +323,7 @@ export default {
         name: "回顾以前",
         description: "回顾过去的会话中的问题",
       },
-      start: "开始 {{mode}",
+      start: "开始 {{mode}}",
     },
     back: "返回科目",
   },
@@ -418,7 +418,7 @@ export default {
           keep: "继续练习！",
           more: "更多练习会有帮助！",
         },
-        streak: "{streak} 题目连击！",
+        streak: "{{streak}} 题目连击！",
       },
       timeSpent: {
         title: "用时",

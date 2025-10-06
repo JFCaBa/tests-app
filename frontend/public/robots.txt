@@ -1,5 +1,6 @@
 # https://testmyrussian.com robots.txt
 
+# Default rules for all crawlers
 User-agent: *
 Allow: /
 Allow: /demo
@@ -20,8 +21,33 @@ Disallow: /statistics
 Disallow: /practice/summary
 Disallow: /practice/*/mode
 
-# Sitemap
-Sitemap: https://testmyrussian.com/sitemap.xml
-
 # Crawl-delay
 Crawl-delay: 10
+
+# Block specific AI crawlers
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# Sitemap
+Sitemap: https://testmyrussian.com/sitemap.xml
