@@ -115,7 +115,7 @@ export const DemoTest = () => {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
       // Show completion message or redirect
-      navigate("/landing");
+      navigate("/");
     }
   };
 
