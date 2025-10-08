@@ -89,9 +89,11 @@ const App = () => {
                 )
               }
             />
-            <Route path="/demo" element={withErrorBoundary(DemoTest)} />
             <Route path="/login" element={withErrorBoundary(LoginForm)} />
             <Route path="/register" element={withErrorBoundary(RegisterForm)} />
+            <Route path="/contact" element={withErrorBoundary(Contact)} />
+            <Route path="/privacy" element={withErrorBoundary(PrivacyPolicy)} />
+            <Route path="/terms" element={withErrorBoundary(TermsConditions)} />
 
             {/* Protected Routes */}
             <Route
@@ -143,9 +145,6 @@ const App = () => {
 
               {/* User Settings and Profile Routes */}
               <Route path="profile" element={withErrorBoundary(Profile)} />
-              <Route path="contact" element={withErrorBoundary(Contact)} />
-              <Route path="privacy" element={withErrorBoundary(PrivacyPolicy)} />
-              <Route path="terms" element={withErrorBoundary(TermsConditions)} />
               <Route
                 path="settings"
                 element={
