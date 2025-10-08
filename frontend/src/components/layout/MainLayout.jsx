@@ -1,7 +1,7 @@
-import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
+import PropTypes from "prop-types";
 import {
   LogOut,
   User,
@@ -26,8 +26,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import ConfirmDialog from "../common/ConfirmDialog";
-import { LoaderLg } from "@/components/ui/loader";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import TextTranslator from "../common/TextTranslator";
 
@@ -108,24 +106,28 @@ export const MainLayout = () => {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {user?.username}
+                        {user?.isTemporary ? "Guest" : user?.username}
                       </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
+                      {!user?.isTemporary && (
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      )}
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <User className="mr-2 h-4 w-4" />
-                    {t("menu.profile")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => navigate("/tuition/sessions")}
-                  >
-                    <GraduationCap className="mr-2 h-4 w-4" />
-                    {t("menu.sessions")}
-                  </DropdownMenuItem>
+                  {user?.isTemporary ? (
+                    <DropdownMenuItem onClick={() => navigate("/register")}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Sign Up</span>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <User className="mr-2 h-4 w-4" />
+                      {t("menu.profile")}
+                    </DropdownMenuItem>
+                  )}
+
                   <DropdownMenuItem onClick={() => navigate("/settings")}>
                     <Settings className="mr-2 h-4 w-4" />
                     {t("menu.settings")}
@@ -205,3 +207,9 @@ export const MainLayout = () => {
 };
 
 export default MainLayout;
+
+MainLayout.propTypes = {};
+
+
+
+

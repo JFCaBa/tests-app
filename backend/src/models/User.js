@@ -89,14 +89,19 @@ const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: [true, "Username is required"],
+      required: function () {
+        return !this.isTemporary;
+      },
       unique: true,
       trim: true,
       minlength: [3, "Username must be at least 3 characters long"],
+      sparse: true,
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: function () {
+        return !this.isTemporary;
+      },
       unique: true,
       trim: true,
       lowercase: true,
@@ -104,11 +109,18 @@ const UserSchema = new mongoose.Schema(
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         "Please enter a valid email",
       ],
+      sparse: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function () {
+        return !this.isTemporary;
+      },
       minlength: [6, "Password must be at least 6 characters long"],
+    },
+    isTemporary: {
+      type: Boolean,
+      default: false,
     },
     role: {
       type: String,

@@ -88,6 +88,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginAsGuest = async () => {
+    try {
+      const response = await axios.post("/auth/guest");
+      const { token: newToken, user: userData } = response.data;
+
+      localStorage.setItem("token", newToken);
+      setToken(newToken);
+      setUser(userData);
+
+      return userData;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Guest login failed");
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
@@ -114,6 +129,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    loginAsGuest,
     logout,
     updateProfile,
     isAuthenticated: !!token,

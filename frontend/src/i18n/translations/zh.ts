@@ -6,7 +6,7 @@ export default {
       description:
         "您全面的备考平台，适用于工作许可、临时居留和永久居留考试。使用真实的考试题目进行练习，并跟踪您的进度。",
       getStarted: "立即开始",
-      tryDemo: "尝试演示测试",
+      tryDemo: "以访客身份进入",
       newPlatform: "新平台发布",
     },
     stats: {

@@ -6,7 +6,7 @@ export default {
       description:
         "Ish ruxsatnomasi, vaqtincha yashash va doimiy yashash testlariga tayyorlanish uchun to'liq platforma. Haqiqiy imtihonga o'xshash savollar bilan mashq qiling va o'z rivojlashingizni kuzating.",
       getStarted: "Boshlash",
-      tryDemo: "Demo Testni Sinab Ko'ring",
+      tryDemo: "Mehmon sifatida kiring",
       newPlatform: "Yangi Platforma Ishga Tushirildi",
     },
     stats: {

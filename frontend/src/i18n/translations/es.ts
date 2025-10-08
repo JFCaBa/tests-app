@@ -6,7 +6,7 @@ export default {
       description:
         "Tu plataforma integral de preparación para pruebas de permiso de trabajo, residencia temporal y residencia permanente. Practica con preguntas similares a las reales y sigue tu progreso.",
       getStarted: "Comenzar",
-      tryDemo: "Probar Test Demo",
+      tryDemo: "Entrar como invitado",
       newPlatform: "Lanzamiento de Nueva Plataforma",
     },
     stats: {
@@ -237,7 +237,7 @@ export default {
     noDataAvailable: "No hay datos disponibles",
   },
   coach: {
-    askQuestion: "Pregunta a tu entrenador...",
+    askQuestion: "Haz una pregunta...",
     selectSubject: "Selecciona una asignatura primero",
     selectSubjectToStart:
       "Selecciona una asignatura y haz preguntas sobre la preparación para el examen",
@@ -245,10 +245,11 @@ export default {
     suggestions: "Sugerencias",
     cleanMessages: "Limpiar Mensajes",
     confirmClean:
-      "Esto eliminará todos los mensajes del chat. Esta acción no se puede deshacer.",
+      "¿Estás seguro de que quieres eliminar todos los mensajes de este tema?",
     troubleResponding:
       "Tengo problemas para responder en este momento. Por favor, intenta de nuevo.",
     cleaning: "Limpiando...",
+    studyCoach: "Entrenador de Estudio",
   },
   flashcards: {
     flip: "Voltear",
@@ -302,7 +303,8 @@ export default {
     joinSession: "Unirse a la sesión",
     bookNewSession: "Reservar nueva sesión",
     bookYourFirstSession: "Reserva tu primera sesión",
-    upcomming: "Próximas",
+    upcoming: "Próximas",
+    unknownTutor: "Tutor Desconocido",
     past: "Pasadas",
     noSessionsFound: "No Hay Sessiones",
   },

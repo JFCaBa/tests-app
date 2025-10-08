@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 import { User } from "../models/index.js";
 import { auth, validation, errors } from "../middleware/index.js";
+import { validationResult } from "express-validator";
 const { asyncHandler } = errors;
 
 const router = express.Router();
@@ -13,10 +14,47 @@ const router = express.Router();
 // @access  Public
 router.post(
   "/register",
-  validation.rules.user.register,
-  validation.validate,
+  auth.optional,
   asyncHandler(async (req, res) => {
+    const isTemporaryUser = req.user && req.user.isTemporary;
+    const validationRules = isTemporaryUser
+      ? validation.rules.user.convert
+      : validation.rules.user.register;
+
+    await Promise.all(validationRules.map(validation => validation.run(req)));
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { username, email, password } = req.body;
+
+    if (isTemporaryUser) {
+      // Convert temporary user to permanent
+      const user = req.user;
+      user.username = username;
+      user.email = email;
+      user.password = password;
+      user.isTemporary = false;
+      await user.save();
+
+      // Generate token
+      const token = jwt.sign({ userId: user._id }, config.jwtSecret, {
+        expiresIn: "120d",
+      });
+
+      return res.status(200).json({
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          preferences: user.preferences,
+        },
+      });
+    }
 
     // Check if user already exists
     const userExists = await User.findOne({ $or: [{ email }, { username }] });
@@ -87,6 +125,35 @@ router.post(
         role: user.role,
         preferences: user.preferences,
         lastLogin: user.lastLogin,
+      },
+    });
+  })
+);
+
+// @route   POST /api/auth/guest
+// @desc    Create a temporary guest user
+// @access  Public
+router.post(
+  "/guest",
+  asyncHandler(async (req, res) => {
+    // Create user
+    const user = await User.create({
+      isTemporary: true,
+    });
+
+    // Generate token
+    const token = jwt.sign({ userId: user._id }, config.jwtSecret, {
+      expiresIn: "120d",
+    });
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        preferences: user.preferences,
       },
     });
   })

@@ -6,7 +6,7 @@ export default {
       description:
         "Your comprehensive preparation platform for working permission, temporary residence, and permanent residence tests. Practice with real exam-like questions and track your progress.",
       getStarted: "Get Started",
-      tryDemo: "Try Demo Test",
+      tryDemo: "Enter as a Guest",
       newPlatform: "New Platform Launch",
     },
     stats: {

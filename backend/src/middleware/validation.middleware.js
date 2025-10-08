@@ -35,6 +35,21 @@ export const userValidationRules = {
     body("email").trim().isEmail().withMessage("Must be a valid email address"),
     body("password").notEmpty().withMessage("Password is required"),
   ],
+  convert: [
+    body("username")
+      .trim()
+      .isLength({ min: 3 })
+      .withMessage("Username must be at least 3 characters long")
+      .matches(/^[a-zA-Z0-9_]+$/)
+      .withMessage(
+        "Username can only contain letters, numbers and underscores"
+      ),
+    body("email")
+      .trim()
+      .isEmail()
+      .withMessage("Must be a valid email address")
+      .normalizeEmail(),
+  ],
 };
 
 // Question validation rules

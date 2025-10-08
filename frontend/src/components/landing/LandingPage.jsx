@@ -1,6 +1,7 @@
-import React from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import PropTypes from "prop-types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,9 +20,18 @@ import {
 } from "lucide-react";
 import YandexAdBanner from "../ads/YandexAdBanner";
 
+import { useAuth } from "@/contexts/AuthContext";
+
 export const LandingPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { loginAsGuest, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/tests");
+    }
+  }, [isAuthenticated, navigate]);
 
   const permitTypes = [
     {
@@ -120,7 +130,10 @@ export const LandingPage = () => {
                 variant="outline"
                 size="lg"
                 className="text-black hover:text-white border-white/20 hover:bg-white/10"
-                onClick={() => navigate("/demo")}
+                onClick={async () => {
+                  await loginAsGuest();
+                  navigate("/tests");
+                }}
               >
                 {t("landing.hero.tryDemo")}
               </Button>
@@ -294,3 +307,6 @@ export const LandingPage = () => {
 };
 
 export default LandingPage;
+
+LandingPage.propTypes = {};
+
