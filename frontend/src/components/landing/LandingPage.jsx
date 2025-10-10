@@ -21,6 +21,7 @@ import {
 import YandexAdBanner from "../ads/YandexAdBanner";
 
 import { useAuth } from "@/contexts/AuthContext";
+import SEOHead from "../SEOHead";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export const LandingPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/tests");
+      navigate("/subjects");
     }
   }, [isAuthenticated, navigate]);
 
@@ -99,9 +100,14 @@ export const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gray-900 py-24 sm:py-32">
+    <>
+      <SEOHead 
+        title="Test My Russian - Master Russian Language Skills" 
+        description="Interactive platform for Russian language learning with practice tests, tutoring, and AI coaching." 
+      />
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gray-900 py-24 sm:py-32">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:mx-0">
@@ -132,7 +138,7 @@ export const LandingPage = () => {
                 className="text-black hover:text-white border-white/20 hover:bg-white/10"
                 onClick={async () => {
                   await loginAsGuest();
-                  navigate("/tests");
+                  navigate("/subjects");
                 }}
               >
                 {t("landing.hero.tryDemo")}
@@ -303,6 +309,7 @@ export const LandingPage = () => {
         <YandexAdBanner />
       </div>
     </div>
+  </>
   );
 };
 

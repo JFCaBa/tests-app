@@ -136,8 +136,11 @@ router.post(
 router.post(
   "/guest",
   asyncHandler(async (req, res) => {
-    // Create user
+    // Create guest user with a generated username
+    const guestUsername = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
     const user = await User.create({
+      username: guestUsername,
       isTemporary: true,
     });
 

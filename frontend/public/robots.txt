@@ -11,6 +11,10 @@ Allow: /practice/history
 Allow: /practice/laws
 Allow: /practice/reading
 Allow: /practice/writing
+Allow: /tuition
+Allow: /coach
+Allow: /flashcards
+Allow: /subscription
 
 # Disallow admin and private routes
 Disallow: /admin/
@@ -20,6 +24,7 @@ Disallow: /progress
 Disallow: /statistics
 Disallow: /practice/summary
 Disallow: /practice/*/mode
+Disallow: /admin/*
 
 # Crawl-delay
 Crawl-delay: 10
