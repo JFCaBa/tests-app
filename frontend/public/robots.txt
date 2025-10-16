@@ -24,7 +24,6 @@ Disallow: /progress
 Disallow: /statistics
 Disallow: /practice/summary
 Disallow: /practice/*/mode
-Disallow: /admin/*
 
 # Crawl-delay
 Crawl-delay: 10
@@ -45,10 +44,10 @@ Disallow: /
 User-agent: ClaudeBot
 Disallow: /
 
-User-agent: Google-Extended
+User-agent: GPTBot
 Disallow: /
 
-User-agent: GPTBot
+User-agent: Google-Extended
 Disallow: /
 
 User-agent: meta-externalagent
