@@ -85,12 +85,6 @@ export const NotFound = () => {
         <p className="text-gray-600 mb-8">
           Sorry, the page you're looking for doesn't exist or has been moved.
         </p>
-        <Link
-          to={isAuthenticated ? "/subjects" : "/"}
-          className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-        >
-          {isAuthenticated ? "Go to Subjects" : "Go to Home"}
-        </Link>
       </div>
     </div>
   );
