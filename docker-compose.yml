@@ -1,5 +1,7 @@
 version: '3.8'
 
+name: testmyrussian
+
 services:
   backend:
     build:
@@ -12,7 +14,7 @@ services:
       - "1999:3000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:password@test-app-mongodb:27017/test-app?authSource=admin
+      - MONGODB_URI=mongodb://admin:password@russian-mongodb:27017/test-app?authSource=admin
       - JWT_SECRET=supersecretjwtkeychangeme
       - CORS_ORIGIN=*
       - UPLOAD_PATH=/app/uploads
@@ -20,7 +22,6 @@ services:
       - uploads:/app/uploads
     networks:
       - app-network
-      - repo_app-network
     command: ["npm", "run", "start"]
 
   frontend:
@@ -43,7 +44,5 @@ volumes:
 
 networks:
   app-network:
-    name: russian-app-network
-    driver: bridge
-  repo_app-network:
     external: true
+    name: russian-app-network

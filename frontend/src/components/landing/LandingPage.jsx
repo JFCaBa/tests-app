@@ -304,6 +304,24 @@ export const LandingPage = () => {
         </svg>
       </div>
 
+      {/* Contextual Links Section */}
+      <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center">
+          <p className="text-gray-700">
+            Planning to visit Russia or other countries?{" "}
+            <a
+              href="https://localguideapp.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 font-semibold underline"
+            >
+              Discover LocalGuideApp
+            </a>
+            {" "}— AI-powered tours and local guides worldwide.
+          </p>
+        </div>
+      </div>
+
       {/* Ad Banner Section */}
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <YandexAdBanner />

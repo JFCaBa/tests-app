@@ -174,6 +174,31 @@ export const MainLayout = () => {
       {/* Footer */}
       <footer className="bg-white border-t mt-auto py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Network Links Section */}
+          <div className="mb-6 border-b pb-6">
+            <h4 className="text-sm font-semibold text-gray-900 mb-3">Our Projects</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="https://testmydele.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  TestMyDELE
+                </a>
+                {" "}&mdash; Prepare for Spanish DELE certification.
+              </li>
+              <li>
+                <a href="https://localguideapp.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  LocalGuideApp
+                </a>
+                {" "}&mdash; Discover cities with AI-powered tours.
+              </li>
+              <li>
+                <a href="https://mt4-vps.com" target="_blank" rel="nofollow noopener noreferrer" className="hover:text-primary transition-colors">
+                  MT4-VPS
+                </a>
+                {" "}&mdash; Secure VPS hosting for traders.
+              </li>
+            </ul>
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-500">
               © {new Date().getFullYear()} Test My Russian. {t("footer.rights")}
