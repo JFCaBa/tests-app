@@ -41,3 +41,8 @@ yarn-error.log*
 # backup files
 testmyrussian_dump_*.tar.gz
 testmyrussian_uploads_*.tar.gz
+
+# Extracted backup files
+audio/
+images/
+*.tar.gz
