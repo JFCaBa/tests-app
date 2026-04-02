@@ -196,6 +196,12 @@ export const MainLayout = () => {
                 </a>
                 {" "}&mdash; Secure VPS hosting for traders.
               </li>
+              <li>
+                <a href="https://myairports.online" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  MyAirports
+                </a>
+                {" "}&mdash; Airport information and travel resources.
+              </li>
             </ul>
           </div>
 
