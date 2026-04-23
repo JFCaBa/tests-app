@@ -143,6 +143,14 @@ export const LandingPage = () => {
               >
                 {t("landing.hero.tryDemo")}
               </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-black hover:text-white border-white/20 hover:bg-white/10"
+                onClick={() => navigate("/blog")}
+              >
+                Blog
+              </Button>
             </div>
           </div>
         </div>

@@ -41,6 +41,7 @@ import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { Contact } from "./components/contact/Contact";
 import { PrivacyPolicy } from "./components/legal/PrivacyPolicy";
 import { TermsConditions } from "./components/legal/TermsConditions";
+import BlogPage from "./components/blog/BlogPage";
 
 
 
@@ -80,6 +81,8 @@ const App = () => {
               <Route path="/contact" element={withErrorBoundary(Contact)} />
               <Route path="/privacy" element={withErrorBoundary(PrivacyPolicy)} />
               <Route path="/terms" element={withErrorBoundary(TermsConditions)} />
+              <Route path="/blog" element={withErrorBoundary(BlogPage)} />
+              <Route path="/blog/*" element={withErrorBoundary(BlogPage)} />
 
               {/* Protected Routes */}
               <Route
@@ -94,6 +97,7 @@ const App = () => {
                   path="subjects"
                   element={withErrorBoundary(SubjectSelection)}
                 />
+              <Route path="practice" element={<Navigate to="/subjects" replace />} />
                 <Route
                   path="practice/summary"
                   element={withErrorBoundary(TestSummary)}

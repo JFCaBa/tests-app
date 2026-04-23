@@ -17,7 +17,6 @@ COPY backend/.env.example ./.env
 
 # Copy startup script and uploads backup
 COPY backend/start.sh .
-COPY testmyrussian_uploads_20250928_082741.tar.gz /backup/
 
 # Make startup script executable
 RUN chmod +x start.sh
